@@ -26,9 +26,8 @@ int main()
 }
 
 
-//////////////////////////////
 // NOTE: For portability it is recommended to use fork or pthreads.
-// Fork is used to prevent child process errors
+// Fork is preferred to prevent child process errors
 // from affecting the parent process.
 
 

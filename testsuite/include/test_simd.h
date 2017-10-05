@@ -16,7 +16,7 @@ int test_simd_merge_lo();
 int test_simd_merge_hi();
 
 
-#endif // SIMD_MODE
+#endif  // SIMD_MODE
 
 
 #endif  // _TEST_SIMD_H

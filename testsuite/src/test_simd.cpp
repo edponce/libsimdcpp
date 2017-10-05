@@ -512,5 +512,5 @@ int test_simd_merge_hi()
 }
 
 
-#endif // SIMD_MODE
+#endif  // SIMD_MODE
 

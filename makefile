@@ -5,42 +5,32 @@
 # Get name of makefile
 MKFILE := $(MAKEFILE_LIST)
 
-# C compiler
-CC := g++
-#CC := icpc
+# C++ compiler
+CXX := g++
+#CXX := icpc
 
-# GNU compiler and linker options
-# -mmx, -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2, -msse4 = SIMD extensions
-# -mavx, -mavx2, -mavx512bw, -mavx512f, -mavx512pf, -mavx512er, -mavx512cd = SIMD extensions
-# -fopenmp, -fopenmp-simd = enable OpenMP
+# GNU/Intel SIMD extensions
+# -mmx, -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2, -msse4
+# -mavx, -mavx2, -mavx512bw, -mavx512f, -mavx512pf, -mavx512er, -mavx512cd
 #SIMDFLAG := -msse4.1
 #SIMDFLAG := -mavx2
-CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -march=native -std=c++11 -funroll-loops
-#CFLAGS += -fopenmp
 
-# INTEL compiler and linker options
-#CFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -march=native -std=c++11 -funroll-loops
-#CFLAGS += -openmp
+# GNU compiler and linker options
+CXXFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -march=native -std=c++98 -funroll-loops
+
+# Intel compiler and linker options
+#CXXFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -march=native -std=c++98 -funroll-loops
 
 # Linker options
 LFLAGS :=
 
 # Preprocessor definitions
-# -DSIMD_MODE, -DAVX512BW_VEC, -DAVX2_VEC, -DSSE4_1_VEC = enabled SIMD modes
-# -DDEBUG = enable debugging
-#
-# -D_GNU_SOURCE = feature test macro (POSIX C and ISOC99)
-# -D_POSIX_C_SOURCE=200112L
-#
-# -DOMP_NUM_THREADS=x = number of OpenMP threads
-# -DOMP_NESTED=TRUE = enables nested parallelism
-# -DOMP_PROC_BIND=TRUE = thread/processor affinity
-# -DOMP_STACKSIZE=8M = stack size for non-master threads
+# SIMD modes: -DSIMD_MODE, -DSSE4_1_VEC, -DAVX2_VEC, -DAVX512BW_VEC
+# -DDEBUG
 DEFINES := -DSIMD_MODE   # auto SIMD mode
-#DEFINES := -DSSE4_1_VEC
-#DEFINES := -DAVX2_VEC
+#DEFINES := -DSSE4_1_VEC  # SSE4.1 SIMD mode
+#DEFINES := -DAVX2_VEC    # AVX2 SIMD mode
 #DEFINES := -DAVX512_VEC  # AVX512BW SIMD mode
-#DEFINES += -DOMP_PROC_BIND=TRUE -DOMP_NUM_THREADS=4
 DEFINES += -D_POSIX_C_SOURCE=200112L
 
 # Define header paths in addition to standard paths
@@ -53,7 +43,6 @@ LIBDIR :=
 LIBS := -lm
 
 # Header files
-# NOTE: allow recompile if changed
 HEADERS := include/*.h testsuite/include/*.h
 
 # Testsuite
@@ -71,11 +60,11 @@ DRIVER := $(TOPDIR)/src/test_suite.cpp
 all: testsuite
 
 testsuite : $(OBJ) $(DRIVER)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(DRIVER) -o $(TOPDIR)/$@ $(OBJ) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(DRIVER) -o $(TOPDIR)/$@ $(OBJ) $(LIBS)
 
-$(OBJDIR)/%.o: $(TOPDIR)/src/%.cpp $(HEADERS)
+$(OBJDIR)/%.o: $(TOPDIR)/src/%.cpp $(HEADERS) $(MKFILE)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
-	$(CC) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
+	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
 	@test -x $(TOPDIR)/testsuite && rm $(TOPDIR)/testsuite || true
