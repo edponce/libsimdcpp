@@ -1,6 +1,6 @@
 Intel Intrinsics SIMD C++ library
 
-A C interface for Intel SIMD intrinsics. This interface
+A C++ interface for Intel SIMD intrinsics. This interface
 allows applications to easily and systematically access the available vector technologies.
 
 General requirements:
