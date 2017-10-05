@@ -15,7 +15,6 @@
 #include <x86intrin.h>
 //#include <immintrin.h>
 
-
 /*
  *  AVX2 256-bit wide vector units
  *  Define constants required for SIMD module to function properly.
@@ -187,6 +186,7 @@ SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
  *  Shift left (logical) packed 32/64-bit integers
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
+//SIMD_INT simd_sll_32(const SIMD_INT va, const int shft)
 SIMD_INT simd_sll_32(const SIMD_INT va, const int shft)
 { return _mm256_slli_epi32(va, shft); }
 

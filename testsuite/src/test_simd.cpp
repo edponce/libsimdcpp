@@ -512,5 +512,37 @@ int test_simd_merge_hi()
 }
 
 
+// Broadcast 32-bit integers to all elements
+int test_simd_set_32()
+{
+    int test_result = 0;
+    const int alignment = SIMD_WIDTH_BYTES;
+
+    // Integer
+    {
+        const int num_elems = SIMD_STREAMS_32;
+        const TEST_TYPES test_type = TEST_I32;
+        int *arr_A = NULL, *arr_B = NULL;
+        const int32_t val = (rand() % (RAND_MAX-1) + 1) - RAND_MAX/2;
+
+        create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_B, num_elems, alignment);
+
+        SIMD_INT va = simd_set(val);
+
+        for (int i = 0; i < num_elems; ++i)
+            arr_B[i] = val;
+
+        simd_store(arr_A, va);
+        test_result += validate_test_arrays(test_type, (void *)arr_A, (void *)arr_B, num_elems);
+
+        free(arr_A);
+        free(arr_B);
+    }
+
+    return test_result;
+}
+
+
 #endif  // SIMD_MODE
 

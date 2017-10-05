@@ -14,6 +14,7 @@ int test_simd_cvt_i32_fp();
 int test_simd_cvt_u64_fp();
 int test_simd_merge_lo();
 int test_simd_merge_hi();
+int test_simd_set_32();
 
 
 #endif  // SIMD_MODE

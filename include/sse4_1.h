@@ -15,6 +15,7 @@
 #include <x86intrin.h>
 //#include <smmintrin.h>
 
+#include <stdint.h>
 
 /*
  *  SSE4.1 128-bit wide vector units
@@ -296,7 +297,7 @@ void simd_set_zero(SIMD_DBL * const va)
  *  Set 32-bit integers to either 32/64 slots.
  */
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__
-SIMD_INT simd_set(const int sa)
+SIMD_INT simd_set(const int32_t sa)
 { return _mm_set1_epi32(sa); }
 
 __SIMD_FUN_ATTR__ __SIMD_FUN_PREFIX__

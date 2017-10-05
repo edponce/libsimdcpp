@@ -24,7 +24,8 @@ struct TEST_T TESTS[] =
     { test_simd_cvt_i32_fp, "Convert 32-bit integers to 32/64-bit floating-point" },
     { test_simd_cvt_u64_fp, "Convert unsigned 64-bit integers to 32/64-bit floating-point" },
     { test_simd_merge_lo, "Merge low parts from pair of registers" },
-    { test_simd_merge_hi, "Merge high parts from pair of registers" }
+    { test_simd_merge_hi, "Merge high parts from pair of registers" },
+    { test_simd_set_32, "Broadcast 32-bit integers to all elements" }
 };
 
 

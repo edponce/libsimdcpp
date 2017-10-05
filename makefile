@@ -25,13 +25,13 @@ CXXFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused
 LFLAGS :=
 
 # Preprocessor definitions
-# SIMD modes: -DSIMD_MODE, -DSSE4_1_VEC, -DAVX2_VEC, -DAVX512BW_VEC
+# SIMD modes: -DSIMD_MODE (auto), -DSSE4_1_VEC, -DAVX2_VEC, -DAVX512BW_VEC
 # -DDEBUG
-DEFINES := -DSIMD_MODE   # auto SIMD mode
-#DEFINES := -DSSE4_1_VEC  # SSE4.1 SIMD mode
-#DEFINES := -DAVX2_VEC    # AVX2 SIMD mode
-#DEFINES := -DAVX512_VEC  # AVX512BW SIMD mode
-DEFINES += -D_POSIX_C_SOURCE=200112L
+DEFINES := -DSIMD_MODE
+#DEFINES := -DSSE4_1_VEC
+#DEFINES := -DAVX2_VEC
+#DEFINES := -DAVX512_VEC
+DEFINES += -D_POSIX_C_SOURCE=200112L -D_ISOC99_SOURCE
 
 # Define header paths in addition to standard paths
 INCDIR := -Iinclude -Itestsuite/include
