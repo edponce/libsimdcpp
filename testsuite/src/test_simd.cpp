@@ -523,7 +523,7 @@ int test_simd_set_32()
         const int num_elems = SIMD_STREAMS_32;
         const TEST_TYPES test_type = TEST_I32;
         int *arr_A = NULL, *arr_B = NULL;
-        const int32_t val = (rand() % (RAND_MAX-1) + 1) - RAND_MAX/2;
+        const int val = (rand() % (RAND_MAX-1) + 1) - RAND_MAX/2;
 
         create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
         create_test_array(test_type, (void **)&arr_B, num_elems, alignment);

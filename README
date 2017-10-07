@@ -6,6 +6,8 @@ allows applications to easily and systematically access the available vector tec
 General requirements:
     GNU compilers, require 4.8 or greater for __builtin_cpu_supports()
     C++98 - function overloading
+    _POSIX_C_SOURCE>=200112L
+    _ISOC99_SOURCE
 
 SIMD requirements:
     SSE - at least SSE4.1 for _mm_mullo_epi32() and _mm_mul_epi32()

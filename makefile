@@ -12,14 +12,14 @@ CXX := g++
 # GNU/Intel SIMD extensions
 # -mmx, -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2, -msse4
 # -mavx, -mavx2, -mavx512bw, -mavx512f, -mavx512pf, -mavx512er, -mavx512cd
-#SIMDFLAG := -msse4.1
-#SIMDFLAG := -mavx2
+#SIMDFLAGS := -msse4.1
+#SIMDFLAGS := -mavx2
 
 # GNU compiler and linker options
-CXXFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -march=native -std=c++98 -funroll-loops
+CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
 
 # Intel compiler and linker options
-#CXXFLAGS := $(SIMDFLAG) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -march=native -std=c++98 -funroll-loops
+#CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
 
 # Linker options
 LFLAGS :=
@@ -51,15 +51,16 @@ OBJDIR := $(TOPDIR)/obj
 SRC := $(TOPDIR)/src/test_simd.cpp $(TOPDIR)/src/test_utils.cpp
 OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 DRIVER := $(TOPDIR)/src/test_suite.cpp
+TEST_EXE := testsuite
 
 #######################################
 
 # Targets that are not real files
 .PHONY: all clean
 
-all: testsuite
+all: $(TEST_EXE)
 
-testsuite : $(OBJ) $(DRIVER)
+$(TEST_EXE): $(OBJ) $(DRIVER)
 	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(DRIVER) -o $(TOPDIR)/$@ $(OBJ) $(LIBS)
 
 $(OBJDIR)/%.o: $(TOPDIR)/src/%.cpp $(HEADERS) $(MKFILE)
@@ -67,6 +68,6 @@ $(OBJDIR)/%.o: $(TOPDIR)/src/%.cpp $(HEADERS) $(MKFILE)
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
-	@test -x $(TOPDIR)/testsuite && rm $(TOPDIR)/testsuite || true
+	@test -x $(TOPDIR)/$(TEST_EXE) && rm $(TOPDIR)/$(TEST_EXE) || true
 	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
 

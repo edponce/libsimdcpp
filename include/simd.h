@@ -8,16 +8,17 @@
  */
 #if defined(SIMD_MODE)
     #undef SIMD_MODE
-    #undef AVX512_VEC
-    #undef AVX2_VEC
     #undef SSE4_1_VEC
-# if defined(__AVX512BW__)
-    #define AVX512_VEC
-# elif defined(__AVX2__)
-    #define AVX2_VEC
-# elif defined(__SSE4_1__)
-    #define SSE4_1_VEC
-# endif
+    #undef AVX2_VEC
+    #undef AVX512_VEC
+
+    #if defined(__AVX512BW__)
+        #define AVX512_VEC
+    #elif defined(__AVX2__)
+        #define AVX2_VEC
+    #elif defined(__SSE4_1__)
+        #define SSE4_1_VEC
+    #endif
 #endif
 
 
@@ -56,7 +57,6 @@
 #define __SIMD_ALIGN__             ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES)
 #define __SIMD_ASSUME_ALIGNED__(a) ARCH_ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
 #define __SIMD_ASSUME__(a)         ARCH_ASSUME(a)
-#define __SIMD_INLINE__            ARCH_ATTR_INLINE
 
 
 #endif  // _SIMD_H
