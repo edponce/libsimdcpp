@@ -53,9 +53,12 @@
  *  General form of macros provided by compiler/architecture settings.
  *  Use SIMD_WIDTH_BYTES provided by SIMD modules.
  */
-#define __SIMD_ALIGN__             SIMD_ATTR_ALIGNED(SIMD_WIDTH_BYTES)
+#define __SIMD_ALIGN__ SIMD_ALIGNED(SIMD_WIDTH_BYTES)
 #define __SIMD_ASSUME_ALIGNED__(a) SIMD_ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
-#define __SIMD_ASSUME__(a)         SIMD_ASSUME(a)
+#define __SIMD_FUNC_ASSUME_ALIGNED__ SIMD_FUNC_ASSUME_ALIGNED(SIMD_WIDTH_BYTES)
+#define __SIMD_ASSUME__(a) SIMD_ASSUME(a)
+#define __SIMD_FUNC_INLINE__ SIMD_FUNC_INLINE
+#define __SIMD_PREFETCH__(a,x) SIMD_PREFETCH(a,x)
 
 
 #endif  // _SIMD_H

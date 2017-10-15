@@ -8,6 +8,7 @@ MKFILE := $(MAKEFILE_LIST)
 # C++ compiler
 CXX := g++
 #CXX := icpc
+#CXX := clang++-4.0
 
 # GNU/Intel SIMD extensions
 # -mmx, -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2, -msse4

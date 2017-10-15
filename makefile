@@ -8,6 +8,7 @@ MKFILE := $(MAKEFILE_LIST)
 # C++ compiler
 CXX := g++
 #CXX := icpc
+#CXX := clang++-4.0
 
 # GNU/Intel SIMD extensions
 # -mmx, -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2, -msse4
@@ -40,7 +41,7 @@ INCDIR := -Iinclude
 LIBDIR :=
 
 # Define libraries to link into executable
-LIBS := -lm
+LIBS := #-lm
 
 # Header files
 HEADERS := include/*.h
@@ -74,14 +75,14 @@ clean:
 	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
 
 # Tests
-testsuite: $(HEADERS) $(MKFILE)
+testsuite: $(OBJ) $(HEADERS) $(MKFILE)
 	cd $(TESTDIR) && $(MAKE)
 
 clean_tests:
 	cd $(TESTDIR) && $(MAKE) clean
 
 # Examples
-examples: $(HEADERS) $(MKFILE)
+examples: $(OBJ) $(HEADERS) $(MKFILE)
 	cd $(EXAMPLEDIR) && $(MAKE)
 
 clean_examples:
