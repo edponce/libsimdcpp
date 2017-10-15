@@ -37,6 +37,11 @@
     #define SIMD_MODE
     #include "sse4_1.h"
 #else
+    /*
+     *  Compiler and architecture specific settings
+     */
+    #include "compiler.h"
+
     // Disable SIMD for scalar mode
     #define SIMD_WIDTH_BYTES 8
     #define SIMD_STREAMS_32  1
@@ -45,18 +50,12 @@
 
 
 /*
- *  Compiler and architecture specific settings
- */
-#include "arch.h"
-
-
-/*
  *  General form of macros provided by compiler/architecture settings.
  *  Use SIMD_WIDTH_BYTES provided by SIMD modules.
  */
-#define __SIMD_ALIGN__             ARCH_ATTR_ALIGNED(SIMD_WIDTH_BYTES)
-#define __SIMD_ASSUME_ALIGNED__(a) ARCH_ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
-#define __SIMD_ASSUME__(a)         ARCH_ASSUME(a)
+#define __SIMD_ALIGN__             SIMD_ATTR_ALIGNED(SIMD_WIDTH_BYTES)
+#define __SIMD_ASSUME_ALIGNED__(a) SIMD_ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
+#define __SIMD_ASSUME__(a)         SIMD_ASSUME(a)
 
 
 #endif  // _SIMD_H

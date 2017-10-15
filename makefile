@@ -34,7 +34,7 @@ DEFINES := -DSIMD_MODE
 DEFINES += -D_POSIX_C_SOURCE=200112L -D_ISOC99_SOURCE
 
 # Define header paths in addition to standard paths
-INCDIR := -Iinclude -Itestsuite/include
+INCDIR := -Iinclude
 
 # Define library paths in addition to standard paths
 LIBDIR :=
@@ -43,31 +43,49 @@ LIBDIR :=
 LIBS := -lm
 
 # Header files
-HEADERS := include/*.h testsuite/include/*.h
+HEADERS := include/*.h
+
+# SIMD library
+OBJDIR := obj
+SRC := src/environ.cpp
+OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 
 # Testsuite
-TOPDIR := testsuite
-OBJDIR := $(TOPDIR)/obj
-SRC := $(TOPDIR)/src/test_simd.cpp $(TOPDIR)/src/test_utils.cpp
-OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
-DRIVER := $(TOPDIR)/src/test_suite.cpp
-TEST_EXE := testsuite
+TESTDIR := testsuite
+
+# Examples
+EXAMPLEDIR := examples
 
 #######################################
 
 # Targets that are not real files
-.PHONY: all clean
+.PHONY: all clean simd clean_tests clean_examples clean_all
 
-all: $(TEST_EXE)
+all: simd testsuite examples
 
-$(TEST_EXE): $(OBJ) $(DRIVER)
-	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $(DRIVER) -o $(TOPDIR)/$@ $(OBJ) $(LIBS)
+# SIMD library
+simd: $(OBJ)
 
-$(OBJDIR)/%.o: $(TOPDIR)/src/%.cpp $(HEADERS) $(MKFILE)
+$(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MKFILE)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
-	@test -x $(TOPDIR)/$(TEST_EXE) && rm $(TOPDIR)/$(TEST_EXE) || true
 	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
+
+# Tests
+testsuite: $(HEADERS) $(MKFILE)
+	cd $(TESTDIR) && $(MAKE)
+
+clean_tests:
+	cd $(TESTDIR) && $(MAKE) clean
+
+# Examples
+examples: $(HEADERS) $(MKFILE)
+	cd $(EXAMPLEDIR) && $(MAKE)
+
+clean_examples:
+	cd $(EXAMPLEDIR) && $(MAKE) clean
+
+clean_all: clean clean_tests clean_examples
 

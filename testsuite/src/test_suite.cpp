@@ -1,7 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>    // malloc, abs, srand
 #include <time.h>      // time
-#include <sys/types.h> // pid_t 
+#include <sys/types.h> // pid_t
 #include <sys/wait.h>  // wait
 #include <errno.h>     // errno
 #include <fcntl.h>     // pipe flags

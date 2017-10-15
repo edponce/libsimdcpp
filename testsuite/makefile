@@ -34,7 +34,7 @@ DEFINES := -DSIMD_MODE
 DEFINES += -D_POSIX_C_SOURCE=200112L -D_ISOC99_SOURCE
 
 # Define header paths in addition to standard paths
-INCDIR := -I../include
+INCDIR := -I../include -Iinclude
 
 # Define library paths in addition to standard paths
 LIBDIR :=
@@ -43,14 +43,14 @@ LIBDIR :=
 LIBS := -lm
 
 # Header files
-HEADERS := ../include/*.h
+HEADERS := ../include/*.h include/*.h
 
-# SIMD library
-OBJ := ../obj/*.o
-
-# Examples
-DRIVER := driver.cpp
-EXE := example
+# Testsuite
+OBJDIR := obj
+SRC := src/test_simd.cpp src/test_utils.cpp
+OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
+DRIVER := src/test_suite.cpp
+EXE := testsuite
 
 #######################################
 
@@ -59,9 +59,14 @@ EXE := example
 
 all: $(EXE)
 
-$(EXE): $(DRIVER) $(OBJ) $(HEADERS) $(MKFILE)
+$(EXE): $(DRIVER) $(OBJ)
 	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $< -o $@ $(OBJ) $(LIBS)
+
+$(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MKFILE)
+	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
+	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
 	@test -x $(EXE) && rm $(EXE) || true
+	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
 

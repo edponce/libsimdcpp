@@ -1,5 +1,5 @@
-#ifndef __UTILS_H
-#define __UTILS_H
+#ifndef _UTILS_H
+#define _UTILS_H
 
 
 /*!
@@ -74,5 +74,5 @@ long int getL3LineSz();
 long int getL3Assoc();
 
 
-#endif  // __UTILS_H
+#endif  // _UTILS_H
 

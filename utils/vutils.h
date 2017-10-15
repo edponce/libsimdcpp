@@ -1,5 +1,5 @@
-#ifndef __VUTILS_H
-#define __VUTILS_H
+#ifndef _VUTILS_H
+#define _VUTILS_H
 
 
 #include "simd.h"
@@ -32,5 +32,5 @@ void simd_print(const char * const, const SIMD_DBL);
 #endif // SIMD_MODE
 
 
-#endif  // __VUTILS_H
+#endif  // _VUTILS_H
 
