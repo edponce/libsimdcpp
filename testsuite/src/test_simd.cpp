@@ -27,8 +27,8 @@ int test_simd_loadstore()
         simd_store(arr_B, va);
         test_result += validate_test_arrays(test_type, (void *)arr_A, (void *)arr_B, num_elems);
 
-        free(arr_A);
-        free(arr_B);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
     }
 
     // Float
@@ -45,8 +45,8 @@ int test_simd_loadstore()
         simd_store(arr_B, va);
         test_result += validate_test_arrays(test_type, (void *)arr_A, (void *)arr_B, num_elems);
 
-        free(arr_A);
-        free(arr_B);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
     }
 
     return test_result;
@@ -81,10 +81,10 @@ int test_simd_fmadd()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     // Double
@@ -109,10 +109,10 @@ int test_simd_fmadd()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     return test_result;
@@ -146,10 +146,10 @@ int test_simd_mul_u64()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     return test_result;
@@ -186,10 +186,10 @@ int test_simd_packmerge_i32()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     return test_result;
@@ -222,9 +222,9 @@ int test_simd_cvt_i32_fp()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     // Double
@@ -247,9 +247,9 @@ int test_simd_cvt_i32_fp()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     return test_result;
@@ -284,9 +284,9 @@ int test_simd_cvt_u64_fp()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     // Double
@@ -309,9 +309,9 @@ int test_simd_cvt_u64_fp()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     return test_result;
@@ -347,10 +347,10 @@ int test_simd_merge_lo()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     // Float
@@ -376,10 +376,10 @@ int test_simd_merge_lo()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     // Double
@@ -405,10 +405,10 @@ int test_simd_merge_lo()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     return test_result;
@@ -444,10 +444,10 @@ int test_simd_merge_hi()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     // Float
@@ -473,10 +473,10 @@ int test_simd_merge_hi()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     // Double
@@ -502,10 +502,10 @@ int test_simd_merge_hi()
         simd_store(arr_C1, vc);
         test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
 
-        free(arr_A);
-        free(arr_B);
-        free(arr_C1);
-        free(arr_C2);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
     }
 
     return test_result;
@@ -536,8 +536,8 @@ int test_simd_set_32()
         simd_store(arr_A, va);
         test_result += validate_test_arrays(test_type, (void *)arr_A, (void *)arr_B, num_elems);
 
-        free(arr_A);
-        free(arr_B);
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
     }
 
     return test_result;

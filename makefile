@@ -2,8 +2,9 @@
 # 10/2017
 # Makefile for libsimdcpp
 
-# Get name of makefile
-MKFILE := $(MAKEFILE_LIST)
+# Get name of makefile and top directory (paths or files cannot have whitespaces)
+export MKFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
+export TOPDIR := $(dir $(MKFILE))
 
 # C++ compiler
 CXX := g++
@@ -12,11 +13,16 @@ CXX := g++
 export CXX
 
 # GNU/Intel SIMD extensions
-# -mmx, -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2, -msse4
-# -mavx, -mavx2, -mavx512bw, -mavx512f, -mavx512pf, -mavx512er, -mavx512cd
-SIMDFLAGS :=
-#SIMDFLAGS := -msse4.1
+# -mmx
+# -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2
+# -mavx, -mavx2
+# -mavx512bw, -mavx512f, -mavx512pf, -mavx512er, -mavx512cd
+# -mfma
+#SIMDFLAGS := -mmx
+#SIMDFLAGS := -msse4.2
+#SIMDFLAGS := -mavx
 #SIMDFLAGS := -mavx2
+#SIMDFLAGS += -mfma
 export SIMDFLAGS
 
 # GNU compiler and linker options
@@ -40,7 +46,32 @@ DEFINES := -DSIMD_MODE
 #DEFINES := -DSSE4_1_VEC
 #DEFINES := -DAVX2_VEC
 #DEFINES := -DAVX512_VEC
-DEFINES += -D_POSIX_C_SOURCE=200112L -D_ISOC99_SOURCE
+
+# Feature Test Macros
+# _POSIX_SOURCE: (deprecated)
+# _POSIX_C_SOURCE: POSIX series of standards
+# _XOPEN_SOURCE/_XOPEN_SOURCE_EXTENDED: X/Open Unix standards
+# _LARGEFILE_SOURCE: Enable large files
+# _LARGEFILE64_SOURCE: Enable large files in 64-bits
+# _FILE_OFFSET_BITS: Enable 64-bit file offset
+# _ISOC99_SOURCE: ISO C standard
+# _GNU_SOURCE: ISO C89, ISO C99, POSIX.1, POSIX.2, BSD, SVID, X/Open, LFS, and GNU extensions
+# _DEFAULT_SOURCE : POSIX 2008, BSD and SVID features
+# _REENTRANT/_THREAD_SAFE : POSIX.1c/pthreads
+#
+# Most of the errors, most of the times, could be resolved by setting _XOPEN_SOURCE appropriately.
+#
+# _XOPEN_SOURCE < 500
+#    is same as _POSIX_C_SOURCE = 2.
+# 500 <= _XOPEN_SOURCE < 600
+#    is same as _POSIX_C_SOURCE = 199506L.
+# 600 <= _XOPEN_SOURCE < 700
+#    is same as _POSIX_C_SOURCE = 200112L.
+# 700 <= _XOPEN_SOURCE (since glibc 2.10)
+#    is same as _POSIX_C_SOURCE = 200809L.
+# _XOPEN_SOURCE >= 500
+#    is same as defining _XOPEN_SOURCE_EXTENDED
+#DEFINES += -D_XOPEN_SOURCE=700
 export DEFINES
 
 # Define header paths in addition to standard paths
@@ -58,7 +89,8 @@ HEADERS := include/*.h
 # SIMD library
 OBJDIR := obj
 SRC := src/environ.cpp
-OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
+#OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
+OBJ := $($(notdir $(SRC)):.cpp=.o)
 
 # Testsuite
 TESTDIR := testsuite

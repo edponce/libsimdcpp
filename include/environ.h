@@ -3,9 +3,15 @@
 
 
 /*!
- *  Detect CPU SIMD features
+ *  Detect CPU name
  */
-int detectProcSIMD(void);
+int detectCPU(void);
+
+
+/*!
+ *  Detect SIMD features supported by CPU
+ */
+int detectSIMD(void);
 
 
 #endif  // _ENVIRON_H

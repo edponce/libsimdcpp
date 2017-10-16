@@ -1,12 +1,9 @@
 # Eduardo Ponce
 # 10/2017
-# Makefile for libsimdcpp
-
-# Get name of makefile
-MKFILE := $(MAKEFILE_LIST)
+# Makefile for libsimdcpp-examples
 
 # Define header paths in addition to standard paths
-INCDIR := -I../include
+INCDIR := -I$(TOPDIR)/include
 
 # Define library paths in addition to standard paths
 LIBDIR :=
@@ -15,10 +12,10 @@ LIBDIR :=
 LIBS :=
 
 # Header files
-HEADERS := ../include/*.h
+HEADERS := $(TOPDIR)/include/*.h
 
 # SIMD library
-OBJ := ../obj/*.o
+OBJ := $(TOPDIR)/obj/*.o
 
 # Examples
 DRIVER := driver.cpp

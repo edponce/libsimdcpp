@@ -6,9 +6,10 @@
  *  Compiler specific macro to set array alignment.
  *
  *  TODO: Verify builtins for Intel and Clang compilers.
+ *  TODO: Refer to 'stdlib.h' and 'mm_malloc.h' for aligned allocation variants and support.
  *
  *  NOTE: C/C++ arrays that are dynamically allocated, it is not enough to just
- *        align the data during creation using 'mm_malloc/posix_memalign', but it
+ *        align the data during creation using 'mm_malloc/posix_memalign/aligned_alloc', but it
  *        also requires a clause of SIMD_ASSUME_ALIGNED before the loop of interest.
  *
  *  SIMD_ALIGNED(a):

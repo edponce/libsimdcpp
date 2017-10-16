@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>    // malloc, abs, srand
+#include <stdlib.h>    // malloc, abs, srand, _Exit, EXIT_SUCCESS/FAILURE
 #include <time.h>      // time
 #include <sys/types.h> // pid_t
 #include <sys/wait.h>  // wait
@@ -8,21 +8,25 @@
 #include <unistd.h>    // fork
 #include <queue>
 #include "test_suite.h"
+#include "environ.h"   // detectCPU, detectSIMD
 
 
 int main()
 {
-    int retval = 0;
     const int NUM_TESTS = sizeof(TESTS) / sizeof(struct TEST_T);
     const int NUM_WORKERS = (MAX_WORKERS > NUM_TESTS) ? (NUM_TESTS) : (MAX_WORKERS);
 
     // Seed RNG
     srand(time(NULL));
 
-    printf("SIMD TESTSUITE\n");
-    retval = test_suite(TESTS, NUM_TESTS, NUM_WORKERS);
+    fprintf(stdout, "SIMD TESTSUITE\n");
+    detectCPU();
+    detectSIMD();
 
-    return retval;
+    if (test_suite(TESTS, NUM_TESTS, NUM_WORKERS))
+        _Exit(EXIT_FAILURE);
+
+    return EXIT_SUCCESS;
 }
 
 
@@ -34,7 +38,7 @@ int main()
 // Pipe management constants
 enum PIPE_PORTS { PIPE_READ_PORT = 0, PIPE_WRITE_PORT, NUM_PIPE_PORTS };
 // NOTE: Both have to be 0 because of no-sign property and used as accumulator
-// NOTE: need to move this somewhere accessible for everyone
+// TODO: need to move this somewhere accessible for everyone
 enum PIPE_MSGS { FAILED_TEST = -1, CANCEL_TEST = 0, SUCCESS_TEST = 0 };
 
 
@@ -46,7 +50,6 @@ enum PIPE_MSGS { FAILED_TEST = -1, CANCEL_TEST = 0, SUCCESS_TEST = 0 };
  */
 int test_suite(const struct TEST_T * const tests, const int num_tests, const int num_workers)
 {
-    int retval = 0;
     int manager_to_worker[NUM_PIPE_PORTS];
     int worker_to_manager[NUM_PIPE_PORTS];
     const pid_t manager_pid = getpid();
@@ -54,11 +57,11 @@ int test_suite(const struct TEST_T * const tests, const int num_tests, const int
 
     // Create unnamed and blocking pipes for IPC
     if (pipe2(manager_to_worker, 0) == -1) {
-        printf("(MANAGER %d) ERROR: failed to create manager to worker pipe\n", manager_pid);
+        fprintf(stdout, "(MANAGER %d) ERROR: failed to create manager to worker pipe\n", manager_pid);
         return -1;
     }
     if (pipe2(worker_to_manager, 0) == -1) {
-        printf("(MANAGER %d) ERROR: failed to create worker to manager pipe\n", manager_pid);
+        fprintf(stdout, "(MANAGER %d) ERROR: failed to create worker to manager pipe\n", manager_pid);
         return -1;
     }
 
@@ -79,7 +82,7 @@ int test_suite(const struct TEST_T * const tests, const int num_tests, const int
         close(manager_to_worker[PIPE_WRITE_PORT]);
     }
     // Worker process
-    else if (worker_pid == 0) {
+    else if (!worker_pid) {
 
         // Free/close unused resources
         close(worker_to_manager[PIPE_READ_PORT]);
@@ -96,12 +99,12 @@ int test_suite(const struct TEST_T * const tests, const int num_tests, const int
         fflush(stdout);
         fsync(fileno(stdout));
 
-        // _exit does not call any functions registered with atexit() or on_exit().
+        // _Exit does not call any functions registered with atexit() or on_exit().
         // Close file descriptors (may flush I/O buffers and remove temporary files)
-        _exit(0);
+        _Exit(EXIT_SUCCESS);
     }
 
-    return retval;
+    return 0;
 }
 
 
@@ -122,7 +125,7 @@ int worker_main(int * const manager_to_worker, int * const worker_to_manager, co
 
         // Validate test ID
         if (current_test > 0 && current_test <= num_tests) {
-            //printf("(WORKER  %d) Running test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
+            //fprintf(stdout, "(WORKER  %d) Running test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
 
             // Run test
             int test_result = SUCCESS_TEST;
@@ -131,11 +134,11 @@ int worker_main(int * const manager_to_worker, int * const worker_to_manager, co
 
             // Validate test
             if (test_result != SUCCESS_TEST) {
-                printf("(WORKER  %d) FAILED test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
+                fprintf(stdout, "(WORKER  %d) FAILED test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
                 current_test = -current_test;
             }
             else {
-                printf("(WORKER  %d) PASSED test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
+                fprintf(stdout, "(WORKER  %d) PASSED test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
             }
         }
 
@@ -164,8 +167,8 @@ int manager_main(int * const manager_to_worker, int * const worker_to_manager, c
     int *test_results = (int *)malloc((num_tests + 1) * sizeof(int));
     test_results[0] = SUCCESS_TEST;
 
-    printf("(MANAGER %d) Total tests = %d\n", manager_pid, num_tests);
-    printf("(MANAGER %d) Total workers = %d\n", manager_pid, num_workers);
+    fprintf(stdout, "(MANAGER %d) Total tests = %d\n", manager_pid, num_tests);
+    fprintf(stdout, "(MANAGER %d) Total workers = %d\n", manager_pid, num_workers);
 
     // Send test IDs to all workers
     for (current_test = 1; current_test <= num_workers; ++current_test) {
@@ -191,7 +194,7 @@ int manager_main(int * const manager_to_worker, int * const worker_to_manager, c
     // Cancel active workers
     cancel_workers(manager_to_worker, num_workers);
 
-    free(test_results);
+    free(test_results); test_results = NULL;
 
     return 0;
 }
@@ -211,7 +214,7 @@ pid_t create_workers(int * const manager_to_worker, const int num_workers)
 {
     const pid_t manager_pid = getpid();;
     pid_t worker_pid = (pid_t)-1;
-    pid_t * const workers = (pid_t *)malloc(num_workers * sizeof(pid_t));
+    pid_t *workers = (pid_t *)malloc(num_workers * sizeof(pid_t));
 
     // Spawn pool of worker processes
     for (int current_worker = 0; current_worker < num_workers; ++current_worker) {
@@ -220,19 +223,19 @@ pid_t create_workers(int * const manager_to_worker, const int num_workers)
 
         // Cancel active workers
         if (worker_pid < 0) {
-            printf("(MANAGER %d) ERROR: failed to fork worker #%d\n", manager_pid, current_worker + 1);
+            fprintf(stdout, "(MANAGER %d) ERROR: failed to fork worker #%d\n", manager_pid, current_worker + 1);
             cancel_workers(manager_to_worker, current_worker);
             break;
         }
         // Worker process
         // Break out of loop to prevent recursive forks
-        else if (worker_pid == 0)
+        else if (!worker_pid)
             break;
         else
             workers[current_worker] = worker_pid;
     }
 
-    free(workers);
+    free(workers); workers = NULL;
 
     return worker_pid;
 }
@@ -240,7 +243,6 @@ pid_t create_workers(int * const manager_to_worker, const int num_workers)
 
 int cancel_workers(int * const manager_to_worker, const int num_workers)
 {
-    int retval = 0;
     const pid_t manager_pid = getpid();;
 
     // Cancel active workers
@@ -255,9 +257,9 @@ int cancel_workers(int * const manager_to_worker, const int num_workers)
     for (int current_worker = 0; current_worker < num_workers; ++current_worker) {
         int worker_status = 0;
         pid_t wait_pid = waitpid(-1, &worker_status, WUNTRACED | WCONTINUED);
-        printf("(MANAGER %d) Worker %d completed\n", manager_pid, wait_pid);
+        fprintf(stdout, "(MANAGER %d) Worker %d completed\n", manager_pid, wait_pid);
     }
 
-    return retval;
+    return 0;
 }
 

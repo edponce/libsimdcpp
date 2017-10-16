@@ -1,5 +1,5 @@
-#include <stdlib.h>    // posix_memalign, rand
-#include <float.h>     // floating-point epsilons
+#include <stdlib.h>      // posix_memalign, rand
+#include <float.h>       // floating-point epsilons
 #include "test_utils.h"
 
 

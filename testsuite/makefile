@@ -1,12 +1,9 @@
 # Eduardo Ponce
 # 10/2017
-# Makefile for libsimdcpp
-
-# Get name of makefile
-MKFILE := $(MAKEFILE_LIST)
+# Makefile for libsimdcpp-testsuite
 
 # Define header paths in addition to standard paths
-INCDIR := -I../include -Iinclude
+INCDIR := -I$(TOPDIR)/include -Iinclude
 
 # Define library paths in addition to standard paths
 LIBDIR :=
@@ -15,12 +12,12 @@ LIBDIR :=
 LIBS :=
 
 # Header files
-HEADERS := ../include/*.h include/*.h
+HEADERS := $(TOPDIR)/include/*.h include/*.h
 
 # Testsuite
 OBJDIR := obj
 SRC := src/test_simd.cpp src/test_utils.cpp
-OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
+OBJ := $(TOPDIR)/obj/*.o $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 DRIVER := src/test_suite.cpp
 EXE := testsuite
 
