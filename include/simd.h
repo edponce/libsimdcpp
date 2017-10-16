@@ -8,16 +8,16 @@
  */
 #if defined(SIMD_MODE)
     #undef SIMD_MODE
-    #undef SSE4_1_VEC
-    #undef AVX2_VEC
-    #undef AVX512_VEC
+    #undef SIMD_SSE4_1
+    #undef SIMD_AVX2
+    #undef SIMD_AVX512
 
-    #if defined(__AVX512BW__)
-        #define AVX512_VEC
+    #if defined(__AVX512BW__) || defined(__AVX512F__) || defined(__AVX512PF__) || defined(__AVX512CD__) || defined(__AVX512ER__)
+        #define SIMD_AVX512
     #elif defined(__AVX2__)
-        #define AVX2_VEC
+        #define SIMD_AVX2
     #elif defined(__SSE4_1__)
-        #define SSE4_1_VEC
+        #define SIMD_SSE4_1
     #endif
 #endif
 
@@ -27,13 +27,13 @@
  *  SIMD_MODE has to be defined to access available SIMD features.
  *  Include corresponding SIMD interfaces.
  */
-#if defined(AVX512_VEC)
+#if defined(SIMD_AVX512)
     #define SIMD_MODE
     #include "avx512.h"
-#elif defined(AVX2_VEC)
+#elif defined(SIMD_AVX2)
     #define SIMD_MODE
     #include "avx2.h"
-#elif defined(SSE4_1_VEC)
+#elif defined(SIMD_SSE4_1)
     #define SIMD_MODE
     #include "sse4_1.h"
 #else

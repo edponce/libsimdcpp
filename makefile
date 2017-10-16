@@ -2,15 +2,16 @@
 # 10/2017
 # Makefile for libsimdcpp
 
-# Get name of makefile and top directory (paths or files cannot have whitespaces)
-export MKFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
-export TOPDIR := $(dir $(MKFILE))
+# NOTE: paths or file names cannot have whitespaces.
+
+# Get name of makefile and top directoryd
+MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
+export TOPDIR := $(dir $(MAKEFILE))
 
 # C++ compiler
-CXX := g++
-#CXX := icpc
-#CXX := clang++-4.0
-export CXX
+export CXX := g++
+#export CXX := icpc
+#export CXX := clang++-4.0
 
 # GNU/Intel SIMD extensions
 # -mmx
@@ -26,26 +27,24 @@ export CXX
 export SIMDFLAGS
 
 # GNU compiler and linker options
-CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
+export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
 
 # Intel compiler and linker options
-#CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
+#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
 
 # Clang compiler and linker options
-#CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
-export CXXFLAGS
+#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
 
 # Linker options
-LFLAGS :=
-export LFLAGS
+export LFLAGS :=
 
 # Preprocessor definitions
-# SIMD modes: -DSIMD_MODE (auto), -DSSE4_1_VEC, -DAVX2_VEC, -DAVX512BW_VEC
+# SIMD modes: -DSIMD_MODE (auto), -DSIMD_SSE4_1, -DSIMD_AVX2, -DSIMD_AVX512
 # -DDEBUG
 DEFINES := -DSIMD_MODE
-#DEFINES := -DSSE4_1_VEC
-#DEFINES := -DAVX2_VEC
-#DEFINES := -DAVX512_VEC
+#DEFINES := -DSIMD_SSE4_1
+#DEFINES := -DSIMD_AVX2
+#DEFINES := -DSIMD_AVX512
 
 # Feature Test Macros
 # _POSIX_SOURCE: (deprecated)
@@ -75,22 +74,21 @@ DEFINES := -DSIMD_MODE
 export DEFINES
 
 # Define header paths in addition to standard paths
-INCDIR := -Iinclude
+export INCDIR := -I$(TOPDIR)/include
 
 # Define library paths in addition to standard paths
-LIBDIR :=
+export LIBDIR :=
 
 # Define libraries to link into executable
-LIBS :=
+export LIBS :=
 
 # Header files
-HEADERS := include/*.h
+export HEADERS := $(TOPDIR)/include/*.h
 
 # SIMD library
-OBJDIR := obj
+OBJDIR := $(TOPDIR)/obj
 SRC := src/environ.cpp
-#OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
-OBJ := $($(notdir $(SRC)):.cpp=.o)
+export OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 
 # Testsuite
 TESTDIR := testsuite
@@ -108,7 +106,7 @@ all: simd testsuite examples
 # SIMD library
 simd: $(OBJ)
 
-$(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MKFILE)
+$(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
@@ -116,14 +114,14 @@ clean:
 	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
 
 # Tests
-testsuite: $(OBJ) $(HEADERS) $(MKFILE)
+testsuite: $(OBJ) $(HEADERS) $(MAKEFILE)
 	$(MAKE) -C $(TESTDIR)
 
 clean_tests:
 	$(MAKE) -C $(TESTDIR) clean
 
 # Examples
-examples: $(OBJ) $(HEADERS) $(MKFILE)
+examples: $(OBJ) $(HEADERS) $(MAKEFILE)
 	$(MAKE) -C $(EXAMPLEDIR)
 
 clean_examples:

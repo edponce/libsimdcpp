@@ -2,22 +2,32 @@
 # 10/2017
 # Makefile for libsimdcpp-examples
 
+# Compiler and linker options
+CXXFLAGS +=
+
+# Linker options
+LFLAGS +=
+
+# Preprocessor definitions
+DEFINES +=
+
 # Define header paths in addition to standard paths
-INCDIR := -I$(TOPDIR)/include
+INCDIR +=
 
 # Define library paths in addition to standard paths
-LIBDIR :=
+LIBDIR +=
 
 # Define libraries to link into executable
-LIBS :=
+LIBS +=
 
 # Header files
-HEADERS := $(TOPDIR)/include/*.h
+HEADERS +=
 
-# SIMD library
-OBJ := $(TOPDIR)/obj/*.o
+# Example
+OBJDIR := obj
+SRC :=
+OBJ += $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 
-# Examples
 DRIVER := driver.cpp
 EXE := example
 
@@ -28,9 +38,14 @@ EXE := example
 
 all: $(EXE)
 
-$(EXE): $(DRIVER) $(OBJ) $(HEADERS) $(MKFILE)
+$(EXE): $(DRIVER) $(OBJ)
 	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $< -o $@ $(OBJ) $(LIBS)
+
+$(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
+	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
+	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
 	@test -x $(EXE) && rm $(EXE) || true
+	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
 
