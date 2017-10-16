@@ -1,2 +1,4 @@
-*/testsuite
-*/obj/
+testsuite/testsuite
+obj/
+examples/example
+
