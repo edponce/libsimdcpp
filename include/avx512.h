@@ -11,7 +11,8 @@
 /*
  *  Compiler and architecture specific settings
  */
-#include "compiler.h"
+#include "compiler_attributes.h"
+#include "compiler_intrinsics.h"
 
 
 /*
@@ -35,12 +36,15 @@
  *  AVX512 512-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
-#define SIMD_INT __m512i
-#define SIMD_FLT __m512
-#define SIMD_DBL __m512d
-#define SIMD_WIDTH_BYTES 64
-#define SIMD_STREAMS_32  16
-#define SIMD_STREAMS_64  8
+//#define SIMD_WIDTH_BYTES 64
+//#define SIMD_STREAMS_32  16
+//#define SIMD_STREAMS_64  8
+const int SIMD_WIDTH_BYTES = 64;
+const int SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
+const int SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
+typedef __m512i SIMD_INT;
+typedef __m512  SIMD_FLT;
+typedef __m512d SIMD_DBL;
 
 
 /*

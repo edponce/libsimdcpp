@@ -11,7 +11,8 @@
 /*
  *  Compiler and architecture specific settings
  */
-#include "compiler.h"
+#include "compiler_attributes.h"
+#include "compiler_intrinsics.h"
 
 
 /*
@@ -35,12 +36,15 @@
  *  SSE4.1 128-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
-#define SIMD_INT __m128i
-#define SIMD_FLT __m128
-#define SIMD_DBL __m128d
-#define SIMD_WIDTH_BYTES 16
-#define SIMD_STREAMS_32  4
-#define SIMD_STREAMS_64  2
+//#define SIMD_WIDTH_BYTES 16
+//#define SIMD_STREAMS_32  4
+//#define SIMD_STREAMS_64  2
+const int SIMD_WIDTH_BYTES = 16;
+const int SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
+const int SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
+typedef __m128i SIMD_INT;
+typedef __m128  SIMD_FLT;
+typedef __m128d SIMD_DBL;
 
 
 /*

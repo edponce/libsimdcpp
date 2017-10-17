@@ -128,9 +128,18 @@ clean_examples:
 
 clean_all: clean clean_tests clean_examples
 
+# Force
 force:
 	$(MAKE) clean
 	$(MAKE)
+
+force_tests:
+	$(MAKE) clean_tests
+	$(MAKE) testsuite
+
+force_examples:
+	$(MAKE) clean_examples
+	$(MAKE) examples
 
 force_all:
 	$(MAKE) clean_all
