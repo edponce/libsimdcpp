@@ -2,7 +2,6 @@
 
 
 #if defined(__clang__)
-    // TODO: check what are the Clang builtins, these are placeholders.
     #define CPU_INIT_SUPPORT() ((void)0)
     #define CPU_IS(a)          0
     #define CPU_SUPPORTS(a)    (__builtin_cpu_supports(a))

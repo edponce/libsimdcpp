@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>   // posix_memalign, _Exit, EXIT_SUCCESS/FAILURE
+#include <stdlib.h>   // free, posix_memalign, _Exit, EXIT_SUCCESS/FAILURE
 #include "simd.h"
 #include "environ.h"  // detectCPU, detectSIMD
 
@@ -47,6 +47,6 @@ int main()
     free(arr_B); arr_B = NULL;
     free(arr_C); arr_C = NULL;
 
-    return EXIT_SUCCESS;
+    return result;
 }
 

@@ -39,9 +39,9 @@
 //#define SIMD_WIDTH_BYTES 16
 //#define SIMD_STREAMS_32  4
 //#define SIMD_STREAMS_64  2
-const int SIMD_WIDTH_BYTES = 16;
-const int SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
-const int SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
+const int32_t SIMD_WIDTH_BYTES = 16;
+const int32_t SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
+const int32_t SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
 typedef __m128i SIMD_INT;
 typedef __m128  SIMD_FLT;
 typedef __m128d SIMD_DBL;
@@ -323,7 +323,7 @@ SIMD_INT simd_set_64(const int32_t sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_set(const uint32_t sa)
-{ return _mm_set1_epi32((int)sa); }
+{ return _mm_set1_epi32((int32_t)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_set_64(const uint32_t sa)

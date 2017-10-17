@@ -3,6 +3,7 @@
 
 
 #include <stdio.h>
+#include <stdlib.h>      // free
 #include "test_utils.h"
 #include "test_simd.h"
 

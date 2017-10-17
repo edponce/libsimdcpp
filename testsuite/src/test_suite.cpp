@@ -36,9 +36,12 @@ int main()
 
 
 // Pipe management constants
+// TODO: need to move this somewhere else?
 enum PIPE_PORTS { PIPE_READ_PORT = 0, PIPE_WRITE_PORT, NUM_PIPE_PORTS };
-// NOTE: Both have to be 0 because of no-sign property and used as accumulator
-// TODO: need to move this somewhere accessible for everyone
+// NOTE: FAILED_TEST not used, instead -test_id is used since it identifies each test.
+//       CANCEL_TEST is used as signal from manager-to-workers.
+//       SUCCESS_TEST is used as signal from workers-to-manager, has to be 0
+//       because of no-sign property (for failed tests) and is used as an accumulator
 enum PIPE_MSGS { FAILED_TEST = -1, CANCEL_TEST = 0, SUCCESS_TEST = 0 };
 
 
@@ -135,6 +138,7 @@ int worker_main(int * const manager_to_worker, int * const worker_to_manager, co
             // Validate test
             if (test_result != SUCCESS_TEST) {
                 fprintf(stdout, "(WORKER  %d) FAILED test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
+                //current_test = FAILED_TEST;
                 current_test = -current_test;
             }
             else {
@@ -160,12 +164,11 @@ int worker_main(int * const manager_to_worker, int * const worker_to_manager, co
 int manager_main(int * const manager_to_worker, int * const worker_to_manager, const int num_tests, const int num_workers)
 {
     const pid_t manager_pid = getpid();
-    int current_test = CANCEL_TEST;
+    int current_test = 0;
 
-    // Plus 1 since test IDs are offset by 1.
-    // Use entry 0 for status of manager process.
+    // Array has 1 more than number of tests since test IDs are offset by 1.
+    // Use entry 0 for global test results calculated by manager process.
     int *test_results = (int *)malloc((num_tests + 1) * sizeof(int));
-    test_results[0] = SUCCESS_TEST;
 
     fprintf(stdout, "(MANAGER %d) Total tests = %d\n", manager_pid, num_tests);
     fprintf(stdout, "(MANAGER %d) Total workers = %d\n", manager_pid, num_workers);
@@ -175,7 +178,7 @@ int manager_main(int * const manager_to_worker, int * const worker_to_manager, c
         write(manager_to_worker[PIPE_WRITE_PORT], &current_test, sizeof(int));
     }
 
-    // Get test result from worker
+    // Get test result from workers
     // Send new test ID
     for (; current_test <= num_tests; ++current_test) {
         int test_result;
@@ -193,6 +196,15 @@ int manager_main(int * const manager_to_worker, int * const worker_to_manager, c
 
     // Cancel active workers
     cancel_workers(manager_to_worker, num_workers);
+
+    // Summarize results from tests
+    int tests_passed = 0;
+    for (int i = 1; i <= num_tests; ++i) {
+        if (test_results[i] > 0)
+            tests_passed++;
+    }
+    fprintf(stdout, "(MANAGER %d) Successful tests ... %d of %d\n", manager_pid, tests_passed, num_tests);
+    test_results[0] = (tests_passed == num_tests) ? (SUCCESS_TEST) : (FAILED_TEST);
 
     free(test_results); test_results = NULL;
 

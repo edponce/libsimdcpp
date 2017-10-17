@@ -8,6 +8,7 @@
  */
 #if defined(SIMD_MODE)
     #undef SIMD_MODE
+    #undef SIMD_MMX
     #undef SIMD_SSE4_1
     #undef SIMD_AVX2
     #undef SIMD_AVX512
@@ -19,6 +20,8 @@
         #define SIMD_AVX2
     #elif defined(__SSE4_1__)
         #define SIMD_SSE4_1
+    #elif defined(__MMX__)
+        #define SIMD_MMX
     #endif
 #endif
 
@@ -37,6 +40,9 @@
 #elif defined(SIMD_SSE4_1)
     #define SIMD_MODE
     #include "sse4_1.h"
+#elif defined(SIMD_MMX)
+    #define SIMD_MODE
+    #include "mmx.h"
 #else
     /*
      *  Compiler and architecture specific settings

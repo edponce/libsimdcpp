@@ -14,12 +14,13 @@ export CXX := g++
 #export CXX := clang++-4.0
 
 # GNU/Intel SIMD extensions
-# -mmx
+# -mmmx
 # -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2
 # -mavx, -mavx2
 # -mavx512bw, -mavx512f, -mavx512fp, -mavx512dq, -mavx512cd, -mavx512er, -mavx512vl
 # -mfma
-SIMDFLAGS += -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2
+#SIMDFLAGS += -mmmx
+#SIMDFLAGS += -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2
 #SIMDFLAGS += -mavx
 #SIMDFLAGS += -mavx2
 #SIMDFLAGS += -mavx512f -mavx512dq
@@ -28,6 +29,7 @@ export SIMDFLAGS
 
 # GNU compiler and linker options
 export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
+#export CXXFLAGS := $(SIMDFLAGS) -m32 -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
 
 # Intel compiler and linker options
 #export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
@@ -39,8 +41,9 @@ export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wex
 export LFLAGS :=
 
 # Preprocessor definitions
-# SIMD modes: -DSIMD_MODE (auto), -DSIMD_SSE4_1, -DSIMD_AVX2, -DSIMD_AVX512
+# SIMD modes: -DSIMD_MODE (auto), -DSIMD_MMX, -DSIMD_SSE4_1, -DSIMD_AVX2, -DSIMD_AVX512
 DEFINES := -DSIMD_MODE
+#DEFINES := -DSIMD_MMX
 #DEFINES := -DSIMD_SSE4_1
 #DEFINES := -DSIMD_AVX2
 #DEFINES := -DSIMD_AVX512
