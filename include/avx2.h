@@ -24,7 +24,7 @@
 #elif defined(__GNUC__)
     //#include <x86intrin.h>
     #include <immintrin.h>
-#elif defined(__INTEL_COMPILER)
+#elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
     #include <immintrin.h>
 #else
     #error "Compiler/architecture is not supported."
@@ -213,9 +213,11 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_srl_64(const SIMD_INT va, const int shft)
 { return _mm256_srli_epi64(va, shft); }
 
+#if !defined(__clang__)
 /*
  *  Shuffle 32-bit elements using control value
  */
+// TODO: Clang throws error with shuffle intrinsics due to non-constants with macro expansion
 static SIMD_FUNC_INLINE
 SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int ctrl)
 { return _mm256_shuffle_epi32(va, ctrl); }
@@ -223,6 +225,7 @@ SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int ctrl)
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int ctrl)
 { return _mm256_shuffle_ps(va, vb, ctrl); }
+#endif
 
 /*
  *  Merge either low/high parts from pair of registers
@@ -429,19 +432,17 @@ static SIMD_FUNC_INLINE
 SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
 {
     unsigned long int sa_ul[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    unsigned long int *sa_ul_ptr = sa_ul;
     float sa_flt[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    float *sa_flt_ptr = sa_flt;
 
     _mm256_store_si256((SIMD_INT *)sa_ul, va);
 
     #pragma vector aligned
     for (int i = 0; i < SIMD_STREAMS_64; ++i)
-        *(sa_flt_ptr++) = (float)*(sa_ul_ptr++);
+        sa_flt[i] = (float)sa_ul[i];
 
     #pragma vector aligned
     for (int i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
-        *(sa_flt_ptr++) = 0.0;
+        sa_flt[i] = 0.0f;
 
     return _mm256_load_ps(sa_flt);
 }
@@ -454,15 +455,13 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
 {
     unsigned long int sa_ul[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    unsigned long int *sa_ul_ptr = sa_ul;
     double sa_dbl[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    double *sa_dbl_ptr = sa_dbl;
 
     _mm256_store_si256((SIMD_INT *)sa_ul, va);
 
     #pragma vector aligned
     for (int i = 0; i < SIMD_STREAMS_64; ++i)
-        *(sa_dbl_ptr++) = (double)*(sa_ul_ptr++);
+        sa_dbl[i] = (double)sa_ul[i];
 
     return _mm256_load_pd(sa_dbl);
 }

@@ -6,7 +6,7 @@
 
 # Get name of makefile and top directoryd
 MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
-export TOPDIR := $(dir $(MAKEFILE))
+export TOPDIR := $(strip $(patsubst %/, %, $(dir $(MAKEFILE))))
 
 # C++ compiler
 export CXX := g++
@@ -17,12 +17,12 @@ export CXX := g++
 # -mmx
 # -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2
 # -mavx, -mavx2
-# -mavx512bw, -mavx512f, -mavx512pf, -mavx512er, -mavx512cd
+# -mavx512bw, -mavx512f, -mavx512fp, -mavx512dq, -mavx512cd, -mavx512er, -mavx512vl
 # -mfma
-#SIMDFLAGS := -mmx
-#SIMDFLAGS := -msse4.2
-#SIMDFLAGS := -mavx
-#SIMDFLAGS := -mavx2
+SIMDFLAGS += -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2
+#SIMDFLAGS += -mavx
+#SIMDFLAGS += -mavx2
+#SIMDFLAGS += -mavx512f -mavx512dq
 #SIMDFLAGS += -mfma
 export SIMDFLAGS
 
@@ -40,7 +40,6 @@ export LFLAGS :=
 
 # Preprocessor definitions
 # SIMD modes: -DSIMD_MODE (auto), -DSIMD_SSE4_1, -DSIMD_AVX2, -DSIMD_AVX512
-# -DDEBUG
 DEFINES := -DSIMD_MODE
 #DEFINES := -DSIMD_SSE4_1
 #DEFINES := -DSIMD_AVX2
@@ -128,4 +127,12 @@ clean_examples:
 	$(MAKE) -C $(EXAMPLEDIR) clean
 
 clean_all: clean clean_tests clean_examples
+
+force:
+	$(MAKE) clean
+	$(MAKE)
+
+force_all:
+	$(MAKE) clean_all
+	$(MAKE)
 

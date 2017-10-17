@@ -24,7 +24,7 @@
 #elif defined(__GNUC__)
     //#include <x86intrin.h>
     #include <immintrin.h>
-#elif defined(__INTEL_COMPILER)
+#elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
     #include <immintrin.h>
 #else
     #error "Compiler/architecture is not supported."
@@ -159,11 +159,11 @@ SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb)
 { return _mm512_and_si512(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb)
+SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_FLT vb)
 { return _mm512_and_ps(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
+SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm512_and_pd(va, vb); }
 
 
@@ -189,16 +189,21 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_srl_64(const SIMD_INT va, const int shft)
 { return _mm512_srli_epi64(va, (unsigned int)shft); }
 
+#if !defined(__clang__)
 /*
  *  Shuffle 32-bit elements using control value
  */
+// TODO: Fix issue with _MM_PERM_ENUM, for now do an explicit cast
+// https://developercommunity.visualstudio.com/content/problem/107147/avx512-permute-macros-are-missing.html
+// TODO: Clang throws error with shuffle intrinsics due to non-constants with macro expansion
 static SIMD_FUNC_INLINE
 SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int ctrl)
-{ return _mm512_shuffle_epi32(va, ctrl); }
+{ return _mm512_shuffle_epi32(va, (_MM_PERM_ENUM)ctrl); }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int ctrl)
 { return _mm512_shuffle_ps(va, vb, ctrl); }
+#endif
 
 /*
  *  Merge either low/high parts from pair of registers
@@ -211,11 +216,14 @@ SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
     return _mm512_inserti64x4(va, vb_lo, 0x1);
 }
 
+// TODO: Verify simd_merge_lo, cast from FLT to DBL
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb)
 {
-    const __m256d vb_lo = _mm512_castpd512_pd256(vb);
-    const SIMD_DBL vc = _mm512_insertf64x4(va, vb_lo, 0x1);
+    const SIMD_DBL va_dbl = _mm512_castps_pd(va);
+    const SIMD_DBL vb_dbl = _mm512_castps_pd(vb);
+    const __m256d vb_lo = _mm512_castpd512_pd256(vb_dbl);
+    const SIMD_DBL vc = _mm512_insertf64x4(va_dbl, vb_lo, 0x1);
     return _mm512_castpd_ps(vc);
 }
 
@@ -233,11 +241,14 @@ SIMD_INT simd_merge_hi(const SIMD_INT va, const SIMD_INT vb)
     return _mm512_inserti64x4(vb, va_hi, 0x0);
 }
 
+// TODO: Verify simd_merge_hi, cast from FLT to DBL
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb)
 {
-    const __m256d va_hi = _mm512_extractf64x4_pd(va, 0x1);
-    const SIMD_DBL vc = _mm512_insertf64x4(vb, va_hi, 0x0);
+    const SIMD_DBL va_dbl = _mm512_castps_pd(va);
+    const SIMD_DBL vb_dbl = _mm512_castps_pd(vb);
+    const __m256d va_hi = _mm512_extractf64x4_pd(va_dbl, 0x1);
+    const SIMD_DBL vc = _mm512_insertf64x4(vb_dbl, va_hi, 0x0);
     return _mm512_castpd_ps(vc);
 }
 
@@ -255,10 +266,10 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb)
 {
     // Pack va
-    const int SIMD_INT va_pk = _mm512_maskz_compress_epi32(0x5555U, va);
+    const SIMD_INT va_pk = _mm512_maskz_compress_epi32(0x5555U, va);
 
     // Pack vb
-    const int SIMD_INT vb_pk = _mm512_maskz_compress_epi32(0x5555U, vb);
+    const SIMD_INT vb_pk = _mm512_maskz_compress_epi32(0x5555U, vb);
 
     // Merge
     const __m256i vb_pk_lo = _mm512_castsi512_si256(vb_pk);
@@ -380,9 +391,14 @@ SIMD_FLT simd_cvt_i32_f32(const SIMD_INT va)
  *  Convert packed 32-bit integer elements
  *  to packed double-precision floating-point elements.
  */
+// TODO: Intrinsic '_mm512_cvtepi32lo_pd was not declared', so not always available.
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va)
-{ return _mm512_cvtepi32lo_pd(va); }
+{
+    //return _mm512_cvtepi32lo_pd(va);
+    const SIMD_FLT va_flt = _mm512_cvtepi32_ps(va);
+    return _mm512_castps_pd(va_flt);
+}
 
 /*!
  *  Convert packed unsigned 64-bit integer elements
@@ -395,13 +411,10 @@ SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
     const __m256 fa = _mm512_cvtepu64_ps(va);
     return _mm512_castps256_ps512(fa); // upper half is undefined
 */
-/*
     const __m256 fa = _mm512_cvtepu64_ps(va);
+    const SIMD_FLT va_flt = _mm512_castps256_ps512(fa); // upper half is undefined
     const SIMD_FLT zero = _mm512_setzero_ps();
-    return _mm512_mask_mov_ps(fa, 0xFF00U, zero);
-*/
-    const __m256 va_flt = _mm512_cvtepu64_ps(va);
-    return _mm512_mask_xor_ps(va_flt, 0xFF00U, va_flt);
+    return _mm512_mask_mov_ps(va_flt, 0xFF00U, zero);
 }
 
 /*!

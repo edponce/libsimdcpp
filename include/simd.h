@@ -12,7 +12,8 @@
     #undef SIMD_AVX2
     #undef SIMD_AVX512
 
-    #if defined(__AVX512BW__) || defined(__AVX512F__) || defined(__AVX512PF__) || defined(__AVX512CD__) || defined(__AVX512ER__)
+    #if defined(__AVX512F__) && defined(__AVX512DQ__)
+    //#if defined(__AVX512BW__) && defined(__AVX512F__) && defined(__AVX512PF__) && defined(__AVX512DQ__) && defined(__AVX512CD__) && defined(__AVX512ER__) && defined(__AVX512VL__)
         #define SIMD_AVX512
     #elif defined(__AVX2__)
         #define SIMD_AVX2

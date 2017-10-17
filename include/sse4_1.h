@@ -24,7 +24,7 @@
 #elif defined(__GNUC__)
     //#include <x86intrin.h>
     #include <smmintrin.h>
-#elif defined(__INTEL_COMPILER)
+#elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
     #include <smmintrin.h>
 #else
     #error "Compiler/architecture is not supported."
@@ -213,9 +213,11 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_srl_64(const SIMD_INT va, const int8_t shft)
 { return _mm_srli_epi64(va, shft); }
 
+#if !defined(__clang__)
 /*
  *  Shuffle 32-bit elements using control value
  */
+// TODO: Clang throws error with shuffle intrinsics due to non-constants with macro expansion
 static SIMD_FUNC_INLINE
 SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int8_t ctrl)
 { return _mm_shuffle_epi32(va, ctrl); }
@@ -223,6 +225,7 @@ SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int8_t ctrl)
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int8_t ctrl)
 { return _mm_shuffle_ps(va, vb, ctrl); }
+#endif
 
 /*
  *  Merge either low/high parts from pair of registers
@@ -412,19 +415,17 @@ static SIMD_FUNC_INLINE
 SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
 {
     uint64_t sa_ul[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    uint64_t *sa_ul_ptr = sa_ul;
     float sa_flt[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    float *sa_flt_ptr = sa_flt;
 
     _mm_store_si128((SIMD_INT *)sa_ul, va);
 
     #pragma vector aligned
     for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
-        *(sa_flt_ptr++) = (float)*(sa_ul_ptr++);
+        sa_flt[i] = (float)sa_ul[i];
 
     #pragma vector aligned
     for (int32_t i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
-        *(sa_flt_ptr++) = 0.0;
+        sa_flt[i] = 0.0f;
 
     return _mm_load_ps(sa_flt);
 }
@@ -437,15 +438,13 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
 {
     uint64_t sa_ul[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    uint64_t *sa_ul_ptr = sa_ul;
     double sa_dbl[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    double *sa_dbl_ptr = sa_dbl;
 
     _mm_store_si128((SIMD_INT *)sa_ul, va);
 
     #pragma vector aligned
     for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
-        *(sa_dbl_ptr++) = (double)*(sa_ul_ptr++);
+        sa_dbl[i] = (double)sa_ul[i];
 
     return _mm_load_pd(sa_dbl);
 }

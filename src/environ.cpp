@@ -3,8 +3,8 @@
 
 #if defined(__clang__)
     // TODO: check what are the Clang builtins, these are placeholders.
-    #define CPU_INIT_SUPPORT() __builtin_cpu_init()
-    #define CPU_IS(a)          (__builtin_cpu_is(a))
+    #define CPU_INIT_SUPPORT() ((void)0)
+    #define CPU_IS(a)          0
     #define CPU_SUPPORTS(a)    (__builtin_cpu_supports(a))
 
     #define SIMD_FEATURE_FMA    CPU_SUPPORTS("fma")
@@ -18,7 +18,7 @@
     #define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS("sse4.2")
     #define SIMD_FEATURE_AVX    CPU_SUPPORTS("avx")
     #define SIMD_FEATURE_AVX2   CPU_SUPPORTS("avx2")
-    #define SIMD_FEATURE_AVX512 CPU_SUPPORTS("avx512BW")
+    #define SIMD_FEATURE_AVX512 (CPU_SUPPORTS("avx512f") && CPU_SUPPORTS("avx512dq"))
     #define SIMD_FEATURE_KNCNI  0
 
 #elif defined(__GNUC__)
@@ -28,7 +28,7 @@
         #define CPU_IS(a)          (__builtin_cpu_is(a))
         #define CPU_SUPPORTS(a)    (__builtin_cpu_supports(a))
     #else
-        #define CPU_INIT_SUPPORT()
+        #define CPU_INIT_SUPPORT() ((void)0)
         #define CPU_IS(a)          0
         #define CPU_SUPPORTS(a)    0
     #endif
@@ -44,12 +44,12 @@
     #define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS("sse4.2")
     #define SIMD_FEATURE_AVX    CPU_SUPPORTS("avx")
     #define SIMD_FEATURE_AVX2   CPU_SUPPORTS("avx2")
-    #define SIMD_FEATURE_AVX512 CPU_SUPPORTS("avx512bw")
+    #define SIMD_FEATURE_AVX512 CPU_SUPPORTS("avx512f")
     #define SIMD_FEATURE_KNCNI  0
 
 
-#elif defined(__INTEL_COMPILER)
-    #define CPU_INIT_SUPPORT()
+#elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
+    #define CPU_INIT_SUPPORT() ((void)0)
     #define CPU_IS(a)          0
     #define CPU_SUPPORTS(a)    _may_i_use_cpu_feature(a)
 
@@ -65,11 +65,12 @@
     #define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS(_FEATURE_SSE4_2)
     #define SIMD_FEATURE_AVX    CPU_SUPPORTS(_FEATURE_AVX)
     #define SIMD_FEATURE_AVX2   CPU_SUPPORTS(_FEATURE_AVX2)
-    #define SIMD_FEATURE_AVX512 CPU_SUPPORTS(_FEATURE_AVX512F | _FEATURE_AVX512PF | _FEATURE_AVX512CD | _FEATURE_AVX512ER)
+    #define SIMD_FEATURE_AVX512 CPU_SUPPORTS(_FEATURE_AVX512F | _FEATURE_AVX512DQ)
+    //#define SIMD_FEATURE_AVX512 CPU_SUPPORTS(_FEATURE_AVX512BW | _FEATURE_AVX512F | _FEATURE_AVX512PF | _FEATURE_AVX512DQ | _FEATURE_AVX512CD | _FEATURE_AVX512ER | _FEATURE_AVX512VL)
     #define SIMD_FEATURE_KNCNI  CPU_SUPPORTS(_FEATURE_KNCNI)
 
 #else
-    #define CPU_INIT_SUPPORT()
+    #define CPU_INIT_SUPPORT() ((void)0)
     #define CPU_IS(a)          0
     #define CPU_SUPPORTS(a)    0
 
@@ -209,15 +210,17 @@ int detectSIMD(void)
         print_feature_support("AVX2", support_feature);
     }
     #endif
-    #if defined(__AVX512BW__) || defined(__AVX512F__) || defined(__AVX512PF__) || defined(__AVX512CD__) || defined(__AVX512ER__)
+    #if defined(__AVX512F__) && defined(__AVX512DQ__)
+    //#if defined(__AVX512BW__) && defined(__AVX512F__) && defined(__AVX512PF__) && defined(__AVX512DQ__) && defined(__AVX512CD__) && defined(__AVX512ER__) && defined(__AVX512VL__)
     support_feature = SIMD_FEATURE_AVX512;
     if (support_feature)
         print_feature_support("AVX512", support_feature);
     #endif
-
+    #if defined(__MIC__)
     support_feature = SIMD_FEATURE_KNCNI;
     if (support_feature)
         print_feature_support("KNCNI", support_feature);
+    #endif
 
     return 0;
 }

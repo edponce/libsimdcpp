@@ -6,11 +6,13 @@
  *  Compiler specific macro to set array alignment.
  *
  *  TODO: Verify builtins for Intel and Clang compilers.
- *  TODO: Refer to 'stdlib.h' and 'mm_malloc.h' for aligned allocation variants and support.
+ *  TODO: Refer to 'stdlib.h' and '_mm_malloc.h' for aligned allocation variants and support.
  *
- *  NOTE: C/C++ arrays that are dynamically allocated, it is not enough to just
- *        align the data during creation using 'mm_malloc/posix_memalign/aligned_alloc', but it
- *        also requires a clause of SIMD_ASSUME_ALIGNED before the loop of interest.
+ *        C11:     void * aligned_alloc(size_t alignment, size_t size)
+ *        POSIX:   int posix_memalign(void **memptr, size_t alignment, size_t size)
+ *        Intel:   void * _mm_malloc(int size, int align)
+ *                 void _mm_free(void *p)
+ *        Windows: void * _aligned_malloc(size_t size, size_t alignment)
  *
  *  SIMD_ALIGNED(a):
  *      use on a variable declaration to specify at least 'a' bytes aligned.
@@ -18,6 +20,17 @@
  *  SIMD_ASSUME_ALIGNED(a,x):
  *      use on a variable declaration/assignment, returns 'a' and allows the compiler
  *      to assume that the returned pointer is at least 'x' bytes aligned.
+ *
+ *      NOTE: C/C++ arrays that are dynamically allocated, it is not enough to just
+ *            align the data during creation, but also requires a clause of
+ *            SIMD_ASSUME_ALIGNED before the loop of interest.
+ *
+ *      NOTE: Add '#pragma vector aligned' before a loop to assert that all array
+ *            accesses inside the loop are aligned (the programmer is responsible for
+ *            ensuring the alignment holds otherwise segmentation faults will occur).
+ *            Note that this pragma needs to be added just before each applicable
+ *            vector loop. In this way you do not have to specify each variable as
+ *            shown in SIMD_ASSUME example.
  *
  *  SIMD_FUNC_ASSUME_ALIGNED(a):
  *      use on a function declaration to specify that the return value of
@@ -68,7 +81,7 @@
     #define SIMD_ASSUME(a) __builtin_assume(a)
     #define SIMD_FUNC_INLINE __inline __attribute__((__gnu_inline__, __always_inline__, __artificial__))
     #define SIMD_PREFETCH(a,x) __builtin_prefetch(a,x)
-#elif defined(__INTEL_COMPILER)
+#elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
     #define SIMD_ALIGNED(a) __attribute__((__aligned__(a)))
     #define SIMD_ASSUME_ALIGNED(a,x) __assume_aligned(a, x)
     #define SIMD_FUNC_ASSUME_ALIGNED(a)
