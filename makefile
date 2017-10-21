@@ -98,12 +98,15 @@ TESTDIR := testsuite
 # Examples
 EXAMPLEDIR := examples
 
+# Benchmarks
+BENCHMARKDIR := benchmarks
+
 #######################################
 
 # Targets that are not real files
 .PHONY: all clean simd clean_tests clean_examples clean_all
 
-all: simd testsuite examples
+all: simd testsuite examples benchmarks
 
 # SIMD library
 simd: $(OBJ)
@@ -129,7 +132,14 @@ examples: $(OBJ) $(HEADERS) $(MAKEFILE)
 clean_examples:
 	$(MAKE) -C $(EXAMPLEDIR) clean
 
-clean_all: clean clean_tests clean_examples
+# Benchmarks
+benchmarks: $(OBJ) $(HEADERS) $(MAKEFILE)
+	$(MAKE) -C $(BENCHMARKDIR)
+
+clean_benchmarks:
+	$(MAKE) -C $(BENCHMARKDIR) clean
+
+clean_all: clean clean_tests clean_examples clean_benchmarks
 
 # Force
 force:
@@ -143,6 +153,10 @@ force_tests:
 force_examples:
 	$(MAKE) clean_examples
 	$(MAKE) examples
+
+force_benchmarks:
+	$(MAKE) clean_benchmarks
+	$(MAKE) benchmarks
 
 force_all:
 	$(MAKE) clean_all
