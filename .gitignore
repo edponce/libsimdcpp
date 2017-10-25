@@ -1,0 +1,5 @@
+*.swp
+obj/
+testsuite/testsuite
+examples/example
+benchmarks/benchmark

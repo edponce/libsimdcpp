@@ -1,0 +1,25 @@
+Intel Intrinsics SIMD C++ library
+
+A C++ interface for Intel SIMD intrinsics. This interface
+allows applications to easily and systematically access the available vector technologies.
+
+General requirements:
+    GNU compilers, require 4.8 or greater for __builtin_cpu_supports()
+    C++98 - function overloading
+    _POSIX_C_SOURCE>=200112L
+    _ISOC99_SOURCE
+
+SIMD requirements:
+    SSE - at least SSE4.1 for _mm_mullo_epi32() and _mm_mul_epi32()
+    AVX - at least AVX2 for integer instructions, _mm256_mullo_epi32(), _mm256_mul_epi32(), and others
+          at least SSE2 _mm_shuffle_epi32() and _mm_or_epi32()
+
+All SIMD macro decisions are ordered from most recent technology to oldest.
+This allows the use of best available technology without the user having to specify.
+Note that the user is allowed to decide on a specific technology using a macro definition.
+The number of streams depends on the width of the vector unit.
+
+Arrays of SIMD intrinsics are allocated using posix_memalign(), using fixed arrays
+worked for SSE but not AVX. It seems this is due to compiler (GCC) not providing automatic
+support for large vector datatypes.
+
