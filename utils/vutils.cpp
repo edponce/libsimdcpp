@@ -5,7 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h> // posix_memalign
 #include <errno.h> // errno
-#include "vutils.h" 
+#include "vutils.h"
 
 
 int scalar_malloc(int ** const sa, const size_t align, const size_t nelems)
@@ -161,7 +161,7 @@ void simd_print(const char * const str, const SIMD_INT va)
       printf("%d\t", itmp[i]);
     printf("\n");
 
-    unsigned int utmp[SIMD_STREAMS_32] __SIMD_ALIGN__; 
+    unsigned int utmp[SIMD_STREAMS_32] __SIMD_ALIGN__;
     simd_store(utmp, va);
     printf("%s", str);
     for (int i = 0; i < SIMD_STREAMS_32; ++i)

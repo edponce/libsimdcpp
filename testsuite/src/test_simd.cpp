@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>      // free
+#include <limits.h>      // limits of fundamental integral types
 #include "test_utils.h"
 #include "test_simd.h"
 
@@ -53,6 +54,70 @@ int test_simd_loadstore()
     return test_result;
 }
 
+// Add signed/unsigned 16/32/64-bit integers
+int test_simd_add()
+{
+    int test_result = 0;
+    const int alignment = SIMD_WIDTH_BYTES;
+
+    // Unsigned integer 32-bit
+    {
+        const int num_elems = SIMD_STREAMS_32;
+        const TEST_TYPES test_type = TEST_U32;
+        unsigned int *arr_A = NULL, *arr_B = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_B, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C1, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C2, num_elems, alignment);
+
+        SIMD_INT va = simd_load(arr_A);
+        SIMD_INT vb = simd_load(arr_B);
+        SIMD_INT vc = simd_load(arr_C1);
+        vc = simd_add_i32(va, vb);
+
+        for (int i = 0; i < num_elems; ++i)
+            arr_C2[i] = arr_A[i] + arr_B[i];
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    // Signed integer 32-bit
+    {
+        const int num_elems = SIMD_STREAMS_32;
+        const TEST_TYPES test_type = TEST_I32;
+        int *arr_A = NULL, *arr_B = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_B, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C1, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C2, num_elems, alignment);
+
+        SIMD_INT va = simd_load(arr_A);
+        SIMD_INT vb = simd_load(arr_B);
+        SIMD_INT vc = simd_load(arr_C1);
+        vc = simd_add_i32(va, vb);
+
+        for (int i = 0; i < num_elems; ++i)
+            arr_C2[i] = arr_A[i] + arr_B[i];
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    return test_result;
+}
 
 // Floating-point fused multiply-add
 int test_simd_fmadd()
@@ -524,7 +589,7 @@ int test_simd_set_32()
         const int num_elems = SIMD_STREAMS_32;
         const TEST_TYPES test_type = TEST_I32;
         int *arr_A = NULL, *arr_B = NULL;
-        const int val = (rand() % (RAND_MAX-1) + 1) - RAND_MAX/2;
+        const int val = rand() % INT_MAX;
 
         create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
         create_test_array(test_type, (void **)&arr_B, num_elems, alignment);

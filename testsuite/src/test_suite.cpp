@@ -19,7 +19,7 @@ int main()
     // Seed RNG
     srand(time(NULL));
 
-    fprintf(stdout, "SIMD TESTSUITE\n");
+    fprintf(stdout, "SIMD TESTSUITE (%d-bits)\n", SIMD_WIDTH_BITS);
     detectCPU();
     detectSIMD();
 

@@ -36,10 +36,9 @@
  *  SSE4.1 128-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
-//#define SIMD_WIDTH_BYTES 16
-//#define SIMD_STREAMS_32  4
-//#define SIMD_STREAMS_64  2
-const int32_t SIMD_WIDTH_BYTES = 16;
+const int32_t SIMD_WIDTH_BITS = 128;
+const int32_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
+const int32_t SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
 const int32_t SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
 const int32_t SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
 typedef __m128i SIMD_INT;
@@ -62,6 +61,14 @@ typedef __m128d SIMD_DBL;
 /**************************
  *  Arithmetic intrinsics
  **************************/
+/*!
+ *  Add/sub for signed/unsigned 16/32/64-bit integers
+ *  Does not use saturation arithmetic (wraps around)
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_add_epi16(va, vb); }
+
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_epi32(va, vb); }
@@ -69,6 +76,44 @@ SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_epi64(va, vb); }
+
+/*!
+ *  Add for unsigned 16-bit integers
+ *  Uses saturation arithmetic (no wrap around)
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_adds_epu16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
+{
+    uint32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm_store_si128((SIMD_INT *)sa, va);
+    _mm_store_si128((SIMD_INT *)sb, vb);
+
+    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+        sa[i] += sb[i];
+
+    return _mm_load_si128((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_u64(const SIMD_INT va, const SIMD_INT vb)
+{
+    uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm_store_si128((SIMD_INT *)sa, va);
+    _mm_store_si128((SIMD_INT *)sb, vb);
+
+    for (int i = 0; i < SIMD_STREAMS_64; ++i)
+        sa[i] += sb[i];
+
+    return _mm_load_si128((SIMD_INT *)sa);
+}
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_add(const SIMD_FLT va, const SIMD_FLT vb)
@@ -458,11 +503,27 @@ SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
  *  Load intrinsics
  ********************/
 static SIMD_FUNC_INLINE
+SIMD_INT simd_load(const int16_t * const sa)
+{ return _mm_load_si128((SIMD_INT *)sa); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_loadu(const int16_t * const sa)
+{ return _mm_loadu_si128((SIMD_INT *)sa); }
+
+static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const int32_t * const sa)
 { return _mm_load_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const int32_t * const sa)
+{ return _mm_loadu_si128((SIMD_INT *)sa); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_load(const uint16_t * const sa)
+{ return _mm_load_si128((SIMD_INT *)sa); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_loadu(const uint16_t * const sa)
 { return _mm_loadu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
@@ -510,11 +571,27 @@ SIMD_DBL simd_loadu(const double * const sa)
  *  Store intrinsics
  *******************************/
 static SIMD_FUNC_INLINE
+void simd_store(int16_t * const sa, const SIMD_INT va)
+{ _mm_store_si128((SIMD_INT *)sa, va); }
+
+static SIMD_FUNC_INLINE
+void simd_storeu(int16_t * const sa, const SIMD_INT va)
+{ _mm_storeu_si128((SIMD_INT *)sa, va); }
+
+static SIMD_FUNC_INLINE
 void simd_store(int32_t * const sa, const SIMD_INT va)
 { _mm_store_si128((SIMD_INT *)sa, va); }
 
 static SIMD_FUNC_INLINE
 void simd_storeu(int32_t * const sa, const SIMD_INT va)
+{ _mm_storeu_si128((SIMD_INT *)sa, va); }
+
+static SIMD_FUNC_INLINE
+void simd_store(uint16_t * const sa, const SIMD_INT va)
+{ _mm_store_si128((SIMD_INT *)sa, va); }
+
+static SIMD_FUNC_INLINE
+void simd_storeu(uint16_t * const sa, const SIMD_INT va)
 { _mm_storeu_si128((SIMD_INT *)sa, va); }
 
 static SIMD_FUNC_INLINE

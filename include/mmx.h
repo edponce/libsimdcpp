@@ -40,10 +40,9 @@
  *        unsigned integers, so signed integers are always assumed.
  *        Floating-point operations simply use float and double scalar datatypes.
  */
-//#define SIMD_WIDTH_BYTES 8
-//#define SIMD_STREAMS_32  2
-//#define SIMD_STREAMS_64  1
-const int32_t SIMD_WIDTH_BYTES = 8;
+const int32_t SIMD_WIDTH_BITS = 64;
+const int32_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
+const int32_t SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
 const int32_t SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
 const int32_t SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
 typedef __m64  SIMD_INT;

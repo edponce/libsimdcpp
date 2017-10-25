@@ -1,4 +1,5 @@
-testsuite/testsuite
-obj/
-examples/example
 *.swp
+obj/
+testsuite/testsuite
+examples/example
+benchmarks/benchmark

@@ -13,7 +13,8 @@
     #undef SIMD_AVX2
     #undef SIMD_AVX512
 
-    #if defined(__AVX512F__) && defined(__AVX512DQ__)
+    #if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__AVX512DQ__)
+    //#if defined(__AVX512F__) && defined(__AVX512DQ__)
     //#if defined(__AVX512BW__) && defined(__AVX512F__) && defined(__AVX512PF__) && defined(__AVX512DQ__) && defined(__AVX512CD__) && defined(__AVX512ER__) && defined(__AVX512VL__)
         #define SIMD_AVX512
     #elif defined(__AVX2__)
@@ -44,15 +45,7 @@
     #define SIMD_MODE
     #include "mmx.h"
 #else
-    /*
-     *  Compiler and architecture specific settings
-     */
-    #include "compiler.h"
-
-    // Disable SIMD for scalar mode
-    #define SIMD_WIDTH_BYTES 8
-    #define SIMD_STREAMS_32  1
-    #define SIMD_STREAMS_64  1
+    #include "scalar.h"
 #endif
 
 

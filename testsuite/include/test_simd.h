@@ -7,6 +7,7 @@
 
 
 int test_simd_loadstore();
+int test_simd_add();
 int test_simd_fmadd();
 int test_simd_mul_u64();
 int test_simd_packmerge_i32();

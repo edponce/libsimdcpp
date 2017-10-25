@@ -18,6 +18,7 @@ struct TEST_T {
 struct TEST_T TESTS[] =
 {
     { test_simd_loadstore, "Aligned loads/stores" },
+    { test_simd_add, "Add signed/unsigned 16/32/64-bit integers" },
     { test_simd_fmadd, "Fused multiply-add" },
     { test_simd_mul_u64, "64-bit integer multiply" },
     { test_simd_packmerge_i32, "Pack and merge 32-bit integers" },
@@ -29,8 +30,8 @@ struct TEST_T TESTS[] =
 };
 
 
-#define MAX_WORKERS 4
-#define MAX_RUNS_PER_TEST 10
+const int MAX_WORKERS = 4;
+const int MAX_RUNS_PER_TEST = 20;
 
 
 int test_suite(const struct TEST_T * const, const int, const int);

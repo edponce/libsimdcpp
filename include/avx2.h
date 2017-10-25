@@ -36,10 +36,9 @@
  *  AVX2 256-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
-//#define SIMD_WIDTH_BYTES 32
-//#define SIMD_STREAMS_32  8
-//#define SIMD_STREAMS_64  4
-const int SIMD_WIDTH_BYTES = 32;
+const int SIMD_WIDTH_BITS = 256;
+const int SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
+const int SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
 const int SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
 const int SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
 typedef __m256i SIMD_INT;
@@ -62,6 +61,14 @@ typedef __m256d SIMD_DBL;
 /**************************
  *  Arithmetic intrinsics
  **************************/
+/*!
+ *  Add/sub for signed/unsigned 16/32/64-bit integers
+ *  Does not use saturation arithmetic (wraps around)
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm256_add_epi16(va, vb); }
+
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_add_epi32(va, vb); }
@@ -69,6 +76,40 @@ SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_add_epi64(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm256_add_epu16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
+{
+    uint32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm256_store_si256((SIMD_INT *)sa, va);
+    _mm256_store_si256((SIMD_INT *)sb, vb);
+
+    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+        sa[i] += sb[i];
+
+    return _mm256_load_si256((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_u64(const SIMD_INT va, const SIMD_INT vb)
+{
+    uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm256_store_si256((SIMD_INT *)sa, va);
+    _mm256_store_si256((SIMD_INT *)sb, vb);
+
+    for (int i = 0; i < SIMD_STREAMS_64; ++i)
+        sa[i] += sb[i];
+
+    return _mm256_load_si256((SIMD_INT *)sa);
+}
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_add(const SIMD_FLT va, const SIMD_FLT vb)
@@ -474,12 +515,32 @@ SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
 /********************
  *  Load intrinsics
  ********************/
+/*!
+ *  Aligned and unaligned load variants have same latency and throughput,
+ *  so can always use the unaligned variant.
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_load(const short int * const sa)
+{ return _mm256_load_si256((SIMD_INT *)sa); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_loadu(const short int * const sa)
+{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const int * const sa)
 { return _mm256_load_si256((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const int * const sa)
+{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_load(const unsigned short int * const sa)
+{ return _mm256_load_si256((SIMD_INT *)sa); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_loadu(const unsigned short int * const sa)
 { return _mm256_loadu_si256((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
@@ -526,12 +587,32 @@ SIMD_DBL simd_loadu(const double * const sa)
 /*******************************
  *  Store intrinsics
  *******************************/
+/*!
+ *  Aligned and unaligned store variants have same latency and throughput,
+ *  so can always use the unaligned variant.
+ */
+static SIMD_FUNC_INLINE
+void simd_store(short int * const sa, const SIMD_INT va)
+{ _mm256_store_si256((SIMD_INT *)sa, va); }
+
+static SIMD_FUNC_INLINE
+void simd_storeu(short int * const sa, const SIMD_INT va)
+{ _mm256_storeu_si256((SIMD_INT *)sa, va); }
+
 static SIMD_FUNC_INLINE
 void simd_store(int * const sa, const SIMD_INT va)
 { _mm256_store_si256((SIMD_INT *)sa, va); }
 
 static SIMD_FUNC_INLINE
 void simd_storeu(int * const sa, const SIMD_INT va)
+{ _mm256_storeu_si256((SIMD_INT *)sa, va); }
+
+static SIMD_FUNC_INLINE
+void simd_store(unsigned short int * const sa, const SIMD_INT va)
+{ _mm256_store_si256((SIMD_INT *)sa, va); }
+
+static SIMD_FUNC_INLINE
+void simd_storeu(unsigned short int * const sa, const SIMD_INT va)
 { _mm256_storeu_si256((SIMD_INT *)sa, va); }
 
 static SIMD_FUNC_INLINE
