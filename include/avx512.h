@@ -12,7 +12,7 @@
  *  Compiler and architecture specific settings
  */
 #include "compiler_attributes.h"
-#include "compiler_intrinsics.h"
+#include "compiler_builtins.h"
 
 
 /*
@@ -22,10 +22,10 @@
 #if defined(__clang__)
     //#include <x86intrin.h>
     #include <immintrin.h>
+#elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
+    #include <immintrin.h>
 #elif defined(__GNUC__)
     //#include <x86intrin.h>
-    #include <immintrin.h>
-#elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
     #include <immintrin.h>
 #else
     #error "Compiler/architecture is not supported."

@@ -2,6 +2,7 @@
 #include <stdlib.h> // getenv
 #include <unistd.h> // sysconf
 #include "utils.h"
+#include "compiler_versions.h"
 
 
 #if defined(_OPENMP)
@@ -34,7 +35,6 @@ int setOmpEnv(const int num_threads)
 }
 
 
-#define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)
 int detectProcSIMD()
 {
 #if GNUC_VERSION > 40800

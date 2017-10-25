@@ -2,6 +2,9 @@
 #define _COMPILER_ATTRIBUTES_H
 
 
+#include "compiler_versions.h"
+
+
 /*
  *  Compiler specific attributes
  *
@@ -54,18 +57,21 @@
     #define SIMD_FUNC_ASSUME_ALIGNED(a)
     #define SIMD_ASSUME(a) __builtin_assume(a)
     #define SIMD_FUNC_INLINE __inline __attribute__((__always_inline__))
-#elif defined(__GNUC__)
-    #define SIMD_ALIGNED(a) __attribute__((__aligned__(a)))
-    #define SIMD_ASSUME_ALIGNED(a,x) __builtin_assume_aligned(a, x)
-    #define SIMD_FUNC_ASSUME_ALIGNED(a) __attribute__((assume_aligned(a)))
-    #define SIMD_ASSUME(a) __builtin_assume(a)
-    #define SIMD_FUNC_INLINE __inline __attribute__((__gnu_inline__, __always_inline__, __artificial__))
+
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
     #define SIMD_ALIGNED(a) __attribute__((__aligned__(a)))
     #define SIMD_ASSUME_ALIGNED(a,x) __assume_aligned(a, x)
     #define SIMD_FUNC_ASSUME_ALIGNED(a)
     #define SIMD_ASSUME(a) __assume(a)
     #define SIMD_FUNC_INLINE inline
+
+#elif defined(__GNUC__)
+    #define SIMD_ALIGNED(a) __attribute__((__aligned__(a)))
+    #define SIMD_ASSUME_ALIGNED(a,x) __builtin_assume_aligned(a, x)
+    #define SIMD_FUNC_ASSUME_ALIGNED(a) __attribute__((assume_aligned(a)))
+    #define SIMD_ASSUME(a) __builtin_assume(a)
+    #define SIMD_FUNC_INLINE __inline __attribute__((__gnu_inline__, __always_inline__, __artificial__))
+
 #else
     #define SIMD_ALIGNED(a)
     #define SIMD_ASSUME_ALIGNED(a,x)
