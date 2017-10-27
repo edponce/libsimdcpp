@@ -1,5 +1,5 @@
-#ifndef _AVX2_H
-#define _AVX2_H
+#ifndef _AVX_H
+#define _AVX_H
 
 
 /*
@@ -33,7 +33,7 @@
 
 
 /*
- *  AVX2 256-bit wide vector units
+ *  AVX 256-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
 const int SIMD_WIDTH_BITS = 256;
@@ -67,7 +67,19 @@ typedef __m256d SIMD_DBL;
  */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm256_add_epi16(va, vb); }
+{
+    __m128i vta = _mm256_castsi256_si128(va);
+    __m128i vtb = _mm256_castsi256_si128(vb);
+    __m128i vl = _mm_add_epi16(vta, vtb);
+
+    vta = _mm256_extractf128_si256(va, 0x01);
+    vtb = _mm256_extractf128_si256(vb, 0x01);
+    __m128i vh = _mm_add_epi16(vta, vtb);
+
+    //return _mm256_set_m128i(vh, vl);
+    SIMD_INT vra = _mm256_castsi128_si256(vl);
+    return _mm256_insertf128_si256(vra, vh, 0x01);
+}
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
@@ -77,9 +89,9 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_add_epi64(va, vb); }
 
-static SIMD_FUNC_INLINE
-SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm256_add_epu16(va, vb); }
+//static SIMD_FUNC_INLINE
+//SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
+//{ return _mm256_add_epu16(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
@@ -131,9 +143,9 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_sub_epi64(va, vb); }
 
-static SIMD_FUNC_INLINE
-SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm256_sub_epu16(va, vb); }
+//static SIMD_FUNC_INLINE
+//SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
+//{ return _mm256_sub_epu16(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
@@ -732,5 +744,5 @@ void simd_storeu(double * const sa, const SIMD_DBL va)
 { _mm256_storeu_pd(sa, va); }
 
 
-#endif  // _AVX2_H
+#endif  // _AVX_H
 

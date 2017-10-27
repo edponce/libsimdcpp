@@ -16,14 +16,15 @@ export CXX := g++
 # GNU/Intel SIMD extensions
 # -mmmx
 # -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2
-# -mavx, -mavx2
-# -mavx512bw, -mavx512f, -mavx512fp, -mavx512dq, -mavx512cd, -mavx512er, -mavx512vl
+# -mavx
+# -mavx2
+# -mavx512f, -mavx512bw, -mavx512dq, -mavx512fp, -mavx512cd, -mavx512er, -mavx512vl
 # -mfma
 #SIMDFLAGS += -mmmx
 #SIMDFLAGS += -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2
 #SIMDFLAGS += -mavx
 #SIMDFLAGS += -mavx2
-#SIMDFLAGS += -mavx512f -mavx512dq
+#SIMDFLAGS += -mavx512f -mavx512bw -mavx512dq
 #SIMDFLAGS += -mfma
 export SIMDFLAGS
 
@@ -45,6 +46,7 @@ export LFLAGS :=
 DEFINES := -DSIMD_MODE
 #DEFINES := -DSIMD_MMX
 #DEFINES := -DSIMD_SSE4_1
+#DEFINES := -DSIMD_AVX
 #DEFINES := -DSIMD_AVX2
 #DEFINES := -DSIMD_AVX512
 

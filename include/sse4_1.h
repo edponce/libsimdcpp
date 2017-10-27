@@ -123,6 +123,64 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_add_pd(va, vb); }
 
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_i16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_sub_epi16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_i32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_sub_epi32(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_sub_epi64(va, vb); }
+
+/*!
+ *  Sub for unsigned 16-bit integers
+ *  Uses saturation arithmetic (no wrap around)
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_subs_epu16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
+{
+    uint32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm_store_si128((SIMD_INT *)sa, va);
+    _mm_store_si128((SIMD_INT *)sb, vb);
+
+    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+        sa[i] -= sb[i];
+
+    return _mm_load_si128((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_u64(const SIMD_INT va, const SIMD_INT vb)
+{
+    uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm_store_si128((SIMD_INT *)sa, va);
+    _mm_store_si128((SIMD_INT *)sb, vb);
+
+    for (int i = 0; i < SIMD_STREAMS_64; ++i)
+        sa[i] -= sb[i];
+
+    return _mm_load_si128((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm_sub_ps(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm_sub_pd(va, vb); }
+
 /*!
  *  Fused multiply-add for 32/64-bit floating-point elements
  */
@@ -134,6 +192,14 @@ SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 { return _mm_fmadd_pd(va, vb, vc); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+{ return _mm_fmsub_ps(va, vb, vc); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+{ return _mm_fmsub_pd(va, vb, vc); }
 
 #else
 static SIMD_FUNC_INLINE
@@ -148,6 +214,20 @@ SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
     const SIMD_DBL vab = _mm_mul_pd(va, vb);
     return _mm_add_pd(vab, vc);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+{
+    const SIMD_FLT vab = _mm_mul_ps(va, vb);
+    return _mm_sub_ps(vab, vc);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+{
+    const SIMD_DBL vab = _mm_mul_pd(va, vb);
+    return _mm_sub_pd(vab, vc);
 }
 #endif
 

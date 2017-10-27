@@ -3,21 +3,25 @@
 
 
 /*
- *  If SIMD_MODE is enabled, use compiler flags to
- *  check automatically for best SIMD mode supported.
+ *  If SIMD_MODE is enabled, use compiler flags to check
+ *  automatically for best SIMD mode supported.
+ *  Undefining specific vector support, gives priority to automatic
+ *  SIMD mode over specific ones.
  */
 #if defined(SIMD_MODE)
-    #undef SIMD_MODE
-    #undef SIMD_MMX
-    #undef SIMD_SSE4_1
-    #undef SIMD_AVX2
     #undef SIMD_AVX512
+    #undef SIMD_AVX2
+    #undef SIMD_AVX
+    #undef SIMD_SSE4_1
+    #undef SIMD_MMX
 
     #if defined(__AVX512F__) && defined(__AVX512BW__) && defined(__AVX512DQ__)
     //#if defined(__AVX512BW__) && defined(__AVX512F__) && defined(__AVX512PF__) && defined(__AVX512DQ__) && defined(__AVX512CD__) && defined(__AVX512ER__) && defined(__AVX512VL__)
         #define SIMD_AVX512
     #elif defined(__AVX2__)
         #define SIMD_AVX2
+//    #elif defined(__AVX__)
+//        #define SIMD_AVX
     #elif defined(__SSE4_1__)
         #define SIMD_SSE4_1
     #elif defined(__MMX__)
@@ -32,18 +36,22 @@
  *  Include corresponding SIMD interfaces.
  */
 #if defined(SIMD_AVX512)
-    #define SIMD_MODE
+//    #define SIMD_MODE
     #include "avx512.h"
 #elif defined(SIMD_AVX2)
-    #define SIMD_MODE
+//    #define SIMD_MODE
     #include "avx2.h"
+#elif defined(SIMD_AVX)
+//    #define SIMD_MODE
+    #include "avx.h"
 #elif defined(SIMD_SSE4_1)
-    #define SIMD_MODE
+//    #define SIMD_MODE
     #include "sse4_1.h"
 #elif defined(SIMD_MMX)
-    #define SIMD_MODE
+//    #define SIMD_MODE
     #include "mmx.h"
 #else
+    #undef SIMD_MODE
     #include "scalar.h"
 #endif
 
