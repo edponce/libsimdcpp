@@ -77,9 +77,13 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_add_epi64(va, vb); }
 
+/*!
+ *  Add for unsigned 16-bit integers
+ *  Uses saturation arithmetic (no wrap around)
+ */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm256_add_epu16(va, vb); }
+{ return _mm256_adds_epu16(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
@@ -131,9 +135,13 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_sub_epi64(va, vb); }
 
+/*!
+ *  Sub for unsigned 16-bit integers
+ *  Uses saturation arithmetic (no wrap around)
+ */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm256_sub_epu16(va, vb); }
+{ return _mm256_subs_epu16(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
@@ -224,6 +232,44 @@ SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 #endif
 
 /*!
+ *  Multiply low signed 32-bit integers from each packed 64-bit elements
+ *  and store the signed 64-bit results
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm256_mul_epi32(va, vb); }
+
+/*!
+ *  Multiply packed 32-bit integers, produce intermediate 64-bit integers,
+ *  and store the low 32-bit results
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm256_mullo_epi32(va, vb); }
+
+/*!
+ *  Perform 64-bit integer multiplication using 32-bit integers
+ *  since vector extensions do not support 64-bit integer multiplication.
+ *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
+ *  NOTE: Same routine for signed/unsigned integer multiply
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
+{
+    const SIMD_INT vmsk = _mm256_set1_epi64x(0xFFFFFFFF00000000UL);
+    SIMD_INT vtmp, vhi, vlo;
+
+    vtmp = _mm256_shuffle_epi32(vb, 0xB1); // shuffle multiplier
+    vhi = _mm256_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
+    vtmp = _mm256_slli_epi64(vhi, 0x20);   // shift << 32
+    vhi = _mm256_add_epi64(vhi, vtmp);     // h = h1 + h2
+    vhi = _mm256_and_si256(vhi, vmsk);     // h & 0xFFFFFFFF00000000
+    vlo = _mm256_mul_epu32(va, vb);        // l = xl * yl
+
+    return _mm256_add_epi64(vlo, vhi);     // l + h
+}
+
+/*!
  *  Multiply low unsigned 32-bit integers from each packed 64-bit elements
  *  and store the unsigned 64-bit results
  */
@@ -232,19 +278,10 @@ SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_mul_epu32(va, vb); }
 
 /*!
- *  Multiply low signed 32-bit integers from each packed 64-bit elements
- *  and store the signed 64-bit results
- *  NOTE: requires at least AVX2 for _mm256_mul_epi32()
- */
-static SIMD_FUNC_INLINE
-SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm256_mul_epi32(va, vb); }
-
-/*!
  *  Perform 64-bit integer multiplication using 32-bit integers
  *  since vector extensions do not support 64-bit integer multiplication.
  *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
- *  NOTE: requires at least AVX2 for _mm256_mullo_epi32()
+ *  NOTE: Same routine for signed/unsigned integer multiply
  */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
@@ -261,15 +298,6 @@ SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
 
     return _mm256_add_epi64(vlo, vhi);     // l + h
 }
-
-/*!
- *  Multiply packed 32-bit integers, produce intermediate 64-bit integers,
- *  and store the low 32-bit results
- *  NOTE: requires at least AVX2 for _mm256_mullo_epi32()
- */
-static SIMD_FUNC_INLINE
-SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm256_mullo_epi32(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_mul(const SIMD_FLT va, const SIMD_FLT vb)

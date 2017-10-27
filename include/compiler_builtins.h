@@ -104,7 +104,8 @@
     #define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS("sse4.2")
     #define SIMD_FEATURE_AVX    CPU_SUPPORTS("avx")
     #define SIMD_FEATURE_AVX2   CPU_SUPPORTS("avx2")
-    #define SIMD_FEATURE_AVX512 (CPU_SUPPORTS("avx512f") && CPU_SUPPORTS("avx512bw") && CPU_SUPPORTS("avx512dq"))
+    #define SIMD_FEATURE_AVX512 CPU_SUPPORTS("avx512f")
+    //#define SIMD_FEATURE_AVX512 (CPU_SUPPORTS("avx512f") && CPU_SUPPORTS("avx512bw") && CPU_SUPPORTS("avx512dq"))
     #define SIMD_FEATURE_KNCNI  0
 
     // Prefetching builtins

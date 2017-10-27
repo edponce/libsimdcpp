@@ -12,6 +12,7 @@
     #undef SIMD_AVX512
     #undef SIMD_AVX2
     #undef SIMD_AVX
+    #undef SIMD_SSE4_2
     #undef SIMD_SSE4_1
     #undef SIMD_MMX
 
@@ -22,10 +23,14 @@
         #define SIMD_AVX2
 //    #elif defined(__AVX__)
 //        #define SIMD_AVX
+    #elif defined(__SSE4_2__)
+        #define SIMD_SSE4_2
     #elif defined(__SSE4_1__)
         #define SIMD_SSE4_1
     #elif defined(__MMX__)
         #define SIMD_MMX
+    #else
+        #undef SIMD_MODE
     #endif
 #endif
 
@@ -36,22 +41,18 @@
  *  Include corresponding SIMD interfaces.
  */
 #if defined(SIMD_AVX512)
-//    #define SIMD_MODE
     #include "avx512.h"
 #elif defined(SIMD_AVX2)
-//    #define SIMD_MODE
     #include "avx2.h"
 #elif defined(SIMD_AVX)
-//    #define SIMD_MODE
     #include "avx.h"
+#elif defined(SIMD_SSE4_2)
+    #include "sse4_2.h"
 #elif defined(SIMD_SSE4_1)
-//    #define SIMD_MODE
     #include "sse4_1.h"
 #elif defined(SIMD_MMX)
-//    #define SIMD_MODE
     #include "mmx.h"
 #else
-    #undef SIMD_MODE
     #include "scalar.h"
 #endif
 

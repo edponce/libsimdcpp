@@ -35,7 +35,7 @@
  *  MMX 64-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  *  NOTE: MMX only supports integer operations of 32 bits or less.
- *        To provide a single API, the 64-bit operations are actually a exact
+ *        To provide a single API, the 64-bit operations are actually an exact
  *        copy of its 32-bit implementation. Also, there is no support for
  *        unsigned integers, so signed integers are always assumed.
  *        Floating-point operations simply use float and double scalar datatypes.
@@ -48,6 +48,9 @@ const int32_t SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
 typedef __m64  SIMD_INT;
 typedef float  SIMD_FLT;
 typedef double SIMD_DBL;
+
+
+#define _SIMD_ALIGNED_ SIMD_ALIGNED(SIMD_WIDTH_BYTES)
 
 
 /*
@@ -65,19 +68,30 @@ typedef double SIMD_DBL;
 /**************************
  *  Arithmetic intrinsics
  **************************/
+/*!
+ *  Add/sub for signed/unsigned 16/32/64-bit integers
+ *  Does not use saturation arithmetic (wraps around)
+ */
 static SIMD_FUNC_INLINE
-SIMD_INT simd_add(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_add_pi16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_pi32(va, vb); }
-#define simd_add_i32(a,b) simd_add(a,b)
-#define simd_add_i64(a,b) simd_add(a,b)
+
+#define simd_add_i64(a,b) simd_add_i32(a,b)
+#define simd_add_u16(a,b) simd_add_i16(a,b)
+#define simd_add_u32(a,b) simd_add_i32(a,b)
+#define simd_add_u64(a,b) simd_add_i32(a,b)
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_add(const SIMD_FLT va, const SIMD_FLT vb)
-{ return (SIMD_FLT)(va + vb); }
+{ return va + vb; }
 
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
-{ return (SIMD_DBL)(va + vb); }
+{ return va + vb; }
 
 /*!
  *  Fused multiply-add for 32/64-bit floating-point elements
@@ -85,13 +99,13 @@ SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 {
-    return (SIMD_FLT)(va * vb + vc);
+    return va * vb + vc;
 }
 
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
-    return (SIMD_DBL)(va * vb + vc);
+    return va * vb + vc;
 }
 
 /*!

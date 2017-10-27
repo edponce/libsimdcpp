@@ -123,6 +123,64 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm512_add_pd(va, vb); }
 
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_i16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm512_sub_epi16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_i32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm512_sub_epi32(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm512_sub_epi64(va, vb); }
+
+/*!
+ *  Sub for unsigned 16-bit integers
+ *  Uses saturation arithmetic (no wrap around)
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm512_subs_epu16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
+{
+    uint32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm512_store_si512((SIMD_INT *)sa, va);
+    _mm512_store_si512((SIMD_INT *)sb, vb);
+
+    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+        sa[i] -= sb[i];
+
+    return _mm512_load_si512((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_u64(const SIMD_INT va, const SIMD_INT vb)
+{
+    uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm512_store_si512((SIMD_INT *)sa, va);
+    _mm512_store_si512((SIMD_INT *)sb, vb);
+
+    for (int i = 0; i < SIMD_STREAMS_64; ++i)
+        sa[i] -= sb[i];
+
+    return _mm512_load_si512((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm512_sub_ps(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm512_sub_pd(va, vb); }
+
 /*!
  *  Fused multiply-add for 32/64-bit floating-point elements
  */
@@ -134,6 +192,14 @@ SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 { return _mm512_fmadd_pd(va, vb, vc); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+{ return _mm512_fmsub_ps(va, vb, vc); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+{ return _mm512_fmsub_pd(va, vb, vc); }
 
 #else
 static SIMD_FUNC_INLINE
@@ -149,15 +215,21 @@ SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
     const SIMD_DBL vab = _mm512_mul_pd(va, vb);
     return _mm512_add_pd(vab, vc);
 }
-#endif
 
-/*!
- *  Multiply low unsigned 32-bit integers from each packed 64-bit elements
- *  and store the unsigned 64-bit results
- */
 static SIMD_FUNC_INLINE
-SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm512_mul_epu32(va, vb); }
+SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+{
+    const SIMD_FLT vab = _mm512_mul_ps(va, vb);
+    return _mm512_sub_ps(vab, vc);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+{
+    const SIMD_DBL vab = _mm512_mul_pd(va, vb);
+    return _mm512_sub_pd(vab, vc);
+}
+#endif
 
 /*!
  *  Multiply low signed 32-bit integers from each packed 64-bit elements
@@ -168,20 +240,39 @@ SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm512_mul_epi32(va, vb); }
 
 /*!
- *  Perform 64-bit integer multiplication
- *  NOTE: requires at least AVX512DQ for _mm512_mullo_epi64()
- */
-static SIMD_FUNC_INLINE
-SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm512_mullo_epi64(va, vb); }
-
-/*!
  *  Multiply packed 32-bit integers, produce intermediate 64-bit integers,
  *  and store the low 32-bit results
  */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm512_mullo_epi32(va, vb); }
+
+/*!
+ *  Multiply packed 64-bit integers, produce intermediate 128-bit integers,
+ *  and store the low 64-bit results
+ *  NOTE: requires at least AVX512F for _mm512_mullox_epi64()
+ *  NOTE: requires at least AVX512DQ for _mm512_mullo_epi64()
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
+//{ return _mm512_mullox_epi64(va, vb); }
+{ return _mm512_mullo_epi64(va, vb); }
+
+/*!
+ *  Multiply low unsigned 32-bit integers from each packed 64-bit elements
+ *  and store the unsigned 64-bit results
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm512_mul_epu32(va, vb); }
+
+/*!
+ *  NOTE: Represents unsigned integer multiply, but uses signed integer multiply
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
+//{ return _mm512_mullox_epi64(va, vb); }
+{ return _mm512_mullo_epi64(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_mul(const SIMD_FLT va, const SIMD_FLT vb)

@@ -89,9 +89,13 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_add_epi64(va, vb); }
 
-//static SIMD_FUNC_INLINE
-//SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
-//{ return _mm256_add_epu16(va, vb); }
+/*!
+ *  Add for unsigned 16-bit integers
+ *  Uses saturation arithmetic (no wrap around)
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm256_adds_epu16(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)

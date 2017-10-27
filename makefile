@@ -42,10 +42,14 @@ export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wex
 export LFLAGS :=
 
 # Preprocessor definitions
-# SIMD modes: -DSIMD_MODE (auto), -DSIMD_MMX, -DSIMD_SSE4_1, -DSIMD_AVX2, -DSIMD_AVX512
+# SIMD modes: -DSIMD_MODE (auto)
+#             -DSIMD_MMX
+#             -DSIMD_SSE4_1 -DSIMD_SSE4_2
+#             -DSIMD_AVX -DSIMD_AVX2 -DSIMD_AVX512
 DEFINES := -DSIMD_MODE
 #DEFINES := -DSIMD_MMX
 #DEFINES := -DSIMD_SSE4_1
+#DEFINES := -DSIMD_SSE4_2
 #DEFINES := -DSIMD_AVX
 #DEFINES := -DSIMD_AVX2
 #DEFINES := -DSIMD_AVX512
