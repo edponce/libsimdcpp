@@ -17,18 +17,17 @@
 
 /*
  *  Include supporting header files based on compiler and architecture
- *  NOTE: currently only support x86_64, GCC and Intel compilers
  */
 #if defined(__clang__)
-    //#include <x86intrin.h>
-    #include <nmmintrin.h>
+//#   include <x86intrin.h>
+#   include <nmmintrin.h>
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
-    #include <nmmintrin.h>
+#   include <nmmintrin.h>
 #elif defined(__GNUC__)
-    //#include <x86intrin.h>
-    #include <nmmintrin.h>
+//#   include <x86intrin.h>
+#   include <nmmintrin.h>
 #else
-    #error "Compiler/architecture is not supported."
+#   error "Compiler/architecture is not supported."
 #endif
 
 
@@ -588,7 +587,8 @@ SIMD_INT simd_load(const int16_t * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const int16_t * const sa)
-{ return _mm_loadu_si128((SIMD_INT *)sa); }
+//{ return _mm_loadu_si128((SIMD_INT *)sa); }
+{ return _mm_lddqu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const int32_t * const sa)
@@ -596,7 +596,8 @@ SIMD_INT simd_load(const int32_t * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const int32_t * const sa)
-{ return _mm_loadu_si128((SIMD_INT *)sa); }
+//{ return _mm_loadu_si128((SIMD_INT *)sa); }
+{ return _mm_lddqu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const uint16_t * const sa)
@@ -604,7 +605,8 @@ SIMD_INT simd_load(const uint16_t * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const uint16_t * const sa)
-{ return _mm_loadu_si128((SIMD_INT *)sa); }
+//{ return _mm_loadu_si128((SIMD_INT *)sa); }
+{ return _mm_lddqu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const uint32_t * const sa)
@@ -612,7 +614,8 @@ SIMD_INT simd_load(const uint32_t * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const uint32_t * const sa)
-{ return _mm_loadu_si128((SIMD_INT *)sa); }
+//{ return _mm_loadu_si128((SIMD_INT *)sa); }
+{ return _mm_lddqu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const int64_t * const sa)
@@ -620,7 +623,8 @@ SIMD_INT simd_load(const int64_t * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const int64_t * const sa)
-{ return _mm_loadu_si128((SIMD_INT *)sa); }
+//{ return _mm_loadu_si128((SIMD_INT *)sa); }
+{ return _mm_lddqu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const uint64_t * const sa)
@@ -628,7 +632,8 @@ SIMD_INT simd_load(const uint64_t * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const uint64_t * const sa)
-{ return _mm_loadu_si128((SIMD_INT *)sa); }
+//{ return _mm_loadu_si128((SIMD_INT *)sa); }
+{ return _mm_lddqu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_load(const float * const sa)

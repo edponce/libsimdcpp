@@ -19,15 +19,15 @@
  *  Include supporting header files based on compiler and architecture
  */
 #if defined(__clang__)
-    //#include <x86intrin.h>
-    #include <immintrin.h>
+//#   include <x86intrin.h>
+#   include <immintrin.h>
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
-    #include <immintrin.h>
+#   include <immintrin.h>
 #elif defined(__GNUC__)
-    //#include <x86intrin.h>
-    #include <immintrin.h>
+//#   include <x86intrin.h>
+#   include <immintrin.h>
 #else
-    #error "Compiler/architecture is not supported."
+#   error "Compiler/architecture is not supported."
 #endif
 
 
@@ -628,7 +628,8 @@ SIMD_INT simd_load(const short int * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const short int * const sa)
-{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+//{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+{ return _mm256_lddqu_si256((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const int * const sa)
@@ -636,7 +637,8 @@ SIMD_INT simd_load(const int * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const int * const sa)
-{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+//{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+{ return _mm256_lddqu_si256((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const unsigned short int * const sa)
@@ -644,7 +646,8 @@ SIMD_INT simd_load(const unsigned short int * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const unsigned short int * const sa)
-{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+//{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+{ return _mm256_lddqu_si256((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const unsigned int * const sa)
@@ -652,7 +655,8 @@ SIMD_INT simd_load(const unsigned int * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const unsigned int * const sa)
-{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+//{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+{ return _mm256_lddqu_si256((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const long int * const sa)
@@ -660,7 +664,8 @@ SIMD_INT simd_load(const long int * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const long int * const sa)
-{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+//{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+{ return _mm256_lddqu_si256((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const unsigned long int * const sa)
@@ -668,7 +673,8 @@ SIMD_INT simd_load(const unsigned long int * const sa)
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const unsigned long int * const sa)
-{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+//{ return _mm256_loadu_si256((SIMD_INT *)sa); }
+{ return _mm256_lddqu_si256((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_load(const float * const sa)

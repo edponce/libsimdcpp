@@ -19,15 +19,15 @@
  *  Include supporting header files based on compiler and architecture
  */
 #if defined(__clang__)
-    //#include <x86intrin.h>
-    #include <mmintrin.h>
+//#   include <x86intrin.h>
+#   include <mmintrin.h>
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
-    #include <mmintrin.h>
+#   include <mmintrin.h>
 #elif defined(__GNUC__)
-    //#include <x86intrin.h>
-    #include <mmintrin.h>
+//#   include <x86intrin.h>
+#   include <mmintrin.h>
 #else
-    #error "Compiler/architecture is not supported."
+#   error "Compiler/architecture is not supported."
 #endif
 
 

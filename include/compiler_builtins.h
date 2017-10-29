@@ -32,111 +32,111 @@
  */
 #if defined(__clang__)
     // Used to verify SIMD features supported
-    #define CPU_INIT_SUPPORT() ((void)0)
-    #define CPU_IS(a)          0
-    #define CPU_SUPPORTS(a)    (__builtin_cpu_supports(a))
+#   define CPU_INIT_SUPPORT() ((void)0)
+#   define CPU_IS(a)          0
+#   define CPU_SUPPORTS(a)    (__builtin_cpu_supports(a))
 
-    #define SIMD_FEATURE_FMA    CPU_SUPPORTS("fma")
-    #define SIMD_FEATURE_FMA4   CPU_SUPPORTS("fma4")
-    #define SIMD_FEATURE_MMX    CPU_SUPPORTS("mmx")
-    #define SIMD_FEATURE_SSE    CPU_SUPPORTS("sse")
-    #define SIMD_FEATURE_SSE2   CPU_SUPPORTS("sse2")
-    #define SIMD_FEATURE_SSE3   CPU_SUPPORTS("sse3")
-    #define SIMD_FEATURE_SSSE3  CPU_SUPPORTS("ssse3")
-    #define SIMD_FEATURE_SSE4_1 CPU_SUPPORTS("sse4.1")
-    #define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS("sse4.2")
-    #define SIMD_FEATURE_AVX    CPU_SUPPORTS("avx")
-    #define SIMD_FEATURE_AVX2   CPU_SUPPORTS("avx2")
-    #define SIMD_FEATURE_AVX512 (CPU_SUPPORTS("avx512f") && CPU_SUPPORTS("avx512bw") && CPU_SUPPORTS("avx512dq"))
-    #define SIMD_FEATURE_KNCNI  0
+#   define SIMD_FEATURE_FMA    CPU_SUPPORTS("fma")
+#   define SIMD_FEATURE_FMA4   CPU_SUPPORTS("fma4")
+#   define SIMD_FEATURE_MMX    CPU_SUPPORTS("mmx")
+#   define SIMD_FEATURE_SSE    CPU_SUPPORTS("sse")
+#   define SIMD_FEATURE_SSE2   CPU_SUPPORTS("sse2")
+#   define SIMD_FEATURE_SSE3   CPU_SUPPORTS("sse3")
+#   define SIMD_FEATURE_SSSE3  CPU_SUPPORTS("ssse3")
+#   define SIMD_FEATURE_SSE4_1 CPU_SUPPORTS("sse4.1")
+#   define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS("sse4.2")
+#   define SIMD_FEATURE_AVX    CPU_SUPPORTS("avx")
+#   define SIMD_FEATURE_AVX2   CPU_SUPPORTS("avx2")
+#   define SIMD_FEATURE_AVX512 (CPU_SUPPORTS("avx512f") && CPU_SUPPORTS("avx512bw") && CPU_SUPPORTS("avx512dq"))
+#   define SIMD_FEATURE_KNCNI  0
 
     // Prefetching builtins
-    #define simd_prefetch(a,x) __builtin_prefetch(a,x)
-    #define simd_prefetch_r(a) simd_prefetch(a,0)
-    #define simd_prefetch_w(a) simd_prefetch(a,1)
+#   define simd_prefetch(a,x) __builtin_prefetch(a,x)
+#   define simd_prefetch_r(a) simd_prefetch(a,0)
+#   define simd_prefetch_w(a) simd_prefetch(a,1)
 
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
     // Used to verify SIMD features supported
-    #define CPU_INIT_SUPPORT() ((void)0)
-    #define CPU_IS(a)          0
-    #define CPU_SUPPORTS(a)    _may_i_use_cpu_feature(a)
+#   define CPU_INIT_SUPPORT() ((void)0)
+#   define CPU_IS(a)          0
+#   define CPU_SUPPORTS(a)    _may_i_use_cpu_feature(a)
 
-    #define SIMD_FEATURE_FMA    CPU_SUPPORTS(_FEATURE_FMA)
-    #define SIMD_FEATURE_FMA4   CPU_SUPPORTS(_FEATURE_FMA4)
-    #define SIMD_FEATURE_MMX    CPU_SUPPORTS(_FEATURE_MMX)
-    #define SIMD_FEATURE_SSE    CPU_SUPPORTS(_FEATURE_SSE)
-    #define SIMD_FEATURE_SSE2   CPU_SUPPORTS(_FEATURE_SSE2)
-    #define SIMD_FEATURE_SSE3   CPU_SUPPORTS(_FEATURE_SSE3)
-    #define SIMD_FEATURE_SSSE3  CPU_SUPPORTS(_FEATURE_SSSE3)
-    #define SIMD_FEATURE_SSE4_1 CPU_SUPPORTS(_FEATURE_SSE4_1)
-    #define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS(_FEATURE_SSE4_2)
-    #define SIMD_FEATURE_AVX    CPU_SUPPORTS(_FEATURE_AVX)
-    #define SIMD_FEATURE_AVX2   CPU_SUPPORTS(_FEATURE_AVX2)
-    #define SIMD_FEATURE_AVX512 CPU_SUPPORTS(_FEATURE_AVX512F | _FEATURE_AVX512BW | _FEATURE_AVX512DQ)
+#   define SIMD_FEATURE_FMA    CPU_SUPPORTS(_FEATURE_FMA)
+#   define SIMD_FEATURE_FMA4   CPU_SUPPORTS(_FEATURE_FMA4)
+#   define SIMD_FEATURE_MMX    CPU_SUPPORTS(_FEATURE_MMX)
+#   define SIMD_FEATURE_SSE    CPU_SUPPORTS(_FEATURE_SSE)
+#   define SIMD_FEATURE_SSE2   CPU_SUPPORTS(_FEATURE_SSE2)
+#   define SIMD_FEATURE_SSE3   CPU_SUPPORTS(_FEATURE_SSE3)
+#   define SIMD_FEATURE_SSSE3  CPU_SUPPORTS(_FEATURE_SSSE3)
+#   define SIMD_FEATURE_SSE4_1 CPU_SUPPORTS(_FEATURE_SSE4_1)
+#   define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS(_FEATURE_SSE4_2)
+#   define SIMD_FEATURE_AVX    CPU_SUPPORTS(_FEATURE_AVX)
+#   define SIMD_FEATURE_AVX2   CPU_SUPPORTS(_FEATURE_AVX2)
+#   define SIMD_FEATURE_AVX512 CPU_SUPPORTS(_FEATURE_AVX512F | _FEATURE_AVX512BW | _FEATURE_AVX512DQ)
     //#define SIMD_FEATURE_AVX512 CPU_SUPPORTS(_FEATURE_AVX512BW | _FEATURE_AVX512F | _FEATURE_AVX512PF | _FEATURE_AVX512DQ | _FEATURE_AVX512CD | _FEATURE_AVX512ER | _FEATURE_AVX512VL)
-    #define SIMD_FEATURE_KNCNI  CPU_SUPPORTS(_FEATURE_KNCNI)
+#   define SIMD_FEATURE_KNCNI  CPU_SUPPORTS(_FEATURE_KNCNI)
 
     // Prefetching builtins
-    #define simd_prefetch(a,x) _mm_prefetch(a,x)
-    #define simd_prefetch_r(a) simd_prefetch(a,_MM_HINT_T0)
-    #define simd_prefetch_w(a) simd_prefetch(a,_MM_HINT_T0)
+#   define simd_prefetch(a,x) _mm_prefetch(a,x)
+#   define simd_prefetch_r(a) simd_prefetch(a,_MM_HINT_T0)
+#   define simd_prefetch_w(a) simd_prefetch(a,_MM_HINT_T0)
 
 #elif defined(__GNUC__)
     // Used to verify SIMD features supported
-    #if GNUC_VERSION > 40800
-        #define CPU_INIT_SUPPORT() __builtin_cpu_init()
-        #define CPU_IS(a)          (__builtin_cpu_is(a))
-        #define CPU_SUPPORTS(a)    (__builtin_cpu_supports(a))
-    #else
-        #define CPU_INIT_SUPPORT() ((void)0)
-        #define CPU_IS(a)          0
-        #define CPU_SUPPORTS(a)    0
-    #endif
+#   if GNUC_VERSION > 40800
+#       define CPU_INIT_SUPPORT() __builtin_cpu_init()
+#       define CPU_IS(a)          (__builtin_cpu_is(a))
+#       define CPU_SUPPORTS(a)    (__builtin_cpu_supports(a))
+#   else
+#       define CPU_INIT_SUPPORT() ((void)0)
+#       define CPU_IS(a)          0
+#       define CPU_SUPPORTS(a)    0
+#   endif
 
-    #define SIMD_FEATURE_FMA    CPU_SUPPORTS("fma")
-    #define SIMD_FEATURE_FMA4   CPU_SUPPORTS("fma4")
-    #define SIMD_FEATURE_MMX    CPU_SUPPORTS("mmx")
-    #define SIMD_FEATURE_SSE    CPU_SUPPORTS("sse")
-    #define SIMD_FEATURE_SSE2   CPU_SUPPORTS("sse2")
-    #define SIMD_FEATURE_SSE3   CPU_SUPPORTS("sse3")
-    #define SIMD_FEATURE_SSSE3  CPU_SUPPORTS("ssse3")
-    #define SIMD_FEATURE_SSE4_1 CPU_SUPPORTS("sse4.1")
-    #define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS("sse4.2")
-    #define SIMD_FEATURE_AVX    CPU_SUPPORTS("avx")
-    #define SIMD_FEATURE_AVX2   CPU_SUPPORTS("avx2")
-    #define SIMD_FEATURE_AVX512 CPU_SUPPORTS("avx512f")
+#   define SIMD_FEATURE_FMA    CPU_SUPPORTS("fma")
+#   define SIMD_FEATURE_FMA4   CPU_SUPPORTS("fma4")
+#   define SIMD_FEATURE_MMX    CPU_SUPPORTS("mmx")
+#   define SIMD_FEATURE_SSE    CPU_SUPPORTS("sse")
+#   define SIMD_FEATURE_SSE2   CPU_SUPPORTS("sse2")
+#   define SIMD_FEATURE_SSE3   CPU_SUPPORTS("sse3")
+#   define SIMD_FEATURE_SSSE3  CPU_SUPPORTS("ssse3")
+#   define SIMD_FEATURE_SSE4_1 CPU_SUPPORTS("sse4.1")
+#   define SIMD_FEATURE_SSE4_2 CPU_SUPPORTS("sse4.2")
+#   define SIMD_FEATURE_AVX    CPU_SUPPORTS("avx")
+#   define SIMD_FEATURE_AVX2   CPU_SUPPORTS("avx2")
+#   define SIMD_FEATURE_AVX512 CPU_SUPPORTS("avx512f")
     //#define SIMD_FEATURE_AVX512 (CPU_SUPPORTS("avx512f") && CPU_SUPPORTS("avx512bw") && CPU_SUPPORTS("avx512dq"))
-    #define SIMD_FEATURE_KNCNI  0
+#   define SIMD_FEATURE_KNCNI  0
 
     // Prefetching builtins
-    #define simd_prefetch(a,x) __builtin_prefetch(a,x)
-    #define simd_prefetch_r(a) simd_prefetch(a,0)
-    #define simd_prefetch_w(a) simd_prefetch(a,1)
+#   define simd_prefetch(a,x) __builtin_prefetch(a,x)
+#   define simd_prefetch_r(a) simd_prefetch(a,0)
+#   define simd_prefetch_w(a) simd_prefetch(a,1)
 
 #else
     // Used to verify SIMD features supported
-    #define CPU_INIT_SUPPORT() ((void)0)
-    #define CPU_IS(a)          0
-    #define CPU_SUPPORTS(a)    0
+#   define CPU_INIT_SUPPORT() ((void)0)
+#   define CPU_IS(a)          0
+#   define CPU_SUPPORTS(a)    0
 
-    #define SIMD_FEATURE_FMA     0
-    #define SIMD_FEATURE_FMA4    0
-    #define SIMD_FEATURE_MMX     0
-    #define SIMD_FEATURE_SSE     0
-    #define SIMD_FEATURE_SSE2    0
-    #define SIMD_FEATURE_SSE3    0
-    #define SIMD_FEATURE_SSSE3   0
-    #define SIMD_FEATURE_SSE4_1  0
-    #define SIMD_FEATURE_SSE4_2  0
-    #define SIMD_FEATURE_AVX     0
-    #define SIMD_FEATURE_AVX2    0
-    #define SIMD_FEATURE_AVX512  0
-    #define SIMD_FEATURE_KNCNI   0
+#   define SIMD_FEATURE_FMA     0
+#   define SIMD_FEATURE_FMA4    0
+#   define SIMD_FEATURE_MMX     0
+#   define SIMD_FEATURE_SSE     0
+#   define SIMD_FEATURE_SSE2    0
+#   define SIMD_FEATURE_SSE3    0
+#   define SIMD_FEATURE_SSSE3   0
+#   define SIMD_FEATURE_SSE4_1  0
+#   define SIMD_FEATURE_SSE4_2  0
+#   define SIMD_FEATURE_AVX     0
+#   define SIMD_FEATURE_AVX2    0
+#   define SIMD_FEATURE_AVX512  0
+#   define SIMD_FEATURE_KNCNI   0
 
     // Prefetching builtins
-    #define simd_prefetch(a,x) ((void)0)
-    #define simd_prefetch_r(a) ((void)0)
-    #define simd_prefetch_w(a) ((void)0)
+#   define simd_prefetch(a,x) ((void)0)
+#   define simd_prefetch_r(a) ((void)0)
+#   define simd_prefetch_w(a) ((void)0)
 #endif
 
 

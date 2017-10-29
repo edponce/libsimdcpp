@@ -1,5 +1,5 @@
-#ifndef _SSE4_1_H
-#define _SSE4_1_H
+#ifndef _SSE2_H
+#define _SSE2_H
 
 
 /*
@@ -19,20 +19,20 @@
  *  Include supporting header files based on compiler and architecture
  */
 #if defined(__clang__)
-    //#include <x86intrin.h>
-    #include <smmintrin.h>
+//#   include <x86intrin.h>
+#   include <emmintrin.h>
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
-    #include <smmintrin.h>
+#   include <emmintrin.h>
 #elif defined(__GNUC__)
-    //#include <x86intrin.h>
-    #include <smmintrin.h>
+//#   include <x86intrin.h>
+#   include <emmintrin.h>
 #else
-    #error "Compiler/architecture is not supported."
+#   error "Compiler/architecture is not supported."
 #endif
 
 
 /*
- *  SSE4.1 128-bit wide vector units
+ *  SSE2 128-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
 const int32_t SIMD_WIDTH_BITS = 128;
@@ -714,5 +714,5 @@ void simd_storeu(double * const sa, const SIMD_DBL va)
 { _mm_storeu_pd(sa, va); }
 
 
-#endif  // _SSE4_1_H
+#endif  // _SSE2_H
 

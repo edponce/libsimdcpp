@@ -8,20 +8,25 @@
 MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
 export TOPDIR := $(strip $(patsubst %/, %, $(dir $(MAKEFILE))))
 
-# C++ compiler
+# C++ compilers
+# g++: 5.4.0
+# icpc: ?
+# clang++: 4.0
 export CXX := g++
 #export CXX := icpc
 #export CXX := clang++-4.0
 
 # GNU/Intel SIMD extensions
 # -mmmx
-# -msse, -msse2, -msse3, -mssse3, -msse4.1, -msse4.2
+# -msse, -msse2
+# -msse3, -mssse3, -msse4.1, -msse4.2
 # -mavx
 # -mavx2
 # -mavx512f, -mavx512bw, -mavx512dq, -mavx512fp, -mavx512cd, -mavx512er, -mavx512vl
 # -mfma
 #SIMDFLAGS += -mmmx
-#SIMDFLAGS += -msse -msse2 -msse3 -mssse3 -msse4.1 -msse4.2
+#SIMDFLAGS += -msse -msse2
+#SIMDFLAGS += -msse3 -mssse3 -msse4.1 -msse4.2
 #SIMDFLAGS += -mavx
 #SIMDFLAGS += -mavx2
 #SIMDFLAGS += -mavx512f -mavx512bw -mavx512dq
@@ -44,11 +49,14 @@ export LFLAGS :=
 # Preprocessor definitions
 # SIMD modes: -DSIMD_MODE (auto)
 #             -DSIMD_MMX
-#             -DSIMD_SSE4_1 -DSIMD_SSE4_2
-#             -DSIMD_AVX -DSIMD_AVX2 -DSIMD_AVX512
-#DEFINES := -DSIMD_MODE
-DEFINES := -DSIMD_MMX
-#DEFINES := -DSIMD_SSE4_1
+#             -DSIMD_SSE2
+#             -DSIMD_SSE4_2
+#             -DSIMD_AVX
+#             -DSIMD_AVX2
+#             -DSIMD_AVX512
+DEFINES := -DSIMD_MODE
+#DEFINES := -DSIMD_MMX
+#DEFINES := -DSIMD_SSE2
 #DEFINES := -DSIMD_SSE4_2
 #DEFINES := -DSIMD_AVX
 #DEFINES := -DSIMD_AVX2
@@ -66,7 +74,7 @@ DEFINES := -DSIMD_MMX
 # _DEFAULT_SOURCE : POSIX 2008, BSD and SVID features
 # _REENTRANT/_THREAD_SAFE : POSIX.1c/pthreads
 #
-# Most of the errors, most of the times, could be resolved by setting _XOPEN_SOURCE appropriately.
+# In many cases, errors could be resolved by setting _XOPEN_SOURCE appropriately.
 #
 # _XOPEN_SOURCE < 500
 #    is same as _POSIX_C_SOURCE = 2.

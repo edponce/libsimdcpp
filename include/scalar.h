@@ -24,7 +24,7 @@
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
 #elif defined(__GNUC__)
 #else
-    #error "Compiler/architecture is not supported."
+#   error "Compiler/architecture is not supported."
 #endif
 */
 
