@@ -182,7 +182,7 @@ SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm512_sub_pd(va, vb); }
 
 /*!
- *  Fused multiply-add for 32/64-bit floating-point elements
+ *  Fused multiply-add/sub for 32/64-bit floating-point elements
  */
 #if defined(__FMA__)
 static SIMD_FUNC_INLINE

@@ -3,10 +3,8 @@
 
 
 /*
- *  If SIMD_MODE is enabled, use compiler flags to check
- *  automatically for best SIMD mode supported.
- *  Undefining specific vector support, gives priority to automatic
- *  SIMD mode over specific ones.
+ *  If SIMD_MODE is enabled, use compiler flags to auto-select best SIMD mode supported
+ *  Auto-select SIMD support has priority over specific SIMD support
  */
 #if defined(SIMD_MODE)
     #undef SIMD_AVX512
@@ -29,16 +27,15 @@
         #define SIMD_SSE4_1
     #elif defined(__MMX__)
         #define SIMD_MMX
-    #else
-        #undef SIMD_MODE
     #endif
+#else
+    #define SIMD_MODE
 #endif
 
 
 /*
- *  If SIMD_MODE is disabled, check for the SIMD mode requested.
- *  SIMD_MODE has to be defined to access available SIMD features.
- *  Include corresponding SIMD interfaces.
+ *  Identify the SIMD mode requested and include SIMD interface
+ *  SIMD_MODE has to be defined to access available SIMD features
  */
 #if defined(SIMD_AVX512)
     #include "avx512.h"
@@ -53,13 +50,14 @@
 #elif defined(SIMD_MMX)
     #include "mmx.h"
 #else
+    #undef SIMD_MODE
     #include "scalar.h"
 #endif
 
 
 /*
- *  General form of macros provided by compiler/architecture settings.
- *  Use SIMD_WIDTH_BYTES provided by SIMD modules.
+ *  General form of macros provided by compiler/architecture settings
+ *  Use SIMD_WIDTH_BYTES provided by SIMD modules
  */
 #define __SIMD_ALIGN__ SIMD_ALIGNED(SIMD_WIDTH_BYTES)
 #define __SIMD_ASSUME_ALIGNED__(a) SIMD_ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)

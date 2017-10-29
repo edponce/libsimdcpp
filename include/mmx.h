@@ -50,9 +50,6 @@ typedef float  SIMD_FLT;
 typedef double SIMD_DBL;
 
 
-#define _SIMD_ALIGNED_ SIMD_ALIGNED(SIMD_WIDTH_BYTES)
-
-
 /*
  *  Interface Legend
  *
@@ -81,7 +78,15 @@ SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_pi32(va, vb); }
 
 #define simd_add_i64(a,b) simd_add_i32(a,b)
-#define simd_add_u16(a,b) simd_add_i16(a,b)
+
+/*!
+ *  Add for unsigned 16-bit integers
+ *  Uses saturation arithmetic (no wrap around)
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_adds_pu16(va, vb); }
+
 #define simd_add_u32(a,b) simd_add_i32(a,b)
 #define simd_add_u64(a,b) simd_add_i32(a,b)
 
@@ -93,8 +98,37 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
 { return va + vb; }
 
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_i16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_sub_pi16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_i32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_sub_pi32(va, vb); }
+
+#define simd_sub_i64(a,b) simd_sub_i32(a,b)
+
 /*!
- *  Fused multiply-add for 32/64-bit floating-point elements
+ *  Sub for unsigned 16-bit integers
+ *  Uses saturation arithmetic (no wrap around)
+ */
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_subs_pu16(va, vb); }
+
+#define simd_sub_u32(a,b) simd_sub_i32(a,b)
+#define simd_sub_u64(a,b) simd_sub_i32(a,b)
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
+{ return va - vb; }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
+{ return va - vb; }
+
+/*!
+ *  Fused multiply-add/sub for 32/64-bit floating-point elements
  */
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
@@ -106,6 +140,18 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
     return va * vb + vc;
+}
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+{
+    return va * vb - vc;
+}
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+{
+    return va * vb - vc;
 }
 
 /*!

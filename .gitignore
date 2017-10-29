@@ -1,5 +1,6 @@
 *.swp
-obj/
+*.o
 testsuite/testsuite
 examples/example
 benchmarks/benchmark
+benchmarks/timers/timer

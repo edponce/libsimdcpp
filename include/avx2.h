@@ -17,7 +17,6 @@
 
 /*
  *  Include supporting header files based on compiler and architecture
- *  NOTE: currently only support x86_64, GCC and Intel compilers
  */
 #if defined(__clang__)
     //#include <x86intrin.h>
@@ -36,11 +35,11 @@
  *  AVX2 256-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
-const int SIMD_WIDTH_BITS = 256;
-const int SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
-const int SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
-const int SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
-const int SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
+const int32_t SIMD_WIDTH_BITS = 256;
+const int32_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
+const int32_t SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
+const int32_t SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
+const int32_t SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
 typedef __m256i SIMD_INT;
 typedef __m256  SIMD_FLT;
 typedef __m256d SIMD_DBL;

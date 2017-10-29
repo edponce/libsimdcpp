@@ -1,16 +1,18 @@
 ## Compiler, tools and options
 CC      = gcc
-CCFLAGS =
+CFLAGS =
+
+#DEFINES = -DUSE_MONOTONIC_CLOCK
 
 ## Files
-OBJECTS = c_timer_test.o c_timer.o
+OBJECTS = timers_test.o timers.o
 TARGET  = timer
 
 ## Implicit rules
 .SUFFIXES: .c
 
 .c.o:
-	$(CC) -c $(CCFLAGS) $<
+	$(CC) $(DEFINES) -c $(CFLAGS) $<
 
 ## Build rules
 all: $(TARGET)

@@ -17,7 +17,6 @@
 
 /*
  *  Include supporting header files based on compiler and architecture
- *  NOTE: currently only support x86_64, GCC and Intel compilers
  */
 #if defined(__clang__)
     //#include <x86intrin.h>
@@ -182,7 +181,7 @@ SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_sub_pd(va, vb); }
 
 /*!
- *  Fused multiply-add for 32/64-bit floating-point elements
+ *  Fused multiply-add/sub for 32/64-bit floating-point elements
  */
 #if defined(__FMA__)
 static SIMD_FUNC_INLINE
