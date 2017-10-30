@@ -10,6 +10,7 @@
 // LLVM
 #if defined(__llvm__)
 #   define LLVM_VERSION (0)
+#   error "Compiler/architecture is not supported."
 
 // Clang
 // NOTE: Imitated GNUC, need to verify
@@ -24,6 +25,7 @@
 // NOTE: Imitated GNUC, need to verify
 #elif defined(__PGI)
 #   define PGI_VERSION (__PGIC__ * 10000 + __PGIC_MINOR__ * 100 + __PGIC_PATCHLEVEL__)  // VVRPP
+#   error "Compiler/architecture is not supported."
 
 // IBM XL C++ or IBM z/OS XL C++
 #elif defined(__IBMCPP__)
@@ -32,6 +34,7 @@
 #   else
 #       define IBM_VERSION (__IBMCPP__)  // VRP
 #   endif
+#   error "Compiler/architecture is not supported."
 
 // Microsoft Visual C++
 #elif defined(_MSC_VER)
@@ -40,6 +43,7 @@
 #   else
 #       define MSC_VERSION (_MSC_VER)  // VVRR
 #   endif
+#   error "Compiler/architecture is not supported."
 
 // GNU C/C++
 // NOTE: Notice that the meaning of the __GNUC__ macro has changed subtly over the years,

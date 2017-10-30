@@ -1,40 +1,463 @@
+/*!
+ *  \defgroup SSE4_2 SSE4.2
+ *  \brief SIMD interface for SSE4.2 (128-bit wide vector registers)
+ *
+ *  Interface Legend:\n
+ *  simd_*_iXX = signed XX-bit integers\n
+ *  simd_*_uXX = unsigned XX-bit integers\n
+ *  simd_*_fXX = floating-point XX-bit elements\n
+ *  simd_*_XX  = unsigned/signed XX-bit integers\n
+ *  simd_*_XX  = (set functions) specifies width to consider for integer types\n
+ *  simd_*     = datatype obtained from function overloading and parameters
+ *
+ *  \author Eduardo Ponce
+ *  \version 1.0
+ *  \date 10/30/2017
+ *
+ *  \todo Reuse vector registers in some cases (will need to remove const from parameter).
+ */
 #ifndef _SSE4_2_H
 #define _SSE4_2_H
 
 
 /*
- *  Support '_t' C datatypes
+ *  \defgroup GlobalSIMD_SSE4_2 Global SIMD identifiers
+ *  \ingroup SSE4_2
+ *  \brief Global constants and type definitions to support SIMD interface
+ *  \{
+ *
+ *  \var const int32_t SIMD_WIDTH_BITS
+ *  \brief Width of vector registers in bits
+ *
+ *  \var const int32_t SIMD_WIDTH_BYTES
+ *  \brief Width of vector registers in bytes
+ *
+ *  \var const int32_t SIMD_STREAMS_16
+ *  \brief Count of 16-bit numbers supported by width of vector registers
+ *
+ *  \var const int32_t SIMD_STREAMS_32
+ *  \brief Count of 32-bit numbers supported by width of vector registers
+ *
+ *  \var const int32_t SIMD_STREAMS_64
+ *  \brief Count of 64-bit numbers supported by width of vector registers
+ *
+ *  \typedef __m128i SIMD_INT
+ *  \brief Vector type for integral numbers
+ *
+ *  \typedef __m128 SIMD_FLT
+ *  \brief Vector type for single-precision floating-point numbers
+ *
+ *  \typedef __m128d SIMD_DBL
+ *  \brief Vector type for double-precision floating-point numbers
+ *
+ *  \}
  */
+
+
+/*!
+ *  \defgroup Arith_SSE4_2 Arithmetic instructions
+ *  \ingroup SSE4_2
+ *  \brief Arithmetic instructions supported by SIMD interface
+ *  \{
+ *
+ *    \defgroup AddSub_SSE4_2 Add and subtract
+ *    \{
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Add signed 16-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
+ *      int i = j * 16;
+ *      vc[i:i+15] = va[i:i+15] + vb[i:i+15];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Add signed 32-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vc[i:i+31] = va[i:i+31] + vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Add signed 64-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+63] + vb[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Add unsigned 16-bit integers
+ *  \details Uses saturation arithmetic (no wrap around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
+ *      int i = j * 16;
+ *      vc[i:i+15] = va[i:i+15] + vb[i:i+15];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Add unsigned 32-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vc[i:i+31] = va[i:i+31] + vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_u64(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Add unsigned 64-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+63] + vb[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_add(const SIMD_FLT va, const SIMD_FLT vb)
+ *  \brief Add single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vc[i:i+31] = va[i:i+31] + vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
+ *  \brief Add double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+63] + vb[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_i16(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Subtract signed 16-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
+ *      int i = j * 16;
+ *      vc[i:i+15] = va[i:i+15] - vb[i:i+15];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_i32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Subtract signed 32-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vc[i:i+31] = va[i:i+31] - vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Subtract signed 64-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+63] - vb[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Subtract unsigned 16-bit integers
+ *  \details Uses saturation arithmetic (no wrap around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
+ *      int i = j * 16;
+ *      vc[i:i+15] = va[i:i+15] - vb[i:i+15];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Subtract unsigned 32-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vc[i:i+31] = va[i:i+31] - vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_u64(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Subtract unsigned 64-bit integers
+ *  \details Does not uses saturation arithmetic (wraps around)
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+63] - vb[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
+ *  \brief Subtract single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vc[i:i+31] = va[i:i+31] - vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
+ *  \brief Subtract double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+63] - vb[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *    \}
+ *
+ *    \defgroup FMA_SSE4_2 Fused-multiply add and subtract
+ *    \{
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_fmadd(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+ *  \brief Fused multiply-add single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vd[i:i+31] = va[i:i+31] * vb[i:i+31] + vc[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \param[in] vc Third operand
+ *  \return vd
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_fmadd(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+ *  \brief Fused multiply-add double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vd[i:i+63] = va[i:i+63] * vb[i:i+63] + vc[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \param[in] vc Third operand
+ *  \return vd
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_fmsub(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+ *  \brief Fused multiply-subtract single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vd[i:i+31] = va[i:i+31] * vb[i:i+31] - vc[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \param[in] vc Third operand
+ *  \return vd
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_fmsub(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+ *  \brief Fused multiply-subtract double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vd[i:i+63] = va[i:i+63] * vb[i:i+63] - vc[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \param[in] vc Third operand
+ *  \return vd
+ *
+ *    \}
+ *
+ *    \defgroup Mul_SSE4_2 Multiply
+ *    \{
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Multiply packed 32-bit integers, produce intermediate 64-bit integers,
+ *         and store the low 32-bit results
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      int64_t tmp[0:63] = va[i:i+31] * vb[i:i+31];
+ *      vc[i:i+31] = tmp[0:31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Multiply low signed 32-bit integers from each packed 64-bit elements
+ *         and store the signed 64-bit results
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+31] * vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Perform signed 64-bit integer multiplication using 32-bit integers
+ *         since vector extensions do not support 64-bit integer multiplication.
+ *  \details x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = (va[i:i+31] * vb[i:i+31]) + (va[i:i+31] * vb[i+32:i+63] + va[i+32:i+63] * vb[i:i+31]) << 32;
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Multiply low unsigned 32-bit integers from each packed 64-bit elements
+ *         and store the unsigned 64-bit results
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+31] * vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Perform unsigned 64-bit integer multiplication using 32-bit integers
+ *         since vector extensions do not support 64-bit integer multiplication.
+ *  \details x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = (va[i:i+31] * vb[i:i+31]) + (va[i:i+31] * vb[i+32:i+63] + va[i+32:i+63] * vb[i:i+31]) << 32;
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_mul(const SIMD_FLT va, const SIMD_FLT vb)
+ *  \brief Multiply single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vc[i:i+31] = va[i:i+31] * vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_mul(const SIMD_DBL va, const SIMD_DBL vb)
+ *  \brief Multiply double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+63] * vb[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *    \}
+ *
+ *  \}
+ */
+
+
+#include "compiler_attributes.h"
+#include "compiler_builtins.h"
+#include <nmmintrin.h>
+//#include <x86intrin.h>
 #include <stdint.h>
 
 
-/*
- *  Compiler and architecture specific settings
- */
-#include "compiler_attributes.h"
-#include "compiler_builtins.h"
-
-
-/*
- *  Include supporting header files based on compiler and architecture
- */
-#if defined(__clang__)
-//#   include <x86intrin.h>
-#   include <nmmintrin.h>
-#elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
-#   include <nmmintrin.h>
-#elif defined(__GNUC__)
-//#   include <x86intrin.h>
-#   include <nmmintrin.h>
-#else
-#   error "Compiler/architecture is not supported."
-#endif
-
-
-/*
- *  SSE4.2 128-bit wide vector units
- *  Define constants required for SIMD module to function properly.
- */
 const int32_t SIMD_WIDTH_BITS = 128;
 const int32_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
 const int32_t SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
@@ -46,23 +469,7 @@ typedef __m128d SIMD_DBL;
 
 
 /*
- *  Interface Legend
- *
- *  simd_*_iXX = signed XX-bit integers
- *  simd_*_uXX = unsigned XX-bit integers
- *  simd_*_fXX = floating-point XX-bit elements
- *  simd_*_XX  = unsigned/signed XX-bit integers
- *  simd_*_XX  = (set functions) specifies width to consider for integer types
- *  simd_*     = datatype obtained from function overloading and parameters
- */
-
-
-/**************************
- *  Arithmetic intrinsics
- **************************/
-/*!
- *  Add/sub for signed/unsigned 16/32/64-bit integers
- *  Does not use saturation arithmetic (wraps around)
+ *  Arithmetic instructions
  */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
@@ -76,10 +483,6 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_epi64(va, vb); }
 
-/*!
- *  Add for unsigned 16-bit integers
- *  Uses saturation arithmetic (no wrap around)
- */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_adds_epu16(va, vb); }
@@ -89,13 +492,10 @@ SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
 {
     uint32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-
     _mm_store_si128((SIMD_INT *)sa, va);
     _mm_store_si128((SIMD_INT *)sb, vb);
-
-    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+    for (int32_t i = 0; i < SIMD_STREAMS_32; ++i)
         sa[i] += sb[i];
-
     return _mm_load_si128((SIMD_INT *)sa);
 }
 
@@ -104,13 +504,10 @@ SIMD_INT simd_add_u64(const SIMD_INT va, const SIMD_INT vb)
 {
     uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-
     _mm_store_si128((SIMD_INT *)sa, va);
     _mm_store_si128((SIMD_INT *)sb, vb);
-
-    for (int i = 0; i < SIMD_STREAMS_64; ++i)
+    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
         sa[i] += sb[i];
-
     return _mm_load_si128((SIMD_INT *)sa);
 }
 
@@ -134,10 +531,6 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_sub_epi64(va, vb); }
 
-/*!
- *  Sub for unsigned 16-bit integers
- *  Uses saturation arithmetic (no wrap around)
- */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_subs_epu16(va, vb); }
@@ -147,13 +540,10 @@ SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
 {
     uint32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-
     _mm_store_si128((SIMD_INT *)sa, va);
     _mm_store_si128((SIMD_INT *)sb, vb);
-
-    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+    for (int32_t i = 0; i < SIMD_STREAMS_32; ++i)
         sa[i] -= sb[i];
-
     return _mm_load_si128((SIMD_INT *)sa);
 }
 
@@ -162,13 +552,10 @@ SIMD_INT simd_sub_u64(const SIMD_INT va, const SIMD_INT vb)
 {
     uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-
     _mm_store_si128((SIMD_INT *)sa, va);
     _mm_store_si128((SIMD_INT *)sb, vb);
-
-    for (int i = 0; i < SIMD_STREAMS_64; ++i)
+    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
         sa[i] -= sb[i];
-
     return _mm_load_si128((SIMD_INT *)sa);
 }
 
@@ -180,103 +567,116 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_sub_pd(va, vb); }
 
-/*!
- *  Fused multiply-add/sub for 32/64-bit floating-point elements
- */
 #if defined(__FMA__)
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+SIMD_FLT simd_fmadd(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 { return _mm_fmadd_ps(va, vb, vc); }
 
 static SIMD_FUNC_INLINE
-SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+SIMD_DBL simd_fmadd(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 { return _mm_fmadd_pd(va, vb, vc); }
 
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+SIMD_FLT simd_fmsub(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 { return _mm_fmsub_ps(va, vb, vc); }
 
 static SIMD_FUNC_INLINE
-SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+SIMD_DBL simd_fmsub(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 { return _mm_fmsub_pd(va, vb, vc); }
 
 #else
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+SIMD_FLT simd_fmadd(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 {
-    const SIMD_FLT vab = _mm_mul_ps(va, vb);
-    return _mm_add_ps(vab, vc);
+    va = _mm_mul_ps(va, vb);
+    return _mm_add_ps(va, vc);
 }
 
 static SIMD_FUNC_INLINE
-SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+SIMD_DBL simd_fmadd(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
-    const SIMD_DBL vab = _mm_mul_pd(va, vb);
-    return _mm_add_pd(vab, vc);
+    va = _mm_mul_pd(va, vb);
+    return _mm_add_pd(va, vc);
 }
 
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+SIMD_FLT simd_fmsub(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 {
-    const SIMD_FLT vab = _mm_mul_ps(va, vb);
-    return _mm_sub_ps(vab, vc);
+    va = _mm_mul_ps(va, vb);
+    return _mm_sub_ps(va, vc);
 }
 
 static SIMD_FUNC_INLINE
-SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+SIMD_DBL simd_fmsub(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
-    const SIMD_DBL vab = _mm_mul_pd(va, vb);
-    return _mm_sub_pd(vab, vc);
+    va = _mm_mul_pd(va, vb);
+    return _mm_sub_pd(va, vc);
 }
 #endif
 
-/*!
- *  Multiply low unsigned 32-bit integers from each packed 64-bit elements
- *  and store the unsigned 64-bit results
- */
 static SIMD_FUNC_INLINE
-SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm_mul_epu32(va, vb); }
+SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_mullo_epi32(va, vb); }
 
-/*!
- *  Multiply low signed 32-bit integers from each packed 64-bit elements
- *  and store the signed 64-bit results
- *  NOTE: requires at least SSE 4.1 for _mm_mul_epi32()
- */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_mul_epi32(va, vb); }
 
-/*!
- *  Perform 64-bit integer multiplication using 32-bit integers
- *  since vector extensions do not support 64-bit integer multiplication.
- *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
- *  NOTE: requires at least SSE 4.1 for _mm_mullo_epi32()
- */
+// x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
 static SIMD_FUNC_INLINE
-SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
 {
+/*
     const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
     SIMD_INT vtmp, vhi, vlo;
-
     vtmp = _mm_shuffle_epi32(vb, 0xB1); // shuffle multiplier
     vhi = _mm_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
     vtmp = _mm_slli_epi64(vhi, 0x20);   // shift << 32
     vhi = _mm_add_epi64(vhi, vtmp);     // h = h1 + h2
     vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
     vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
-
+    return _mm_add_epi64(vlo, vhi);     // l + h
+*/
+    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
+    SIMD_INT vlo, vhi;
+    vlo = _mm_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
+    vhi = _mm_mullo_epi32(va, vlo);     // xl * yh, xh * yl
+    vlo = _mm_slli_epi64(vhi, 0x20);    // shift << 32
+    vhi = _mm_add_epi64(vhi, vlo);      // h = h1 + h2
+    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
+    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
     return _mm_add_epi64(vlo, vhi);     // l + h
 }
 
-/*!
- *  Multiply packed 32-bit integers, produce intermediate 64-bit integers,
- *  and store the low 32-bit results
- *  NOTE: requires at least SSE 4.1 for _mm_mullo_epi32()
- */
 static SIMD_FUNC_INLINE
-SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm_mullo_epi32(va, vb); }
+SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_mul_epu32(va, vb); }
+
+// x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
+{
+/*
+    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
+    SIMD_INT vtmp, vhi, vlo;
+    vtmp = _mm_shuffle_epi32(vb, 0xB1); // shuffle multiplier
+    vhi = _mm_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
+    vtmp = _mm_slli_epi64(vhi, 0x20);   // shift << 32
+    vhi = _mm_add_epi64(vhi, vtmp);     // h = h1 + h2
+    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
+    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
+    return _mm_add_epi64(vlo, vhi);     // l + h
+*/
+    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
+    SIMD_INT vlo, vhi;
+    vlo = _mm_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
+    vhi = _mm_mullo_epi32(va, vlo);     // xl * yh, xh * yl
+    vlo = _mm_slli_epi64(vhi, 0x20);    // shift << 32
+    vhi = _mm_add_epi64(vhi, vlo);      // h = h1 + h2
+    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
+    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
+    return _mm_add_epi64(vlo, vhi);     // l + h
+}
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_mul(const SIMD_FLT va, const SIMD_FLT vb)
@@ -287,9 +687,15 @@ SIMD_DBL simd_mul(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_mul_pd(va, vb); }
 
 
-/********************************
- *  Integral logical intrinsics
- ********************************/
+/*
+ *  Logical instructions
+ */
+/*!
+ *  \defgroup Logic_SSE4_2 Logical instructions
+ *  \ingroup SSE4_2
+ *  \brief Logical instructions supported by SIMD interface
+ *  \{
+ */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_or(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_or_si128(va, vb); }
@@ -318,10 +724,21 @@ SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
     return _mm_castsi128_pd(va_int);
 }
 
+/*!
+ *  \}
+ */
 
-/*****************************
- *  Shift/Shuffle intrinsics
- *****************************/
+
+/*
+ *  Shift and shuffle instructions
+ */
+/*!
+ *  \defgroup ShiftShuffle_SSE4_2 Shift and shuffle instructions
+ *  \ingroup SSE4_2
+ *  \brief Shift and shuffle instructions supported by SIMD interface
+ *  \{
+ */
+
 /*
  *  Shift left (logical) packed 32/64-bit integers
  */
@@ -415,10 +832,21 @@ SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb)
 */
 }
 
+/*!
+ *  \}
+ */
 
-/*******************
- *  Set intrinsics
- *******************/
+
+/*
+ *  Set instructions
+ */
+/*!
+ *  \defgroup Set_SSE4_2 Set instructions
+ *  \ingroup SSE4_2
+ *  \brief Set instructions supported by SIMD interface
+ *  \{
+ */
+
 /*
  *  Set vector to zero.
  */
@@ -514,10 +942,21 @@ SIMD_INT simd_set(const uint64_t * const sa, const int32_t n)
         return _mm_setzero_si128();
 }
 
+/*!
+ *  \}
+ */
 
-/***********************
- *  Convert intrinsics
- ***********************/
+
+/*
+ *  Convert instructions
+ */
+/*!
+ *  \defgroup Convert_SSE4_2 Convert instructions
+ *  \ingroup SSE4_2
+ *  \brief Convert instructions supported by SIMD interface
+ *  \{
+ */
+
 /*!
  *  Convert packed 32-bit integer elements
  *  to packed 32-bit floating-point elements.
@@ -577,10 +1016,21 @@ SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
     return _mm_load_pd(sa_dbl);
 }
 
+/*!
+ *  \}
+ */
 
-/********************
- *  Load intrinsics
- ********************/
+
+/*
+ *  Load instructions
+ */
+/*!
+ *  \defgroup Load_SSE4_2 Load instructions
+ *  \ingroup SSE4_2
+ *  \brief Load instructions supported by SIMD interface
+ *  \{
+ */
+
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const int16_t * const sa)
 { return _mm_load_si128((SIMD_INT *)sa); }
@@ -651,10 +1101,21 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_loadu(const double * const sa)
 { return _mm_loadu_pd(sa); }
 
+/*!
+ *  \}
+ */
 
-/*******************************
- *  Store intrinsics
- *******************************/
+
+/*
+ *  Store instructions
+ */
+/*!
+ *  \defgroup Store_SSE4_2 Store instructions
+ *  \ingroup SSE4_2
+ *  \brief Store instructions supported by SIMD interface
+ *  \{
+ */
+
 static SIMD_FUNC_INLINE
 void simd_store(int16_t * const sa, const SIMD_INT va)
 { _mm_store_si128((SIMD_INT *)sa, va); }
@@ -718,6 +1179,10 @@ void simd_store(double * const sa, const SIMD_DBL va)
 static SIMD_FUNC_INLINE
 void simd_storeu(double * const sa, const SIMD_DBL va)
 { _mm_storeu_pd(sa, va); }
+
+/*!
+ *  \}
+ */
 
 
 #endif  // _SSE4_2_H
