@@ -451,6 +451,67 @@
  */
 
 
+/*!
+ *  \defgroup Logic_AVX2 Logical instructions
+ *  \ingroup AVX2
+ *  \brief Logical instructions supported by SIMD interface
+ *  \{
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_or(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Bitwise OR of integral numbers
+ *  \code{.c}
+ *      vc[0:SIMD_WIDTH_BITS-1] = va[0:SIMD_WIDTH_BITS-1] | vb[0:SIMD_WIDTH_BITS-1];
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_xor(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Bitwise XOR of integral numbers
+ *  \code{.c}
+ *      vc[0:SIMD_WIDTH_BITS-1] = va[0:SIMD_WIDTH_BITS-1] ^ vb[0:SIMD_WIDTH_BITS-1];
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Bitwise AND of integral numbers
+ *  \code{.c}
+ *      vc[0:SIMD_WIDTH_BITS-1] = va[0:SIMD_WIDTH_BITS-1] & vb[0:SIMD_WIDTH_BITS-1];
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb)
+ *  \brief Bitwise AND of single-precision floating-point number and integral number
+ *  \details Useful for masking vector elements
+ *  \code{.c}
+ *      vc[0:SIMD_WIDTH_BITS-1] = (SIMD_FLT)((SIMD_INT)va[0:SIMD_WIDTH_BITS-1] & vb[0:SIMD_WIDTH_BITS-1]);
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
+ *  \brief Bitwise AND of double-precision floating-point number and integral number
+ *  \details Useful for masking vector elements
+ *  \code{.c}
+ *      vc[0:SIMD_WIDTH_BITS-1] = (SIMD_DBL)((SIMD_INT)va[0:SIMD_WIDTH_BITS-1] & vb[0:SIMD_WIDTH_BITS-1]);
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *  \}
+ */
+
+
 #include "compiler_attributes.h"
 #include "compiler_builtins.h"
 #include <immintrin.h>
@@ -690,12 +751,6 @@ SIMD_DBL simd_mul(const SIMD_DBL va, const SIMD_DBL vb)
 /*
  *  Logical instructions
  */
-/*!
- *  \defgroup Logic_AVX2 Logical instructions
- *  \ingroup AVX2
- *  \brief Logical instructions supported by SIMD interface
- *  \{
- */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_or(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_or_si256(va, vb); }
@@ -723,10 +778,6 @@ SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
     va_int = _mm256_and_si256(va_int, vb);
     return _mm256_castsi256_pd(va_int);
 }
-
-/*!
- *  \}
- */
 
 
 /*
