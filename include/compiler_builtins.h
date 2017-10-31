@@ -83,6 +83,7 @@
 
 #elif defined(__GNUC__)
     // Used to verify SIMD features supported
+    // NOTE: Requires 4.8 or greater for __builtin_cpu_supports
 #   if GNUC_VERSION > 40800
 #       define CPU_INIT_SUPPORT() __builtin_cpu_init()
 #       define CPU_IS(a)          (__builtin_cpu_is(a))

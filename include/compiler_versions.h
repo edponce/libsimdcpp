@@ -46,14 +46,14 @@
 #   error "Compiler/architecture is not supported."
 
 // GNU C/C++
-// NOTE: Notice that the meaning of the __GNUC__ macro has changed subtly over the years,
-//       from identifying the GNU C/C++ compiler to identifying any compiler that
-//       implements the GNU compiler extensions
+// NOTE: This compiler check is last because the meaning of the __GNUC__ macro
+//       has changed subtly over the years, from identifying the GNU C/C++
+//       compiler to identifying any compiler that implements the GNU compiler extensions.
 #elif defined(__GNUC__)
 #   if defined(__GNUC_PATCHLEVEL__)
 #       define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  // VVRPP
 #   else
-#       define GNUC_TMP_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)  // VRR00
+#       define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100)  // VRR00
 #   endif
 #endif
 

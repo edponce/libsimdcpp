@@ -65,7 +65,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed 16-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
  *      int i = j * 16;
@@ -79,7 +78,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed 32-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
  *      int i = j * 32;
@@ -93,7 +91,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed 64-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
  *      int i = j * 64;
@@ -107,7 +104,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add unsigned 16-bit integers
- *  \details Uses saturation arithmetic (no wrap around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
  *      int i = j * 16;
@@ -121,7 +117,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add unsigned 32-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
  *      int i = j * 32;
@@ -135,7 +130,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_u64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add unsigned 64-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
  *      int i = j * 64;
@@ -175,7 +169,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_i16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract signed 16-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
  *      int i = j * 16;
@@ -189,7 +182,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_i32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract signed 32-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
  *      int i = j * 32;
@@ -203,7 +195,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract signed 64-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
  *      int i = j * 64;
@@ -217,7 +208,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract unsigned 16-bit integers
- *  \details Uses saturation arithmetic (no wrap around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
  *      int i = j * 16;
@@ -231,7 +221,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract unsigned 32-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
  *      int i = j * 32;
@@ -245,7 +234,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_u64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract unsigned 64-bit integers
- *  \details Does not uses saturation arithmetic (wraps around)
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
  *      int i = j * 64;
@@ -379,7 +367,6 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Perform signed 64-bit integer multiplication using 32-bit integers
  *         since vector extensions do not support 64-bit integer multiplication.
- *  \details x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
  *      int i = j * 64;
@@ -408,7 +395,6 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Perform unsigned 64-bit integer multiplication using 32-bit integers
  *         since vector extensions do not support 64-bit integer multiplication.
- *  \details x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
  *      int i = j * 64;
@@ -489,7 +475,6 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb)
  *  \brief Bitwise AND of single-precision floating-point number and integral number
- *  \details Useful for masking vector elements
  *  \code{.c}
  *      vc[0:SIMD_WIDTH_BITS-1] = (SIMD_FLT)((SIMD_INT)va[0:SIMD_WIDTH_BITS-1] & vb[0:SIMD_WIDTH_BITS-1]);
  *  \endcode
@@ -500,12 +485,142 @@
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
  *  \brief Bitwise AND of double-precision floating-point number and integral number
- *  \details Useful for masking vector elements
  *  \code{.c}
  *      vc[0:SIMD_WIDTH_BITS-1] = (SIMD_DBL)((SIMD_INT)va[0:SIMD_WIDTH_BITS-1] & vb[0:SIMD_WIDTH_BITS-1]);
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *  \}
+ */
+
+
+/*!
+ *  \defgroup ShiftShuffle_AVX2 Shift and shuffle instructions
+ *  \ingroup AVX2
+ *  \brief Shift and shuffle instructions supported by SIMD interface
+ *  \{
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_16(const SIMD_INT va, const int8_t shft)
+ *  \brief Shift left logical packed 16-bit integers while shifting in zeros
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
+ *      int i = j * 16;
+ *      if (shft > 15)
+ *          vc[i:i+15] = 0;
+ *      else
+ *          vc[i:i+15] = ZeroExtend(va[i:i+15] << shft);
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to shift
+ *  \param[in] shft Shift amount
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_32(const SIMD_INT va, const int8_t shft)
+ *  \brief Shift left logical packed 32-bit integers while shifting in zeros
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      if (shft > 31)
+ *          vc[i:i+31] = 0;
+ *      else
+ *          vc[i:i+31] = ZeroExtend(va[i:i+31] << shft);
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to shift
+ *  \param[in] shft Shift amount
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_64(const SIMD_INT va, const int8_t shft)
+ *  \brief Shift left logical packed 64-bit integers while shifting in zeros
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      if (shft > 63)
+ *          vc[i:i+63] = 0;
+ *      else
+ *          vc[i:i+63] = ZeroExtend(va[i:i+63] << shft);
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to shift
+ *  \param[in] shft Shift amount
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_128(const SIMD_INT va, const int8_t shft)
+ *  \brief Shift left logical packed 128-bit integers (at byte level) while shifting in zeros
+ *  \code{.c}
+ *  if (shft > 15)
+ *      shft = 16;
+ *  vc[0:127] = va[0:127] << (shft * 8);
+ *  vc[128:255] = va[128:255] << (shft * 8);
+ *  \endcode
+ *  \param[in] va Vector register to shift
+ *  \param[in] shft Shift amount
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_16(const SIMD_INT va, const int8_t shft)
+ *  \brief Shift right logical packed 16-bit integers while shifting in zeros
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
+ *      int i = j * 16;
+ *      if (shft > 15)
+ *          vc[i:i+15] = 0;
+ *      else
+ *          vc[i:i+15] = ZeroExtend(va[i:i+15] >> shft);
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to shift
+ *  \param[in] shft Shift amount
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_32(const SIMD_INT va, const int8_t shft)
+ *  \brief Shift right logical packed 32-bit integers while shifting in zeros
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      if (shft > 31)
+ *          vc[i:i+31] = 0;
+ *      else
+ *          vc[i:i+31] = ZeroExtend(va[i:i+31] >> shft);
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to shift
+ *  \param[in] shft Shift amount
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_64(const SIMD_INT va, const int8_t shft)
+ *  \brief Shift right logical packed 64-bit integers while shifting in zeros
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      if (shft > 63)
+ *          vc[i:i+63] = 0;
+ *      else
+ *          vc[i:i+63] = ZeroExtend(va[i:i+63] >> shft);
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to shift
+ *  \param[in] shft Shift amount
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_128(const SIMD_INT va, const int8_t shft)
+ *  \brief Shift right logical packed 128-bit integers (at byte level) while shifting in zeros
+ *  \code{.c}
+ *  if (shft > 15)
+ *      shft = 16;
+ *  vc[0:127] = va[0:127] >> (shft * 8);
+ *  vc[128:255] = va[128:255] >> (shft * 8);
+ *  \endcode
+ *  \param[in] va Vector register to shift
+ *  \param[in] shft Shift amount
  *  \return vc
  *
  *  \}
@@ -529,9 +644,9 @@ typedef __m256  SIMD_FLT;
 typedef __m256d SIMD_DBL;
 
 
-/*
- *  Arithmetic instructions
- */
+/*****************************
+ *  Arithmetic instructions  *
+ *****************************/
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_add_epi16(va, vb); }
@@ -544,6 +659,9 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_add_epi64(va, vb); }
 
+/*!
+ *  Uses saturation arithmetic (no wrap around)
+ */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_adds_epu16(va, vb); }
@@ -592,6 +710,9 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_sub_epi64(va, vb); }
 
+/*!
+ *  Uses saturation arithmetic (no wrap around)
+ */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_subs_epu16(va, vb); }
@@ -628,52 +749,49 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm256_sub_pd(va, vb); }
 
-#if defined(__FMA__)
-static SIMD_FUNC_INLINE
-SIMD_FLT simd_fmadd(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
-{ return _mm256_fmadd_ps(va, vb, vc); }
-
-static SIMD_FUNC_INLINE
-SIMD_DBL simd_fmadd(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
-{ return _mm256_fmadd_pd(va, vb, vc); }
-
-static SIMD_FUNC_INLINE
-SIMD_FLT simd_fmsub(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
-{ return _mm256_fmsub_ps(va, vb, vc); }
-
-static SIMD_FUNC_INLINE
-SIMD_DBL simd_fmsub(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
-{ return _mm256_fmsub_pd(va, vb, vc); }
-
-#else
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_fmadd(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 {
+#if defined(__FMA__)
+    return _mm256_fmadd_ps(va, vb, vc);
+#else
     va = _mm256_mul_ps(va, vb);
     return _mm256_add_ps(va, vc);
+#endif
 }
 
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_fmadd(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
+#if defined(__FMA__)
+    return _mm256_fmadd_pd(va, vb, vc);
+#else
     va = _mm256_mul_pd(va, vb);
     return _mm256_add_pd(va, vc);
+#endif
 }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_fmsub(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 {
+#if defined(__FMA__)
+    return _mm256_fmsub_ps(va, vb, vc);
+#else
     va = _mm256_mul_ps(va, vb);
     return _mm256_sub_ps(va, vc);
+#endif
 }
 
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_fmsub(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
+#if defined(__FMA__)
+    return _mm256_fmsub_pd(va, vb, vc);
+#else
     va = _mm256_mul_pd(va, vb);
     return _mm256_sub_pd(va, vc);
-}
 #endif
+}
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb)
@@ -683,7 +801,9 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_mul_epi32(va, vb); }
 
-// x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
+/*!
+ *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
+ */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
 {
@@ -713,7 +833,9 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_mul_epu32(va, vb); }
 
-// x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
+/*!
+ *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
+ */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
 {
@@ -748,9 +870,9 @@ SIMD_DBL simd_mul(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm256_mul_pd(va, vb); }
 
 
-/*
- *  Logical instructions
- */
+/**************************
+ *  Logical instructions  *
+ **************************/
 static SIMD_FUNC_INLINE
 SIMD_INT simd_or(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_or_si256(va, vb); }
@@ -763,6 +885,10 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_and_si256(va, vb); }
 
+
+/*!
+ *  Used to mask vector elements
+ */
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb)
 {
@@ -771,6 +897,9 @@ SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb)
     return _mm256_castsi256_ps(va_int);
 }
 
+/*!
+ *  Used to mask vector elements
+ */
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
 {
@@ -780,34 +909,40 @@ SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
 }
 
 
-/*
- *  Shift and shuffle instructions
- */
-/*!
- *  \defgroup ShiftShuffle_AVX2 Shift and shuffle instructions
- *  \ingroup AVX2
- *  \brief Shift and shuffle instructions supported by SIMD interface
- *  \{
- */
+/************************************
+ *  Shift and shuffle instructions  *
+ ************************************/
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sll_16(const SIMD_INT va, const int shft)
+{ return _mm256_slli_epi16(va, shft); }
 
-/*
- *  Shift left (logical) packed 32/64-bit integers
- */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_sll_32(const SIMD_INT va, const int shft)
 { return _mm256_slli_epi32(va, shft); }
-
-static SIMD_FUNC_INLINE
-SIMD_INT simd_srl_32(const SIMD_INT va, const int shft)
-{ return _mm256_srli_epi32(va, shft); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_sll_64(const SIMD_INT va, const int shft)
 { return _mm256_slli_epi64(va, shft); }
 
 static SIMD_FUNC_INLINE
+SIMD_INT simd_sll_128(const SIMD_INT va, const int shft)
+{ return _mm256_slli_si128(va, shft); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_srl_16(const SIMD_INT va, const int shft)
+{ return _mm256_srli_epi16(va, shft); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_srl_32(const SIMD_INT va, const int shft)
+{ return _mm256_srli_epi32(va, shft); }
+
+static SIMD_FUNC_INLINE
 SIMD_INT simd_srl_64(const SIMD_INT va, const int shft)
 { return _mm256_srli_epi64(va, shft); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_srl_128(const SIMD_INT va, const int shft)
+{ return _mm256_srli_si128(va, shft); }
 
 #if !defined(__clang__)
 /*
@@ -896,14 +1031,10 @@ SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb)
     return _mm256_inserti128_si256(va_pk, vtmp2, 0x1);
 }
 
-/*!
- *  \}
- */
 
-
-/*
- *  Set instructions
- */
+/**********************
+ *  Set instructions  *
+ **********************/
 /*!
  *  \defgroup Set_AVX2 Set instructions
  *  \ingroup AVX2
@@ -1011,9 +1142,9 @@ SIMD_INT simd_set(const unsigned long int * const sa, const int n)
  */
 
 
-/*
- *  Convert instructions
- */
+/**************************
+ *  Convert instructions  *
+ **************************/
 /*!
  *  \defgroup Convert_AVX2 Convert instructions
  *  \ingroup AVX2
@@ -1090,9 +1221,9 @@ SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
  */
 
 
-/*
- *  Load instructions
- */
+/***********************
+ *  Load instructions  *
+ ***********************/
 /*!
  *  \defgroup Load_AVX2 Load instructions
  *  \ingroup AVX2
@@ -1179,9 +1310,9 @@ SIMD_DBL simd_loadu(const double * const sa)
  */
 
 
-/*
- *  Store instructions
- */
+/************************
+ *  Store instructions  *
+ ************************/
 /*!
  *  \defgroup Store_AVX2 Store instructions
  *  \ingroup AVX2
