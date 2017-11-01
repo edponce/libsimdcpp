@@ -621,6 +621,102 @@
  *  \param[in] shft Shift amount
  *  \return vc
  *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Merge low parts from pair of 16/32/64-bit integer registers
+ *  \code{.c}
+ *  vc[0:63] = va[0:63]
+ *  vc[64:127] = vb[0:63]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb)
+ *  \brief Merge low parts from pair of single-precision floating point registers
+ *  \code{.c}
+ *  vc[0:31] = va[0:31]
+ *  vc[32:63] = va[32:63]
+ *  vc[64:95] = vb[0:31]
+ *  vc[96:127] = vb[32:63]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb)
+ *  \brief Merge low parts from pair of double-precision floating point registers
+ *  \code{.c}
+ *  vc[0:63] = va[0:63]
+ *  vc[64:127] = vb[0:63]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_merge_hi(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Merge high parts from pair of 16/32/64-bit integer registers
+ *  \code{.c}
+ *  vc[0:63] = va[64:127]
+ *  vc[64:127] = vb[64:127]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb)
+ *  \brief Merge high parts from pair of single-precision floating point registers
+ *  \code{.c}
+ *  vc[0:31] = va[64:95]
+ *  vc[32:63] = va[96:127]
+ *  vc[64:95] = vb[64:95]
+ *  vc[96:127] = vb[96:127]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
+ *  \brief Merge high parts from pair of double-precision floating point registers
+ *  \code{.c}
+ *  vc[0:63] = va[64:127]
+ *  vc[64:127] = vb[64:127]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_packmerge_lo(SIMD_INT va, SIMD_INT vb)
+ *  \brief Pack and merge the low 32-bits of 64-bit elements
+ *  \code{.c}
+ *  vc[0:31] = va[0:31]
+ *  vc[32:63] = va[64:95]
+ *  vc[64:95] = vb[0:31]
+ *  vc[96:127] = vb[64:95]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_packmerge_lo(const SIMD_FLT va, const SIMD_FLT vb)
+ *  \brief Pack and merge the low 32-bits of 64-bit elements
+ *  \code{.c}
+ *  vc[0:31] = va[0:31]
+ *  vc[32:63] = va[64:95]
+ *  vc[64:95] = vb[0:31]
+ *  vc[96:127] = vb[64:95]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
  *  \}
  */
 
@@ -805,7 +901,17 @@ SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
 {
+    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
+    SIMD_INT vlo, vhi;
+    vlo = _mm_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
+    vhi = _mm_mullo_epi32(va, vlo);     // xl * yh, xh * yl
+    vlo = _mm_slli_epi64(vhi, 0x20);    // shift << 32
+    vhi = _mm_add_epi64(vhi, vlo);      // h = h1 + h2
+    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
+    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
+    return _mm_add_epi64(vlo, vhi);     // l + h
 /*
+    // This implementation uses a temp register
     const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
     SIMD_INT vtmp, vhi, vlo;
     vtmp = _mm_shuffle_epi32(vb, 0xB1); // shuffle multiplier
@@ -816,15 +922,6 @@ SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
     vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
     return _mm_add_epi64(vlo, vhi);     // l + h
 */
-    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
-    SIMD_INT vlo, vhi;
-    vlo = _mm_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
-    vhi = _mm_mullo_epi32(va, vlo);     // xl * yh, xh * yl
-    vlo = _mm_slli_epi64(vhi, 0x20);    // shift << 32
-    vhi = _mm_add_epi64(vhi, vlo);      // h = h1 + h2
-    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
-    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
-    return _mm_add_epi64(vlo, vhi);     // l + h
 }
 
 static SIMD_FUNC_INLINE
@@ -837,7 +934,17 @@ SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
 {
+    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
+    SIMD_INT vlo, vhi;
+    vlo = _mm_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
+    vhi = _mm_mullo_epi32(va, vlo);     // xl * yh, xh * yl
+    vlo = _mm_slli_epi64(vhi, 0x20);    // shift << 32
+    vhi = _mm_add_epi64(vhi, vlo);      // h = h1 + h2
+    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
+    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
+    return _mm_add_epi64(vlo, vhi);     // l + h
 /*
+    // This implementation uses a temp register
     const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
     SIMD_INT vtmp, vhi, vlo;
     vtmp = _mm_shuffle_epi32(vb, 0xB1); // shuffle multiplier
@@ -848,15 +955,6 @@ SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
     vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
     return _mm_add_epi64(vlo, vhi);     // l + h
 */
-    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
-    SIMD_INT vlo, vhi;
-    vlo = _mm_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
-    vhi = _mm_mullo_epi32(va, vlo);     // xl * yh, xh * yl
-    vlo = _mm_slli_epi64(vhi, 0x20);    // shift << 32
-    vhi = _mm_add_epi64(vhi, vlo);      // h = h1 + h2
-    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
-    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
-    return _mm_add_epi64(vlo, vhi);     // l + h
 }
 
 static SIMD_FUNC_INLINE
@@ -955,10 +1053,6 @@ SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int8_t ctr
 { return _mm_shuffle_ps(va, vb, ctrl); }
 #endif
 
-/*
- *  Merge either low/high parts from pair of registers
- *  into a single register
- */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_unpacklo_epi64(va, vb); }
@@ -983,36 +1077,36 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_unpackhi_pd(va, vb); }
 
-/*!
- *  Pack and merge the low 32-bits of 64-bit integers
- *  from a pair of registers.
- */
 static SIMD_FUNC_INLINE
-SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_packmerge_lo(SIMD_INT va, SIMD_INT vb)
 {
-    // Mask unused elements
-    const SIMD_INT vmsk = _mm_set_epi32(0x0, 0xFFFFFFFF, 0x0, 0xFFFFFFFF);
-    SIMD_INT va_pk = _mm_and_si128(va, vmsk);
-    SIMD_INT vb_pk = _mm_and_si128(vb, vmsk);
-
-    // Pack registers
-    va_pk = _mm_shuffle_epi32(va_pk, 0x58);
-    vb_pk = _mm_shuffle_epi32(vb_pk, 0x85);
-
-    // Merge
-    return _mm_or_si128(va_pk, vb_pk);
-
+    const SIMD_INT vmsk = _mm_set_epi32(0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF);
+    va = _mm_and_si128(va, vmsk);      // mask out elements 1 and 3
+    vb = _mm_and_si128(vb, vmsk);      // mask out elements 1 and 3
+    va = _mm_shuffle_epi32(va, 0xD8);  // pack integers in low part of register
+    vb = _mm_shuffle_epi32(vb, 0x8D);  // pack integers in high part of register
+    return _mm_or_si128(va, vb);       // merge packed registers
 /*
     // This implementation requires that the input vectors
     // already have to be of the form [#, 0, #, 0 ...]
-
-    // Pack registers
-    const SIMD_INT va_pk = _mm_shuffle_epi32(va, 0x58);
-    const SIMD_INT vb_pk = _mm_shuffle_epi32(vb, 0x85);
-
-    // Merge
-    return _mm_or_si128(va_pk, vb_pk);
+    va = _mm_shuffle_epi32(va, 0xD8);  // pack integers in low part of register
+    vb = _mm_shuffle_epi32(vb, 0x8D);  // pack integers in high part of register
+    return _mm_or_si128(va, vb);       // merge packed registers
 */
+}
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_packmerge_lo(const SIMD_FLT va, const SIMD_FLT vb)
+{
+    const SIMD_INT vmsk = _mm_set_epi32(0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF);
+    SIMD_INT va_int = _mm_castps_si128(va);
+    SIMD_INT vb_int = _mm_castps_si128(vb);
+    va_int = _mm_and_si128(va_int, vmsk);      // mask out elements 1 and 3
+    vb_int = _mm_and_si128(vb_int, vmsk);      // mask out elements 1 and 3
+    va_int = _mm_shuffle_epi32(va_int, 0xD8);  // pack integers in low part of register
+    vb_int = _mm_shuffle_epi32(vb_int, 0x8D);  // pack integers in high part of register
+    va_int = _mm_or_si128(va_int, vb_int);     // merge packed registers
+    return _mm_castsi128_ps(va_int);
 }
 
 

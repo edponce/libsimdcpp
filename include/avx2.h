@@ -623,6 +623,88 @@
  *  \param[in] shft Shift amount
  *  \return vc
  *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Merge low parts from pair of 16/32/64-bit integer registers
+ *  \code{.c}
+ *  vc[0:127] = va[0:127]
+ *  vc[128:255] = vb[0:127]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb)
+ *  \brief Merge low parts from pair of single-precision floating point registers
+ *  \code{.c}
+ *  vc[0:31] = va[0:31]
+ *  vc[32:63] = va[32:63]
+ *  vc[64:95] = va[64:95]
+ *  vc[96:127] = va[96:127]
+ *  vc[128:159] = vb[0:31]
+ *  vc[160:191] = vb[32:63]
+ *  vc[192:223] = vb[64:95]
+ *  vc[224:255] = vb[96:127]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb)
+ *  \brief Merge low parts from pair of double-precision floating point registers
+ *  \code{.c}
+ *  vc[0:63] = va[0:63]
+ *  vc[64:127] = va[64:127]
+ *  vc[128:191] = vb[0:63]
+ *  vc[192:255] = vb[64:127]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_merge_hi(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Merge high parts from pair of 16/32/64-bit integer registers
+ *  \code{.c}
+ *  vc[0:127] = va[128:255]
+ *  vc[128:255] = vb[128:255]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb)
+ *  \brief Merge high parts from pair of single-precision floating point registers
+ *  \code{.c}
+ *  vc[0:31] = va[128:159]
+ *  vc[32:63] = va[160:191]
+ *  vc[64:95] = va[192:223]
+ *  vc[96:127] = va[224:255]
+ *  vc[128:159] = vb[128:159]
+ *  vc[160:191] = vb[160:191]
+ *  vc[192:223] = vb[192:223]
+ *  vc[224:255] = vb[224:255]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
+ *  \brief Merge high parts from pair of double-precision floating point registers
+ *  \code{.c}
+ *  vc[0:63] = va[128:191]
+ *  vc[64:127] = va[192:255]
+ *  vc[128:191] = vb[128:191]
+ *  vc[192:255] = vb[192:255]
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
  *  \}
  */
 
@@ -673,7 +755,7 @@ SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
     uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     _mm256_store_si256((SIMD_INT *)sa, va);
     _mm256_store_si256((SIMD_INT *)sb, vb);
-    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+    for (int32_t i = 0; i < SIMD_STREAMS_32; ++i)
         sa[i] += sb[i];
     return _mm256_load_si256((SIMD_INT *)sa);
 }
@@ -685,7 +767,7 @@ SIMD_INT simd_add_u64(const SIMD_INT va, const SIMD_INT vb)
     uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     _mm256_store_si256((SIMD_INT *)sa, va);
     _mm256_store_si256((SIMD_INT *)sb, vb);
-    for (int i = 0; i < SIMD_STREAMS_64; ++i)
+    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
         sa[i] += sb[i];
     return _mm256_load_si256((SIMD_INT *)sa);
 }
@@ -724,7 +806,7 @@ SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
     uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     _mm256_store_si256((SIMD_INT *)sa, va);
     _mm256_store_si256((SIMD_INT *)sb, vb);
-    for (int i = 0; i < SIMD_STREAMS_32; ++i)
+    for (int32_t i = 0; i < SIMD_STREAMS_32; ++i)
         sa[i] -= sb[i];
     return _mm256_load_si256((SIMD_INT *)sa);
 }
@@ -736,7 +818,7 @@ SIMD_INT simd_sub_u64(const SIMD_INT va, const SIMD_INT vb)
     uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     _mm256_store_si256((SIMD_INT *)sa, va);
     _mm256_store_si256((SIMD_INT *)sb, vb);
-    for (int i = 0; i < SIMD_STREAMS_64; ++i)
+    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
         sa[i] -= sb[i];
     return _mm256_load_si256((SIMD_INT *)sa);
 }
@@ -807,7 +889,17 @@ SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
 {
+    const SIMD_INT vmsk = _mm256_set1_epi64x(0xFFFFFFFF00000000UL);
+    SIMD_INT vlo, vhi;
+    vlo = _mm256_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
+    vhi = _mm256_mullo_epi32(va, vlo);     // xl * yh, xh * yl
+    vlo = _mm256_slli_epi64(vhi, 0x20);    // shift << 32
+    vhi = _mm256_add_epi64(vhi, vlo);      // h = h1 + h2
+    vhi = _mm256_and_si256(vhi, vmsk);     // h & 0xFFFFFFFF00000000
+    vlo = _mm256_mul_epu32(va, vb);        // l = xl * yl
+    return _mm256_add_epi64(vlo, vhi);     // l + h
 /*
+    // This implementation uses a temp register
     const SIMD_INT vmsk = _mm256_set1_epi64x(0xFFFFFFFF00000000UL);
     SIMD_INT vtmp, vhi, vlo;
     vtmp = _mm256_shuffle_epi32(vb, 0xB1); // shuffle multiplier
@@ -818,15 +910,6 @@ SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
     vlo = _mm256_mul_epu32(va, vb);        // l = xl * yl
     return _mm256_add_epi64(vlo, vhi);     // l + h
 */
-    const SIMD_INT vmsk = _mm256_set1_epi64x(0xFFFFFFFF00000000UL);
-    SIMD_INT vlo, vhi;
-    vlo = _mm256_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
-    vhi = _mm256_mullo_epi32(va, vlo);     // xl * yh, xh * yl
-    vlo = _mm256_slli_epi64(vhi, 0x20);    // shift << 32
-    vhi = _mm256_add_epi64(vhi, vlo);      // h = h1 + h2
-    vhi = _mm256_and_si256(vhi, vmsk);     // h & 0xFFFFFFFF00000000
-    vlo = _mm256_mul_epu32(va, vb);        // l = xl * yl
-    return _mm256_add_epi64(vlo, vhi);     // l + h
 }
 
 static SIMD_FUNC_INLINE
@@ -839,7 +922,17 @@ SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
 {
+    const SIMD_INT vmsk = _mm256_set1_epi64x(0xFFFFFFFF00000000UL);
+    SIMD_INT vlo, vhi;
+    vlo = _mm256_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
+    vhi = _mm256_mullo_epi32(va, vlo);     // xl * yh, xh * yl
+    vlo = _mm256_slli_epi64(vhi, 0x20);    // shift << 32
+    vhi = _mm256_add_epi64(vhi, vlo);      // h = h1 + h2
+    vhi = _mm256_and_si256(vhi, vmsk);     // h & 0xFFFFFFFF00000000
+    vlo = _mm256_mul_epu32(va, vb);        // l = xl * yl
+    return _mm256_add_epi64(vlo, vhi);     // l + h
 /*
+    // This implementation uses a temp register
     const SIMD_INT vmsk = _mm256_set1_epi64x(0xFFFFFFFF00000000UL);
     SIMD_INT vtmp, vhi, vlo;
     vtmp = _mm256_shuffle_epi32(vb, 0xB1); // shuffle multiplier
@@ -850,15 +943,6 @@ SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
     vlo = _mm256_mul_epu32(va, vb);        // l = xl * yl
     return _mm256_add_epi64(vlo, vhi);     // l + h
 */
-    const SIMD_INT vmsk = _mm256_set1_epi64x(0xFFFFFFFF00000000UL);
-    SIMD_INT vlo, vhi;
-    vlo = _mm256_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
-    vhi = _mm256_mullo_epi32(va, vlo);     // xl * yh, xh * yl
-    vlo = _mm256_slli_epi64(vhi, 0x20);    // shift << 32
-    vhi = _mm256_add_epi64(vhi, vlo);      // h = h1 + h2
-    vhi = _mm256_and_si256(vhi, vmsk);     // h & 0xFFFFFFFF00000000
-    vlo = _mm256_mul_epu32(va, vb);        // l = xl * yl
-    return _mm256_add_epi64(vlo, vhi);     // l + h
 }
 
 static SIMD_FUNC_INLINE
@@ -884,7 +968,6 @@ SIMD_INT simd_xor(const SIMD_INT va, const SIMD_INT vb)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_and_si256(va, vb); }
-
 
 /*!
  *  Used to mask vector elements
@@ -913,35 +996,35 @@ SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
  *  Shift and shuffle instructions  *
  ************************************/
 static SIMD_FUNC_INLINE
-SIMD_INT simd_sll_16(const SIMD_INT va, const int shft)
+SIMD_INT simd_sll_16(const SIMD_INT va, const int8_t shft)
 { return _mm256_slli_epi16(va, shft); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_sll_32(const SIMD_INT va, const int shft)
+SIMD_INT simd_sll_32(const SIMD_INT va, const int8_t shft)
 { return _mm256_slli_epi32(va, shft); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_sll_64(const SIMD_INT va, const int shft)
+SIMD_INT simd_sll_64(const SIMD_INT va, const int8_t shft)
 { return _mm256_slli_epi64(va, shft); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_sll_128(const SIMD_INT va, const int shft)
+SIMD_INT simd_sll_128(const SIMD_INT va, const int8_t shft)
 { return _mm256_slli_si128(va, shft); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_srl_16(const SIMD_INT va, const int shft)
+SIMD_INT simd_srl_16(const SIMD_INT va, const int8_t shft)
 { return _mm256_srli_epi16(va, shft); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_srl_32(const SIMD_INT va, const int shft)
+SIMD_INT simd_srl_32(const SIMD_INT va, const int8_t shft)
 { return _mm256_srli_epi32(va, shft); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_srl_64(const SIMD_INT va, const int shft)
+SIMD_INT simd_srl_64(const SIMD_INT va, const int8_t shft)
 { return _mm256_srli_epi64(va, shft); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_srl_128(const SIMD_INT va, const int shft)
+SIMD_INT simd_srl_128(const SIMD_INT va, const int8_t shft)
 { return _mm256_srli_si128(va, shft); }
 
 #if !defined(__clang__)
@@ -950,70 +1033,63 @@ SIMD_INT simd_srl_128(const SIMD_INT va, const int shft)
  */
 // TODO: Clang throws error with shuffle intrinsics due to non-constants with macro expansion
 static SIMD_FUNC_INLINE
-SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int ctrl)
+SIMD_INT simd_shuffle_i32(const SIMD_INT va, const int8_t ctrl)
 { return _mm256_shuffle_epi32(va, ctrl); }
 
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int ctrl)
+SIMD_FLT simd_shuffle_f32(const SIMD_FLT va, const SIMD_FLT vb, const int8_t ctrl)
 { return _mm256_shuffle_ps(va, vb, ctrl); }
 #endif
 
-/*
- *  Merge either low/high parts from pair of registers
- *  into a single register
- */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
 {
     const __m128i vb_lo = _mm256_castsi256_si128(vb);
-    return _mm256_inserti128_si256(va, vb_lo, 0x1);
+    return _mm256_inserti128_si256(va, vb_lo, 0x01);
 }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb)
 {
     const __m128 vb_lo = _mm256_castps256_ps128(vb);
-    return _mm256_insertf128_ps(va, vb_lo, 0x1);
+    return _mm256_insertf128_ps(va, vb_lo, 0x01);
 }
 
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb)
 {
     const __m128d vb_lo = _mm256_castpd256_pd128(vb);
-    return _mm256_insertf128_pd(va, vb_lo, 0x1);
+    return _mm256_insertf128_pd(va, vb_lo, 0x01);
 }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_merge_hi(const SIMD_INT va, const SIMD_INT vb)
 {
-    const __m128i va_hi = _mm256_extracti128_si256(va, 0x1);
-    return _mm256_inserti128_si256(vb, va_hi, 0x0);
+    const __m128i va_hi = _mm256_extracti128_si256(va, 0x01);
+    return _mm256_inserti128_si256(vb, va_hi, 0x00);
 }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb)
 {
-    const __m128 va_hi = _mm256_extractf128_ps(va, 0x1);
-    return _mm256_insertf128_ps(vb, va_hi, 0x0);
+    const __m128 va_hi = _mm256_extractf128_ps(va, 0x01);
+    return _mm256_insertf128_ps(vb, va_hi, 0x00);
 }
 
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
 {
-    const __m128d va_hi = _mm256_extractf128_pd(va, 0x1);
-    return _mm256_insertf128_pd(vb, va_hi, 0x0);
+    const __m128d va_hi = _mm256_extractf128_pd(va, 0x01);
+    return _mm256_insertf128_pd(vb, va_hi, 0x00);
 }
 
-/*!
- *  Pack and merge a pair of registers
- */
 static SIMD_FUNC_INLINE
-SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_packmerge_lo(const SIMD_INT va, const SIMD_INT vb)
 {
     const __m128i va_lo = _mm256_castsi256_si128(va);
-    const __m128i va_hi = _mm256_extracti128_si256(va, 0x1);
+    const __m128i va_hi = _mm256_extracti128_si256(va, 0x01);
     const __m128i vb_lo = _mm256_castsi256_si128(vb);
-    const __m128i vb_hi = _mm256_extracti128_si256(vb, 0x1);
+    const __m128i vb_hi = _mm256_extracti128_si256(vb, 0x01);
 
     // Pack va
     __m128i vtmp1 = _mm_shuffle_epi32(va_lo, 0x58);
@@ -1028,8 +1104,12 @@ SIMD_INT simd_packmerge_i32(const SIMD_INT va, const SIMD_INT vb)
     vtmp2 = _mm_or_si128(vtmp1, vtmp2);
 
     // Merge
-    return _mm256_inserti128_si256(va_pk, vtmp2, 0x1);
+    return _mm256_inserti128_si256(va_pk, vtmp2, 0x01);
 }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_packmerge_lo(SIMD_FLT va, SIMD_FLT vb)
+{ return va; }
 
 
 /**********************

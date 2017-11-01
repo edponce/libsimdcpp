@@ -223,7 +223,7 @@ int test_simd_mul_u64()
 
 
 // Pack and merge the low 32-bits of 64-bit integers
-int test_simd_packmerge_i32()
+int test_simd_packmerge_lo()
 {
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
@@ -242,7 +242,7 @@ int test_simd_packmerge_i32()
 
         SIMD_INT va = simd_load(arr_A);
         SIMD_INT vb = simd_load(arr_B);
-        SIMD_INT vc = simd_packmerge_i32(va, vb);
+        SIMD_INT vc = simd_packmerge_lo(va, vb);
 
         for (int i = 0; i < num_elems/2; ++i)
             arr_C2[i] = ((int *)arr_A)[2*i];
