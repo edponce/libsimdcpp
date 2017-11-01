@@ -63,8 +63,8 @@
  *    \defgroup AddSub_SSE4_2 Add and subtract
  *    \{
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Add signed 16-bit integers
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_16(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Add signed/unsigned 16-bit integers
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
  *      int i = j * 16;
@@ -76,8 +76,8 @@
  *  \return vc
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Add signed 32-bit integers
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Add signed/unsigned 32-bit integers
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
  *      int i = j * 32;
@@ -89,47 +89,8 @@
  *  \return vc
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Add signed 64-bit integers
- *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
- *      vc[i:i+63] = va[i:i+63] + vb[i:i+63];
- *  }
- *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \return vc
- *
- *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Add unsigned 16-bit integers
- *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
- *      int i = j * 16;
- *      vc[i:i+15] = va[i:i+15] + vb[i:i+15];
- *  }
- *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \return vc
- *
- *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Add unsigned 32-bit integers
- *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
- *      vc[i:i+31] = va[i:i+31] + vb[i:i+31];
- *  }
- *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \return vc
- *
- *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_u64(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Add unsigned 64-bit integers
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_64(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Add signed/unsigned 64-bit integers
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
  *      int i = j * 64;
@@ -167,8 +128,8 @@
  *  \return vc
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_i16(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Subtract signed 16-bit integers
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_16(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Subtract signed/unsigned 16-bit integers
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
  *      int i = j * 16;
@@ -180,8 +141,8 @@
  *  \return vc
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_i32(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Subtract signed 32-bit integers
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Subtract signed/unsigned 32-bit integers
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
  *      int i = j * 32;
@@ -193,47 +154,8 @@
  *  \return vc
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Subtract signed 64-bit integers
- *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
- *      vc[i:i+63] = va[i:i+63] - vb[i:i+63];
- *  }
- *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \return vc
- *
- *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Subtract unsigned 16-bit integers
- *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
- *      int i = j * 16;
- *      vc[i:i+15] = va[i:i+15] - vb[i:i+15];
- *  }
- *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \return vc
- *
- *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Subtract unsigned 32-bit integers
- *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
- *      vc[i:i+31] = va[i:i+31] - vb[i:i+31];
- *  }
- *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \return vc
- *
- *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_u64(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Subtract unsigned 64-bit integers
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_64(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Subtract signed/unsigned 64-bit integers
  *  \code{.c}
  *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
  *      int i = j * 64;
@@ -693,7 +615,7 @@
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_packmerge_lo(SIMD_INT va, SIMD_INT vb)
- *  \brief Pack and merge the low 32-bits of 64-bit elements
+ *  \brief Pack and merge the low 32-bit integers from 64-bit elements
  *  \code{.c}
  *  vc[0:31] = va[0:31]
  *  vc[32:63] = va[64:95]
@@ -706,7 +628,7 @@
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_packmerge_lo(const SIMD_FLT va, const SIMD_FLT vb)
- *  \brief Pack and merge the low 32-bits of 64-bit elements
+ *  \brief Pack and merge the low single-precision floating-point number from 64-bit elements
  *  \code{.c}
  *  vc[0:31] = va[0:31]
  *  vc[32:63] = va[64:95]
@@ -742,47 +664,16 @@ typedef __m128d SIMD_DBL;
  *  Arithmetic instructions  *
  *****************************/
 static SIMD_FUNC_INLINE
-SIMD_INT simd_add_i16(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_add_16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_epi16(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_add_i32(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_add_32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_epi32(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_add_i64(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_add_64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_epi64(va, vb); }
-
-/*!
- *  Uses saturation arithmetic (no wrap around)
- */
-static SIMD_FUNC_INLINE
-SIMD_INT simd_add_u16(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm_adds_epu16(va, vb); }
-
-static SIMD_FUNC_INLINE
-SIMD_INT simd_add_u32(const SIMD_INT va, const SIMD_INT vb)
-{
-    uint32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    _mm_store_si128((SIMD_INT *)sa, va);
-    _mm_store_si128((SIMD_INT *)sb, vb);
-    for (int32_t i = 0; i < SIMD_STREAMS_32; ++i)
-        sa[i] += sb[i];
-    return _mm_load_si128((SIMD_INT *)sa);
-}
-
-static SIMD_FUNC_INLINE
-SIMD_INT simd_add_u64(const SIMD_INT va, const SIMD_INT vb)
-{
-    uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    _mm_store_si128((SIMD_INT *)sa, va);
-    _mm_store_si128((SIMD_INT *)sb, vb);
-    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
-        sa[i] += sb[i];
-    return _mm_load_si128((SIMD_INT *)sa);
-}
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_add(const SIMD_FLT va, const SIMD_FLT vb)
@@ -793,47 +684,16 @@ SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_add_pd(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_sub_i16(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_sub_16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_sub_epi16(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_sub_i32(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_sub_32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_sub_epi32(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_sub_i64(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_sub_64(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_sub_epi64(va, vb); }
-
-/*!
- *  Uses saturation arithmetic (no wrap around)
- */
-static SIMD_FUNC_INLINE
-SIMD_INT simd_sub_u16(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm_subs_epu16(va, vb); }
-
-static SIMD_FUNC_INLINE
-SIMD_INT simd_sub_u32(const SIMD_INT va, const SIMD_INT vb)
-{
-    uint32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    uint32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    _mm_store_si128((SIMD_INT *)sa, va);
-    _mm_store_si128((SIMD_INT *)sb, vb);
-    for (int32_t i = 0; i < SIMD_STREAMS_32; ++i)
-        sa[i] -= sb[i];
-    return _mm_load_si128((SIMD_INT *)sa);
-}
-
-static SIMD_FUNC_INLINE
-SIMD_INT simd_sub_u64(const SIMD_INT va, const SIMD_INT vb)
-{
-    uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    uint64_t sb[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    _mm_store_si128((SIMD_INT *)sa, va);
-    _mm_store_si128((SIMD_INT *)sb, vb);
-    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
-        sa[i] -= sb[i];
-    return _mm_load_si128((SIMD_INT *)sa);
-}
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
@@ -1080,32 +940,19 @@ SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_packmerge_lo(SIMD_INT va, SIMD_INT vb)
 {
-    const SIMD_INT vmsk = _mm_set_epi32(0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF);
-    va = _mm_and_si128(va, vmsk);      // mask out elements 1 and 3
-    vb = _mm_and_si128(vb, vmsk);      // mask out elements 1 and 3
-    va = _mm_shuffle_epi32(va, 0xD8);  // pack integers in low part of register
-    vb = _mm_shuffle_epi32(vb, 0x8D);  // pack integers in high part of register
-    return _mm_or_si128(va, vb);       // merge packed registers
-/*
-    // This implementation requires that the input vectors
-    // already have to be of the form [#, 0, #, 0 ...]
-    va = _mm_shuffle_epi32(va, 0xD8);  // pack integers in low part of register
-    vb = _mm_shuffle_epi32(vb, 0x8D);  // pack integers in high part of register
-    return _mm_or_si128(va, vb);       // merge packed registers
-*/
+    va = _mm_shuffle_epi32(va, 0xD8);   // pack into low part of register
+    vb = _mm_shuffle_epi32(vb, 0xD8);   // pack into low part of register
+    return _mm_unpacklo_epi64(va, vb);  // merge packed registers
 }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_packmerge_lo(const SIMD_FLT va, const SIMD_FLT vb)
 {
-    const SIMD_INT vmsk = _mm_set_epi32(0x00000000, 0xFFFFFFFF, 0x00000000, 0xFFFFFFFF);
     SIMD_INT va_int = _mm_castps_si128(va);
     SIMD_INT vb_int = _mm_castps_si128(vb);
-    va_int = _mm_and_si128(va_int, vmsk);      // mask out elements 1 and 3
-    vb_int = _mm_and_si128(vb_int, vmsk);      // mask out elements 1 and 3
-    va_int = _mm_shuffle_epi32(va_int, 0xD8);  // pack integers in low part of register
-    vb_int = _mm_shuffle_epi32(vb_int, 0x8D);  // pack integers in high part of register
-    va_int = _mm_or_si128(va_int, vb_int);     // merge packed registers
+    va_int = _mm_shuffle_epi32(va_int, 0xD8);     // pack into low part of register
+    vb_int = _mm_shuffle_epi32(vb_int, 0xD8);     // pack into low part of register
+    va_int = _mm_unpacklo_epi64(va_int, vb_int);  // merge packed registers
     return _mm_castsi128_ps(va_int);
 }
 

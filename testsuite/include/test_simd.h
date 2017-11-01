@@ -7,8 +7,10 @@
 
 
 int test_simd_loadstore();
-int test_simd_add();
-int test_simd_fmadd();
+int test_simd_add(void);
+int test_simd_sub(void);
+int test_simd_fmadd(void);
+int test_simd_fmsub(void);
 int test_simd_mul_u64();
 int test_simd_packmerge_lo();
 int test_simd_cvt_i32_fp();

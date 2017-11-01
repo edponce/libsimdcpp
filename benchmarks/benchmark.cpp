@@ -32,7 +32,7 @@ int main()
     SIMD_INT va = simd_load(arr_A);
     SIMD_INT vb = simd_load(arr_B);
 
-    SIMD_INT vc = simd_add_i32(va, vb);
+    SIMD_INT vc = simd_add_32(va, vb);
 
     simd_store(arr_C, vc);
 
