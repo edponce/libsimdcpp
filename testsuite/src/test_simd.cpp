@@ -5,6 +5,7 @@
 #include <stdio.h>
 #include <stdlib.h>      // free
 #include <stdint.h>
+#include <math.h>        // sqrt, abs, floor, ceil
 #include <limits.h>      // limits of fundamental integral types
 #include "test_utils.h"
 #include "test_simd.h"
@@ -558,6 +559,32 @@ int32_t test_simd_mul(void)
     const int32_t alignment = SIMD_WIDTH_BYTES;
 
     {
+        const int32_t num_elems = SIMD_STREAMS_16;
+        const TEST_TYPES test_type = TEST_I16;
+        int16_t *arr_A = NULL, *arr_B = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_B, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C1, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C2, num_elems, alignment);
+
+        SIMD_INT va = simd_load(arr_A);
+        SIMD_INT vb = simd_load(arr_B);
+        SIMD_INT vc = simd_mul_16(va, vb);
+
+        for (int32_t i = 0; i < num_elems; ++i)
+            arr_C2[i] = arr_A[i] * arr_B[i];
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    {
         const int32_t num_elems = SIMD_STREAMS_32;
         const TEST_TYPES test_type = TEST_I32;
         int32_t *arr_A = NULL, *arr_B = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
@@ -569,7 +596,7 @@ int32_t test_simd_mul(void)
 
         SIMD_INT va = simd_load(arr_A);
         SIMD_INT vb = simd_load(arr_B);
-        SIMD_INT vc = simd_mullo_i32(va, vb);
+        SIMD_INT vc = simd_mul_32(va, vb);
 
         for (int32_t i = 0; i < num_elems; ++i)
             arr_C2[i] = arr_A[i] * arr_B[i];
@@ -595,7 +622,7 @@ int32_t test_simd_mul(void)
 
         SIMD_INT va = simd_load(arr_A);
         SIMD_INT vb = simd_load(arr_B);
-        SIMD_INT vc = simd_mul_i32(va, vb);
+        SIMD_INT vc = simd_mul_64(va, vb);
 
         for (int32_t i = 0; i < num_elems; ++i)
             arr_C2[i] = arr_A[i] * arr_B[i];
@@ -610,9 +637,9 @@ int32_t test_simd_mul(void)
     }
 
     {
-        const int32_t num_elems = SIMD_STREAMS_64;
-        const TEST_TYPES test_type = TEST_I64;
-        int64_t *arr_A = NULL, *arr_B = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
+        const int32_t num_elems = SIMD_STREAMS_16;
+        const TEST_TYPES test_type = TEST_U16;
+        uint16_t *arr_A = NULL, *arr_B = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
 
         create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
         create_test_array(test_type, (void **)&arr_B, num_elems, alignment);
@@ -621,7 +648,7 @@ int32_t test_simd_mul(void)
 
         SIMD_INT va = simd_load(arr_A);
         SIMD_INT vb = simd_load(arr_B);
-        SIMD_INT vc = simd_mul_i64(va, vb);
+        SIMD_INT vc = simd_mul_16(va, vb);
 
         for (int32_t i = 0; i < num_elems; ++i)
             arr_C2[i] = arr_A[i] * arr_B[i];
@@ -634,7 +661,7 @@ int32_t test_simd_mul(void)
         free(arr_C1); arr_C1 = NULL;
         free(arr_C2); arr_C2 = NULL;
     }
-/*
+
     {
         const int32_t num_elems = SIMD_STREAMS_32;
         const TEST_TYPES test_type = TEST_U32;
@@ -647,7 +674,7 @@ int32_t test_simd_mul(void)
 
         SIMD_INT va = simd_load(arr_A);
         SIMD_INT vb = simd_load(arr_B);
-        SIMD_INT vc = simd_mul_u32(va, vb);
+        SIMD_INT vc = simd_mul_32(va, vb);
 
         for (int32_t i = 0; i < num_elems; ++i)
             arr_C2[i] = arr_A[i] * arr_B[i];
@@ -673,7 +700,7 @@ int32_t test_simd_mul(void)
 
         SIMD_INT va = simd_load(arr_A);
         SIMD_INT vb = simd_load(arr_B);
-        SIMD_INT vc = simd_mul_u64(va, vb);
+        SIMD_INT vc = simd_mul_64(va, vb);
 
         for (int32_t i = 0; i < num_elems; ++i)
             arr_C2[i] = arr_A[i] * arr_B[i];
@@ -686,7 +713,7 @@ int32_t test_simd_mul(void)
         free(arr_C1); arr_C1 = NULL;
         free(arr_C2); arr_C2 = NULL;
     }
-*/
+
     {
         const int32_t num_elems = SIMD_STREAMS_32;
         const TEST_TYPES test_type = TEST_FLT;
@@ -735,6 +762,230 @@ int32_t test_simd_mul(void)
 
         free(arr_A); arr_A = NULL;
         free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    {
+        const int32_t num_elems1 = SIMD_STREAMS_16;
+        const int32_t num_elems2 = SIMD_STREAMS_32;
+        const TEST_TYPES test_type1 = TEST_I16;
+        const TEST_TYPES test_type2 = TEST_I32;
+        int16_t *arr_A = NULL, *arr_B = NULL;
+        int32_t *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type1, (void **)&arr_A, num_elems1, alignment);
+        create_test_array(test_type1, (void **)&arr_B, num_elems1, alignment);
+        create_test_array(test_type2, (void **)&arr_C1, num_elems2, alignment);
+        create_test_array(test_type2, (void **)&arr_C2, num_elems2, alignment);
+
+        SIMD_INT va = simd_load(arr_A);
+        SIMD_INT vb = simd_load(arr_B);
+        SIMD_INT vc = simd_mul_i16_32(va, vb);
+
+        for (int32_t i = 0; i < num_elems2; ++i)
+            arr_C2[i] = (int32_t)arr_A[i*2] * (int32_t)arr_B[i*2];
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type2, (void *)arr_C1, (void *)arr_C2, num_elems2);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    {
+        const int32_t num_elems1 = SIMD_STREAMS_32;
+        const int32_t num_elems2 = SIMD_STREAMS_64;
+        const TEST_TYPES test_type1 = TEST_I32;
+        const TEST_TYPES test_type2 = TEST_I64;
+        int32_t *arr_A = NULL, *arr_B = NULL;
+        int64_t *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type1, (void **)&arr_A, num_elems1, alignment);
+        create_test_array(test_type1, (void **)&arr_B, num_elems1, alignment);
+        create_test_array(test_type2, (void **)&arr_C1, num_elems2, alignment);
+        create_test_array(test_type2, (void **)&arr_C2, num_elems2, alignment);
+
+        SIMD_INT va = simd_load(arr_A);
+        SIMD_INT vb = simd_load(arr_B);
+        SIMD_INT vc = simd_mul_i32_64(va, vb);
+
+        for (int32_t i = 0; i < num_elems2; ++i)
+            arr_C2[i] = (int64_t)arr_A[i*2] * (int64_t)arr_B[i*2];
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type2, (void *)arr_C1, (void *)arr_C2, num_elems2);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    {
+        const int32_t num_elems1 = SIMD_STREAMS_16;
+        const int32_t num_elems2 = SIMD_STREAMS_32;
+        const TEST_TYPES test_type1 = TEST_U16;
+        const TEST_TYPES test_type2 = TEST_U32;
+        uint16_t *arr_A = NULL, *arr_B = NULL;
+        uint32_t *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type1, (void **)&arr_A, num_elems1, alignment);
+        create_test_array(test_type1, (void **)&arr_B, num_elems1, alignment);
+        create_test_array(test_type2, (void **)&arr_C1, num_elems2, alignment);
+        create_test_array(test_type2, (void **)&arr_C2, num_elems2, alignment);
+
+        SIMD_INT va = simd_load(arr_A);
+        SIMD_INT vb = simd_load(arr_B);
+        SIMD_INT vc = simd_mul_u16_32(va, vb);
+
+        for (int32_t i = 0; i < num_elems2; ++i)
+            arr_C2[i] = (uint32_t)arr_A[i*2] * (uint32_t)arr_B[i*2];
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type2, (void *)arr_C1, (void *)arr_C2, num_elems2);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    {
+        const int32_t num_elems1 = SIMD_STREAMS_32;
+        const int32_t num_elems2 = SIMD_STREAMS_64;
+        const TEST_TYPES test_type1 = TEST_I32;
+        const TEST_TYPES test_type2 = TEST_I64;
+        uint32_t *arr_A = NULL, *arr_B = NULL;
+        uint64_t *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type1, (void **)&arr_A, num_elems1, alignment);
+        create_test_array(test_type1, (void **)&arr_B, num_elems1, alignment);
+        create_test_array(test_type2, (void **)&arr_C1, num_elems2, alignment);
+        create_test_array(test_type2, (void **)&arr_C2, num_elems2, alignment);
+
+        SIMD_INT va = simd_load(arr_A);
+        SIMD_INT vb = simd_load(arr_B);
+        SIMD_INT vc = simd_mul_u32_64(va, vb);
+
+        for (int32_t i = 0; i < num_elems2; ++i)
+            arr_C2[i] = (uint64_t)arr_A[i*2] * (uint64_t)arr_B[i*2];
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type2, (void *)arr_C1, (void *)arr_C2, num_elems2);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    return test_result;
+}
+
+
+int32_t test_simd_div_sqrt(void)
+{
+
+    int test_result = 0;
+    const int alignment = SIMD_WIDTH_BYTES;
+
+    {
+        const int32_t num_elems = SIMD_STREAMS_32;
+        const TEST_TYPES test_type = TEST_FLT;
+        float *arr_A = NULL, *arr_B = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_B, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C1, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C2, num_elems, alignment);
+
+        SIMD_FLT va = simd_load(arr_A);
+        SIMD_FLT vb = simd_load(arr_B);
+        SIMD_FLT vc = simd_div(va, vb);
+
+        for (int32_t i = 0; i < num_elems; ++i)
+            arr_C2[i] = arr_A[i] / arr_B[i];
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    {
+        const int32_t num_elems = SIMD_STREAMS_64;
+        const TEST_TYPES test_type = TEST_DBL;
+        double *arr_A = NULL, *arr_B = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_B, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C1, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C2, num_elems, alignment);
+
+        SIMD_DBL va = simd_load(arr_A);
+        SIMD_DBL vb = simd_load(arr_B);
+        SIMD_DBL vc = simd_div(va, vb);
+
+        for (int32_t i = 0; i < num_elems; ++i)
+            arr_C2[i] = arr_A[i] / arr_B[i];
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_B); arr_B = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    {
+        const int32_t num_elems = SIMD_STREAMS_32;
+        const TEST_TYPES test_type = TEST_FLT;
+        float *arr_A = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C1, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C2, num_elems, alignment);
+
+        SIMD_FLT va = simd_load(arr_A);
+        SIMD_FLT vc = simd_sqrt(va);
+
+        for (int32_t i = 0; i < num_elems; ++i)
+            arr_C2[i] = sqrt(arr_A[i]);
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
+
+        free(arr_A); arr_A = NULL;
+        free(arr_C1); arr_C1 = NULL;
+        free(arr_C2); arr_C2 = NULL;
+    }
+
+    {
+        const int32_t num_elems = SIMD_STREAMS_64;
+        const TEST_TYPES test_type = TEST_DBL;
+        double *arr_A = NULL, *arr_C1 = NULL, *arr_C2 = NULL;
+
+        create_test_array(test_type, (void **)&arr_A, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C1, num_elems, alignment);
+        create_test_array(test_type, (void **)&arr_C2, num_elems, alignment);
+
+        SIMD_DBL va = simd_load(arr_A);
+        SIMD_DBL vc = simd_sqrt(va);
+
+        for (int32_t i = 0; i < num_elems; ++i)
+            arr_C2[i] = sqrt(arr_A[i]);
+
+        simd_store(arr_C1, vc);
+        test_result += validate_test_arrays(test_type, (void *)arr_C1, (void *)arr_C2, num_elems);
+
+        free(arr_A); arr_A = NULL;
         free(arr_C1); arr_C1 = NULL;
         free(arr_C2); arr_C2 = NULL;
     }

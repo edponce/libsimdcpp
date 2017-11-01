@@ -60,9 +60,6 @@
  *  \brief Arithmetic instructions supported by SIMD interface
  *  \{
  *
- *    \defgroup AddSub_SSE4_2 Add and subtract
- *    \{
- *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed/unsigned 16-bit integers
  *  \code{.c}
@@ -192,10 +189,6 @@
  *  \param[in] vb Second operand
  *  \return vc
  *
- *    \}
- *
- *    \defgroup FMA_SSE4_2 Fused-multiply add and subtract
- *    \{
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_fmadd(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
  *  \brief Fused multiply-add single-precision floating-point numbers
@@ -252,10 +245,6 @@
  *  \param[in] vc Third operand
  *  \return vd
  *
- *    \}
- *
- *    \defgroup Mul_SSE4_2 Multiply
- *    \{
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply packed 32-bit integers, produce intermediate 64-bit integers,
@@ -368,7 +357,55 @@
  *  \param[in] vb Second operand
  *  \return vc
  *
- *    \}
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_div(const SIMD_FLT va, const SIMD_FLT vb)
+ *  \brief Divide single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vc[i:i+31] = va[i:i+31] / vb[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_div(const SIMD_DBL va, const SIMD_DBL vb)
+ *  \brief Divide double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = va[i:i+63] / vb[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_sqrt(const SIMD_FLT va)
+ *  \brief Calculate square root of single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      vc[i:i+31] = SQRT(va[i:i+31]);
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_sqrt(const SIMD_DBL va)
+ *  \brief Calculate square root of double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
+ *      int i = j * 64;
+ *      vc[i:i+63] = SQRT(va[i:i+63]);
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \return vc
  *
  *  \}
  */
@@ -763,55 +800,18 @@ SIMD_DBL simd_fmsub(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_mullo_i32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm_mullo_epi32(va, vb); }
+SIMD_INT simd_mul_16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_mullo_epi16(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_mul_i32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm_mul_epi32(va, vb); }
+SIMD_INT simd_mul_32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_mullo_epi32(va, vb); }
 
 /*!
  *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
  */
 static SIMD_FUNC_INLINE
-SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
-{
-    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
-    SIMD_INT vlo, vhi;
-    vlo = _mm_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
-    vhi = _mm_mullo_epi32(va, vlo);     // xl * yh, xh * yl
-    vlo = _mm_slli_epi64(vhi, 0x20);    // shift << 32
-    vhi = _mm_add_epi64(vhi, vlo);      // h = h1 + h2
-    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
-    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
-    return _mm_add_epi64(vlo, vhi);     // l + h
-/*
-    // This implementation uses a temp register
-    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
-    SIMD_INT vtmp, vhi, vlo;
-    vtmp = _mm_shuffle_epi32(vb, 0xB1); // shuffle multiplier
-    vhi = _mm_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
-    vtmp = _mm_slli_epi64(vhi, 0x20);   // shift << 32
-    vhi = _mm_add_epi64(vhi, vtmp);     // h = h1 + h2
-    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
-    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
-    return _mm_add_epi64(vlo, vhi);     // l + h
-*/
-}
-
-static SIMD_FUNC_INLINE
-SIMD_INT simd_mullo_u32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm_mullo_epi32(va, vb); }
-
-static SIMD_FUNC_INLINE
-SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
-{ return _mm_mul_epu32(va, vb); }
-
-/*!
- *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
- */
-static SIMD_FUNC_INLINE
-SIMD_INT simd_mul_u64(const SIMD_INT va, const SIMD_INT vb)
+SIMD_INT simd_mul_64(const SIMD_INT va, const SIMD_INT vb)
 {
     const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
     SIMD_INT vlo, vhi;
@@ -843,6 +843,48 @@ SIMD_FLT simd_mul(const SIMD_FLT va, const SIMD_FLT vb)
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_mul(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_mul_pd(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_i16_32(const SIMD_INT va, const SIMD_INT vb)
+{
+    const SIMD_INT vlo = _mm_mullo_epi16(va, vb);  // low 16-bits
+    SIMD_INT vhi = _mm_mulhi_epi16(va, vb);        // high 16-bits
+    vhi = _mm_slli_si128(vhi, 0x02);               // shift 16-bits
+    return _mm_blend_epi16(vlo, vhi, 0xAA);        // merge low and high parts
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_i32_64(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_mul_epi32(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_u16_32(const SIMD_INT va, const SIMD_INT vb)
+{
+    const SIMD_INT vlo = _mm_mullo_epi16(va, vb);  // low 16-bits
+    SIMD_INT vhi = _mm_mulhi_epu16(va, vb);        // high 16-bits
+    vhi = _mm_slli_si128(vhi, 0x02);               // shift 16-bits
+    return _mm_blend_epi16(vlo, vhi, 0xAA);        // merge low and high parts
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_mul_u32_64(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_mul_epu32(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_div(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm_div_ps(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_div(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm_div_pd(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_sqrt(const SIMD_FLT va)
+{ return _mm_sqrt_ps(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_sqrt(const SIMD_DBL va)
+{ return _mm_sqrt_pd(va); }
 
 
 /**************************

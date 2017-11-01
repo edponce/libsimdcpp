@@ -19,7 +19,8 @@ struct TEST_T TESTS[] =
 {
     { test_simd_add_sub, "Add/subtract signed/unsigned 16/32/64-bit integers and single/double-precision floating-point numbers" },
     { test_simd_fm_add_sub, "Fused multiply-add/subtract single/double-precision floating-point numbers" },
-    { test_simd_mul, "Multiply signed/unsigned 32/64-bit integers and single/double-precision floating-point numbers" },
+    { test_simd_mul, "Multiply signed/unsigned 16/32/64-bit integers and single/double-precision floating-point numbers" },
+    { test_simd_div_sqrt, "Divide/sqrt single/double-precision floating-point numbers" },
     { test_simd_merge_lo, "Merge low parts from pair of registers" },
     { test_simd_merge_hi, "Merge high parts from pair of registers" },
     { test_simd_packmerge_lo, "Pack and merge 32-bit integers" },
@@ -32,7 +33,7 @@ struct TEST_T TESTS[] =
 
 
 const int MAX_WORKERS = 4;
-const int MAX_RUNS_PER_TEST = 20;
+const int MAX_RUNS_PER_TEST = 10;
 
 
 int test_suite(const struct TEST_T * const, const int, const int);

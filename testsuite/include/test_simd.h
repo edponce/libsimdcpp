@@ -9,6 +9,7 @@
 int test_simd_add_sub(void);
 int test_simd_fm_add_sub(void);
 int test_simd_mul(void);
+int test_simd_div_sqrt(void);
 int test_simd_merge_lo();
 int test_simd_merge_hi();
 int test_simd_packmerge_lo();
