@@ -17,18 +17,17 @@ struct TEST_T {
 // Array of test cases
 struct TEST_T TESTS[] =
 {
-    { test_simd_loadstore, "Aligned loads/stores" },
-    { test_simd_add, "Add signed/unsigned 16/32/64-bit integers" },
-    { test_simd_sub, "Subtract signed/unsigned 16/32/64-bit integers" },
-    { test_simd_fmadd, "Fused multiply-add" },
-    { test_simd_fmsub, "Fused multiply-subtract" },
-    { test_simd_mul_u64, "64-bit integer multiply" },
+    { test_simd_add_sub, "Add/subtract signed/unsigned 16/32/64-bit integers and single/double-precision floating-point numbers" },
+    { test_simd_fm_add_sub, "Fused multiply-add/subtract single/double-precision floating-point numbers" },
+    { test_simd_mul, "Multiply signed/unsigned 32/64-bit integers and single/double-precision floating-point numbers" },
+    { test_simd_merge_lo, "Merge low parts from pair of registers" },
+    { test_simd_merge_hi, "Merge high parts from pair of registers" },
     { test_simd_packmerge_lo, "Pack and merge 32-bit integers" },
     { test_simd_cvt_i32_fp, "Convert 32-bit integers to 32/64-bit floating-point" },
     { test_simd_cvt_u64_fp, "Convert unsigned 64-bit integers to 32/64-bit floating-point" },
-    { test_simd_merge_lo, "Merge low parts from pair of registers" },
-    { test_simd_merge_hi, "Merge high parts from pair of registers" },
-    { test_simd_set_32, "Broadcast 32-bit integers to all elements" }
+    { test_simd_set_32, "Broadcast 32-bit integers to all elements" },
+    { test_simd_loadstore, "Aligned loads/stores" },
+    { test_simd_loadstoreu, "Unaligned loads/stores" }
 };
 
 

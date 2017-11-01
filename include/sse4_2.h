@@ -300,6 +300,21 @@
  *  \return vc
  *
  *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mullo_u32(const SIMD_INT va, const SIMD_INT vb)
+ *  \brief Multiply packed 32-bit unsigned integers, produce intermediate 64-bit integers,
+ *         and store the low 32-bit results
+ *  \code{.c}
+ *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
+ *      int i = j * 32;
+ *      int64_t tmp[0:63] = va[i:i+31] * vb[i:i+31];
+ *      vc[i:i+31] = tmp[0:31];
+ *  }
+ *  \endcode
+ *  \param[in] va First operand
+ *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply low unsigned 32-bit integers from each packed 64-bit elements
  *         and store the unsigned 64-bit results
@@ -785,6 +800,10 @@ SIMD_INT simd_mul_i64(const SIMD_INT va, const SIMD_INT vb)
 }
 
 static SIMD_FUNC_INLINE
+SIMD_INT simd_mullo_u32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_mullo_epi32(va, vb); }
+
+static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_u32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_mul_epu32(va, vb); }
 
@@ -968,7 +987,7 @@ SIMD_FLT simd_packmerge_lo(const SIMD_FLT va, const SIMD_FLT vb)
  */
 
 /*
- *  Set vector to zero.
+ *  Set vector to zero. Use pointer for function overloading.
  */
 static SIMD_FUNC_INLINE
 void simd_set_zero(SIMD_INT * const va)
