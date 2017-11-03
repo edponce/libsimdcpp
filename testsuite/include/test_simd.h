@@ -14,11 +14,12 @@ int test_simd_logic(void);
 int test_simd_shift(void);
 int test_simd_merge(void);
 int test_simd_pack(void);
-int test_simd_cvt_i32_fp();
-int test_simd_cvt_u64_fp();
-int test_simd_set_32();
-int test_simd_loadstore(void);
-int test_simd_loadstoreu(void);
+int test_simd_shuffle(void);
+//int test_simd_cvt_i32_fp();
+//int test_simd_cvt_u64_fp();
+//int test_simd_set_32();
+//int test_simd_loadstore(void);
+//int test_simd_loadstoreu(void);
 
 
 #endif  // SIMD_MODE

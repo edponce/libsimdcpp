@@ -13,11 +13,13 @@
  *  \author Eduardo Ponce
  *  \version 1.0
  *  \date 10/30/2017
- *
- *  \todo Reuse vector registers in some cases (will need to remove const from parameter).
  */
 #ifndef _SSE4_2_H
 #define _SSE4_2_H
+
+
+// NOTE: Include comments inside namespace for correct module listing in documentation
+namespace SSE4_2 {
 
 
 /*
@@ -63,299 +65,299 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed/unsigned 16-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
+ *  for (int i = 0; i < 128; i+=16)
  *      vc[i:i+15] = va[i:i+15] + vb[i:i+15];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed/unsigned 32-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = va[i:i+31] + vb[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed/unsigned 64-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = va[i:i+63] + vb[i:i+63];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_add(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Add single-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = va[i:i+31] + vb[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
  *  \brief Add double-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = va[i:i+63] + vb[i:i+63];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract signed/unsigned 16-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
+ *  for (int i = 0; i < 128; i+=16)
  *      vc[i:i+15] = va[i:i+15] - vb[i:i+15];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract signed/unsigned 32-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = va[i:i+31] - vb[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract signed/unsigned 64-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = va[i:i+63] - vb[i:i+63];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Subtract single-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = va[i:i+31] - vb[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
  *  \brief Subtract double-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = va[i:i+63] - vb[i:i+63];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
  *  \brief Fused multiply-add single-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vd[i:i+31] = va[i:i+31] * vb[i:i+31] + vc[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \param[in] vc Third operand
+ *  \param[in] va Left multiply operand
+ *  \param[in] vb Right multiply operand
+ *  \param[in] vc Right add operand
  *  \return vd
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
  *  \brief Fused multiply-add double-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vd[i:i+63] = va[i:i+63] * vb[i:i+63] + vc[i:i+63];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \param[in] vc Third operand
+ *  \param[in] va Left multiply operand
+ *  \param[in] vb Right multiply operand
+ *  \param[in] vc Right add operand
  *  \return vd
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
  *  \brief Fused multiply-subtract single-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vd[i:i+31] = va[i:i+31] * vb[i:i+31] - vc[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \param[in] vc Third operand
+ *  \param[in] va Left multiply operand
+ *  \param[in] vb Right multiply operand
+ *  \param[in] vc Right subtract operand
  *  \return vd
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
  *  \brief Fused multiply-subtract double-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vd[i:i+63] = va[i:i+63] * vb[i:i+63] - vc[i:i+63];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
- *  \param[in] vc Third operand
+ *  \param[in] va Left multiply operand
+ *  \param[in] vb Right multiply operand
+ *  \param[in] vc Right subtract operand
  *  \return vd
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed/unsigned 16-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
+ *  for (int i = 0; i < 128; i+=16)
  *      vc[i:i+15] = va[i:i+15] * vb[i:i+15];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed/unsigned 32-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = va[i:i+31] * vb[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed/unsigned 64-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = va[i:i+63] * vb[i:i+63];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_mul(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Multiply single-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = va[i:i+31] * vb[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_mul(const SIMD_DBL va, const SIMD_DBL vb)
  *  \brief Multiply double-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = va[i:i+63] * vb[i:i+63];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_i16_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed 16-bit integers and store result as 32-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = va[i:i+15] * vb[i:i+15];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_i32_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed 32-bit integers and store result as 64-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = va[i:i+31] * vb[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_u16_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply unsigned 16-bit integers and store result as 32-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = va[i:i+15] * vb[i:i+15];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_u32_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply unsigned 32-bit integers and store result as 64-bit integers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = va[i:i+31] * vb[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_div(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Divide single-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = va[i:i+31] / vb[i:i+31];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_div(const SIMD_DBL va, const SIMD_DBL vb)
  *  \brief Divide double-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = va[i:i+63] / vb[i:i+63];
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_sqrt(const SIMD_FLT va)
  *  \brief Calculate square root of single-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = SQRT(va[i:i+31]);
  *  \endcode
- *  \param[in] va First operand
+ *  \param[in] va Operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_sqrt(const SIMD_DBL va)
  *  \brief Calculate square root of double-precision floating-point numbers
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = SQRT(va[i:i+63]);
  *  \endcode
- *  \param[in] va First operand
+ *  \param[in] va Operand
  *  \return vc
  *
  *  \}
@@ -373,8 +375,8 @@
  *  \code{.c}
  *  vc = va & vb;
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
@@ -383,8 +385,8 @@
  *  \code{.c}
  *  vc = (SIMD_FLT)((SIMD_INT)va & vb);
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
@@ -393,8 +395,8 @@
  *  \code{.c}
  *  vc = (SIMD_DBL)((SIMD_INT)va & vb);
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
@@ -403,8 +405,8 @@
  *  \code{.c}
  *  vc = va | vb;
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
@@ -413,15 +415,15 @@
  *  \code{.c}
  *  vc = va ^ vb;
  *  \endcode
- *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \param[in] va Left operand
+ *  \param[in] vb Right operand
  *  \return vc
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_16(const SIMD_INT va, const int8_t shft)
  *  \brief Shift left logical packed 16-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
+ *  for (int i = 0; i < 128; i+=16)
  *      vc[i:i+15] = (shft > 15) ? 0 : ZeroExtend(va[i:i+15] << shft);
  *  \endcode
  *  \param[in] va Vector register to shift
@@ -432,7 +434,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_32(const SIMD_INT va, const int8_t shft)
  *  \brief Shift left logical packed 32-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = (shft > 31) ? 0 : ZeroExtend(va[i:i+31] << shft);
  *  \endcode
  *  \param[in] va Vector register to shift
@@ -443,7 +445,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_64(const SIMD_INT va, const int8_t shft)
  *  \brief Shift left logical packed 64-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = (shft > 63) ? 0 : ZeroExtend(va[i:i+63] << shft);
  *  \endcode
  *  \param[in] va Vector register to shift
@@ -454,9 +456,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_128(const SIMD_INT va, const int8_t shft)
  *  \brief Shift left logical packed 128-bit integers (at byte level) while shifting in zeros
  *  \code{.c}
- *  if (shft > 15)
- *      shft = 16;
- *  vc = va << (shft * 8);
+ *  vc = (shft > 15) 0 : (va << (shft * 8));
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -466,7 +466,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_16(const SIMD_INT va, const int8_t shft)
  *  \brief Shift right logical packed 16-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
+ *  for (int i = 0; i < 128; i+=16)
  *      vc[i:i+15] = (shft > 15) ? 0 : ZeroExtend(va[i:i+15] >> shft);
  *  \endcode
  *  \param[in] va Vector register to shift
@@ -477,7 +477,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_32(const SIMD_INT va, const int8_t shft)
  *  \brief Shift right logical packed 32-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *  for (int i = 0; i < 128; i+=32)
  *      vc[i:i+31] = (shft > 31) ? 0 : ZeroExtend(va[i:i+31] >> shft);
  *  \endcode
  *  \param[in] va Vector register to shift
@@ -488,7 +488,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_64(const SIMD_INT va, const int8_t shft)
  *  \brief Shift right logical packed 64-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *  for (int i = 0; i < 128; i+=64)
  *      vc[i:i+63] = (shft > 63) ? 0 : ZeroExtend(va[i:i+63] >> shft);
  *  \endcode
  *  \param[in] va Vector register to shift
@@ -499,9 +499,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_128(const SIMD_INT va, const int8_t shft)
  *  \brief Shift right logical packed 128-bit integers (at byte level) while shifting in zeros
  *  \code{.c}
- *  if (shft > 15)
- *      shft = 16;
- *  vc = va >> (shft * 8);
+ *  vc = (shft > 15) 0 : (va >> (shft * 8));
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -512,28 +510,10 @@
 
 
 /*!
- *  \defgroup Shuffle_SSE4_2 Shuffle and merge instructions
+ *  \defgroup Merge_SSE4_2 Merge instructions
  *  \ingroup SSE4_2
- *  \brief Shuffle and merge instructions supported by SIMD interface
+ *  \brief Merge instructions supported by SIMD interface
  *  \{
- *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_shuffle_32(const SIMD_INT va, const int8_t ctrl)
- *  \brief Shuffle 32-bit integers
- *  \code{.c}
- *  for (int i = 0; i < 4; ++i) {
- *      int j = i * 32;
- *      int k = i * 2;
- *      switch (ctrl[k:k+1]) {
- *          case 0: vc[j:j+31] = va[0:31];
- *          case 1: vc[j:j+31] = va[32:63];
- *          case 2: vc[j:j+31] = va[64:95];
- *          case 3: vc[j:j+31] = va[96:127];
- *      }
- *  }
- *  \endcode
- *  \param[in] va Vector register to shuffle
- *  \return vc
- *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Merge lower half from pair of integer registers
@@ -549,10 +529,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Merge lower half from pair of single-precision floating-point registers
  *  \code{.c}
- *  vc[0:31] = va[0:31]
- *  vc[32:63] = va[32:63]
- *  vc[64:95] = vb[0:31]
- *  vc[96:127] = vb[32:63]
+ *  vc[0:63] = va[0:63]
+ *  vc[64:127] = vb[0:63]
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -584,10 +562,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Merge upper half from pair of single-precision floating-point registers
  *  \code{.c}
- *  vc[0:31] = va[64:95]
- *  vc[32:63] = va[96:127]
- *  vc[64:95] = vb[64:95]
- *  vc[96:127] = vb[96:127]
+ *  vc[0:63] = va[64:127]
+ *  vc[64:127] = vb[64:127]
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -604,20 +580,27 @@
  *  \param[in] vb Second operand
  *  \return vc
  *
+ *  \}
+ */
+
+
+/*!
+ *  \defgroup Shuffle_SSE4_2 Shuffle instructions
+ *  \ingroup SSE4_2
+ *  \brief Shuffle instructions supported by SIMD interface
+ *  \{
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_pack_8(const SIMD_INT va)
  *  \brief Pack into first half of register the lower 8-bit integers from 16-bit elements
  *         and pack into second half of register the upper 8-bit integers from 16-bit elements
  *  \code{.c}
- *  for (int i = 0; i < 64; i+=8)
+ *  for (int i = 0; i < 64; i+=8) {
  *      int k = i * 2;
  *      vc[i:i+7] = va[k:k+7];
- *  for (int i = 0; i < 64; i+=8)
- *      int j = i + 64;
- *      int k = i * 2 + 8;
- *      vc[j:j+7] = va[k:k+7];
+ *      vc[i+64:(i+64)+7] = va[k+8:(k+8)+7];
+ *  }
  *  \endcode
- *  \param[in] va First operand
+ *  \param[in] va Vector register to pack
  *  \return vc
  *
  *
@@ -625,16 +608,13 @@
  *  \brief Pack into first half of register the lower 16-bit integers from 32-bit elements
  *         and pack into second half of register the upper 16-bit integers from 32-bit elements
  *  \code{.c}
- *  vc[0:15] = va[0:15]
- *  vc[16:31] = va[32:47]
- *  vc[32:47] = va[64:79] 
- *  vc[48:63] = va[96:111] 
- *  vc[64:79] = va[16:31]
- *  vc[80:95] = va[48:63]
- *  vc[96:111] = va[80:95] 
- *  vc[112:127] = va[112:127] 
+ *  for (int i = 0; i < 64; i+=16) {
+ *      int k = i * 2;
+ *      vc[i:i+15] = va[k:k+15];
+ *      vc[i+64:(i+64)+15] = va[k+16:(k+16)+15];
+ *  }
  *  \endcode
- *  \param[in] va First operand
+ *  \param[in] va Vector register to pack
  *  \return vc
  *
  *
@@ -642,12 +622,13 @@
  *  \brief Pack into first half of register the lower 32-bit integers from 64-bit elements
  *         and pack into second half of register the upper 32-bit integers from 64-bit elements
  *  \code{.c}
- *  vc[0:31] = va[0:31]
- *  vc[32:63] = va[64:95]
- *  vc[64:95] = va[32:63] 
- *  vc[96:127] = va[96:127] 
+ *  for (int i = 0; i < 64; i+=32) {
+ *      int k = i * 2;
+ *      vc[i:i+31] = va[k:k+31];
+ *      vc[i+64:(i+64)+31] = va[k+32:(k+32)+31];
+ *  }
  *  \endcode
- *  \param[in] va First operand
+ *  \param[in] va Vector register to pack
  *  \return vc
  *
  *
@@ -655,12 +636,30 @@
  *  \brief Pack into first half of register the lower single-precision floating-point numbers from 64-bit elements
  *         and pack into second half of register the upper single-precision floating-point numbers from 64-bit elements
  *  \code{.c}
- *  vc[0:31] = va[0:31]
- *  vc[32:63] = va[64:95]
- *  vc[64:95] = va[32:63] 
- *  vc[96:127] = va[96:127] 
+ *  for (int i = 0; i < 64; i+=32) {
+ *      int k = i * 2;
+ *      vc[i:i+31] = va[k:k+31];
+ *      vc[i+64:(i+64)+31] = va[k+32:(k+32)+31];
+ *  }
  *  \endcode
- *  \param[in] va First operand
+ *  \param[in] va Vector register to pack
+ *  \return vc
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_shuffle_32(const SIMD_INT va, const int8_t ctrl)
+ *  \brief Shuffle 32-bit integers
+ *  \code{.c}
+ *  for (int i = 0; i < 4; ++i) {
+ *      int j = i * 32;
+ *      int k = i * 2;
+ *      switch (ctrl[k:k+1]) {
+ *          case 0: vc[j:j+31] = va[0:31]; break;
+ *          case 1: vc[j:j+31] = va[32:63]; break;
+ *          case 2: vc[j:j+31] = va[64:95]; break;
+ *          case 3: vc[j:j+31] = va[96:127]; break;
+ *      }
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to shuffle
  *  \return vc
  *
  *  \}
@@ -780,12 +779,10 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_32(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_mullo_epi32(va, vb); }
 
-/*!
- *  x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
- */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_64(const SIMD_INT va, const SIMD_INT vb)
 {
+    //! \note x64 * y64 = (xl * yl) + (xl * yh + xh * yl) * 2^32
     const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000);
     SIMD_INT vlo, vhi;
     vlo = _mm_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
@@ -855,23 +852,19 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_and_si128(va, vb); }
 
-/*!
- *  Used to mask vector elements
- */
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb)
 {
+    //! \note Used to mask vector elements
     SIMD_INT va_int = _mm_castps_si128(va);
     va_int = _mm_and_si128(va_int, vb);
     return _mm_castsi128_ps(va_int);
 }
 
-/*!
- *  Used to mask vector elements
- */
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
 {
+    //! \note Used to mask vector elements
     SIMD_INT va_int = _mm_castpd_si128(va);
     va_int = _mm_and_si128(va_int, vb);
     return _mm_castsi128_pd(va_int);
@@ -900,8 +893,11 @@ SIMD_INT simd_sll_64(const SIMD_INT va, const int8_t shft)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_sll_128(const SIMD_INT va, const int8_t shft)
 {
-    // NOTE: Shift amount has to be an 8-bit immediate literal
-    //return _mm_slli_si128(va, shft);
+    /*!
+     *  \note Explicit cases are included because \c shft
+     *        has to be an 8-bit immediate literal\n
+     *        The alternative is to use: \c _mm_slli_si128(va, shft)
+     */
     switch (shft) {
         case 0: return va; break;
         case 1: return _mm_slli_si128(va, 0x01); break;
@@ -938,8 +934,11 @@ SIMD_INT simd_srl_64(const SIMD_INT va, const int8_t shft)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_srl_128(const SIMD_INT va, const int8_t shft)
 {
-    // NOTE: Shift amount has to be an 8-bit immediate literal
-    //return _mm_srli_si128(va, shft);
+    /*!
+     *  \note Explicit cases are included because \c shft
+     *        has to be an 8-bit immediate literal\n
+     *        The alternative is to use: \c _mm_srli_si128(va, shft)
+     */
     switch (shft) {
         case 0: return va; break;
         case 1: return _mm_srli_si128(va, 0x01); break;
@@ -962,20 +961,9 @@ SIMD_INT simd_srl_128(const SIMD_INT va, const int8_t shft)
 }
 
 
-/**************************
- *  Shuffle instructions  *
- **************************/
-// NOTE: Clang throws error for non-literal constant due to macro expansion
-#if !defined(__clang__)
-static SIMD_FUNC_INLINE
-SIMD_INT simd_shuffle_32(const SIMD_INT va, const int8_t ctrl)
-{ return _mm_shuffle_epi32(va, ctrl); }
-
-static SIMD_FUNC_INLINE
-SIMD_FLT simd_shuffle(const SIMD_FLT va, const SIMD_FLT vb, const int8_t ctrl)
-{ return _mm_shuffle_ps(va, vb, ctrl); }
-#endif
-
+/*********************************
+ *  Merge and pack instructions  *
+ *********************************/
 static SIMD_FUNC_INLINE
 SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_unpacklo_epi64(va, vb); }
@@ -1000,6 +988,10 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_unpackhi_pd(va, vb); }
 
+
+/**************************
+ *  Shuffle instructions  *
+ **************************/
 static SIMD_FUNC_INLINE
 SIMD_INT simd_pack_8(const SIMD_INT va)
 {
@@ -1021,6 +1013,41 @@ SIMD_INT simd_pack_32(const SIMD_INT va)
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_pack(const SIMD_FLT va)
 { return _mm_shuffle_ps(va, va, 0xD8); }
+
+
+//! \todo Move this to somewhere else
+enum SHUFFLE_CTRL { XCHG = 0, // Exchange lower/upper halfs of register
+                    XCHG8,    // Exchange pairs of 8-bit elements
+                    XCHG16,   // Exchange pairs of 16-bit elements
+                    XCHG32,   // Exchange pairs of 32-bit elements
+                    XCHG64,   // Exchange pairs of 64-bit elements
+                    DUPL,     // Duplicate lower half into upper half of register
+                    DUPH      // Duplicate upper half into lower half of register
+                  };
+
+
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_shuffle(const SIMD_INT va, const SHUFFLE_CTRL ctrl)
+{
+    //! \note Options assume that vector register width is a multiple of 32
+    //! \todo Missing XCHG8 and XCHG16
+    switch (ctrl) {
+        case XCHG: return _mm_shuffle_epi32(va, 0x4E); break;
+        case XCHG32: return _mm_shuffle_epi32(va, 0xB1); break;
+        case XCHG64: return _mm_shuffle_epi32(va, 0x4E); break;
+        case DUPL: return _mm_shuffle_epi32(va, 0x44); break;
+        case DUPH: return _mm_shuffle_epi32(va, 0xEE); break;
+        default: return va; break;
+    }
+}
+
+
+#if !defined(__clang__)
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_shuffle(const SIMD_FLT va, const SIMD_FLT vb, const int8_t ctrl)
+{ return _mm_shuffle_ps(va, vb, ctrl); }
+#endif
 
 
 /**********************
@@ -1403,6 +1430,12 @@ void simd_storeu(double * const sa, const SIMD_DBL va)
 /*!
  *  \}
  */
+
+
+}  // SSE4_2 namespace
+
+
+using namespace SSE4_2;
 
 
 #endif  // _SSE4_2_H

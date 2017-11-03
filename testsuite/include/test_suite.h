@@ -25,11 +25,12 @@ struct TEST_T TESTS[] =
     { test_simd_shift, "Shift left/right 16/32/64/128-bit integers" },
     { test_simd_merge, "Merge low/high parts from pair of integers/floating-point numbers" },
     { test_simd_pack, "Pack 8/16/32-bit integers and single-precision floating-point numbers" },
-    { test_simd_cvt_i32_fp, "Convert 32-bit integers to 32/64-bit floating-point" },
-    { test_simd_cvt_u64_fp, "Convert unsigned 64-bit integers to 32/64-bit floating-point" },
-    { test_simd_set_32, "Broadcast 32-bit integers to all elements" },
-    { test_simd_loadstore, "Aligned loads/stores" },
-    { test_simd_loadstoreu, "Unaligned loads/stores" }
+    { test_simd_shuffle, "Shuffle 16/32/64-bit integers and single/double-precision floating-point numbers" },
+    //{ test_simd_cvt_i32_fp, "Convert 32-bit integers to 32/64-bit floating-point" },
+    //{ test_simd_cvt_u64_fp, "Convert unsigned 64-bit integers to 32/64-bit floating-point" },
+    //{ test_simd_set_32, "Broadcast 32-bit integers to all elements" },
+    //{ test_simd_loadstore, "Aligned loads/stores" },
+    //{ test_simd_loadstoreu, "Unaligned loads/stores" }
 };
 
 

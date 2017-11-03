@@ -8,6 +8,7 @@
 
 /*!
  *  \brief Array allocation and initialization
+ *  \todo Eliminate use of pointer for casting, cast pointer when accessing data directly
  */
 void create_test_array(const int32_t arr_type, void ** const arr, const int32_t num_elems, const int32_t alignment)
 {

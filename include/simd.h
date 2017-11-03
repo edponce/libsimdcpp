@@ -58,6 +58,7 @@
 /*
  *  General form of macros provided by compiler/architecture settings
  *  Use SIMD_WIDTH_BYTES provided by SIMD modules
+ *  NOTE: This macros will not be correct if multiple SIMD interfaces are loaded
  */
 #define __SIMD_ALIGN__ SIMD_ALIGNED(SIMD_WIDTH_BYTES)
 #define __SIMD_ASSUME_ALIGNED__(a) SIMD_ASSUME_ALIGNED(a, SIMD_WIDTH_BYTES)
