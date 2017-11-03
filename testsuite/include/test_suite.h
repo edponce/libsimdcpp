@@ -23,9 +23,8 @@ struct TEST_T TESTS[] =
     { test_simd_div_sqrt, "Divide/sqrt single/double-precision floating-point numbers" },
     { test_simd_logic, "Logical and/or/xor for integers and floating-point numbers" },
     { test_simd_shift, "Shift left/right 16/32/64/128-bit integers" },
-    { test_simd_merge_lo, "Merge low parts from pair of registers" },
-    { test_simd_merge_hi, "Merge high parts from pair of registers" },
-    { test_simd_packmerge_lo, "Pack and merge 32-bit integers" },
+    { test_simd_merge, "Merge low/high parts from pair of integers/floating-point numbers" },
+    { test_simd_pack, "Pack 8/16/32-bit integers and single-precision floating-point numbers" },
     { test_simd_cvt_i32_fp, "Convert 32-bit integers to 32/64-bit floating-point" },
     { test_simd_cvt_u64_fp, "Convert unsigned 64-bit integers to 32/64-bit floating-point" },
     { test_simd_set_32, "Broadcast 32-bit integers to all elements" },
@@ -35,7 +34,7 @@ struct TEST_T TESTS[] =
 
 
 const int MAX_WORKERS = 4;
-const int MAX_RUNS_PER_TEST = 10;
+const int RUNS_PER_TEST = 1;
 
 
 int test_suite(const struct TEST_T * const, const int, const int);

@@ -63,10 +63,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed/unsigned 16-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
- *      int i = j * 16;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
  *      vc[i:i+15] = va[i:i+15] + vb[i:i+15];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -76,10 +74,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed/unsigned 32-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = va[i:i+31] + vb[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -89,10 +85,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_add_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Add signed/unsigned 64-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = va[i:i+63] + vb[i:i+63];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -102,10 +96,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_add(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Add single-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = va[i:i+31] + vb[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -115,10 +107,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
  *  \brief Add double-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = va[i:i+63] + vb[i:i+63];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -128,10 +118,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract signed/unsigned 16-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
- *      int i = j * 16;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
  *      vc[i:i+15] = va[i:i+15] - vb[i:i+15];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -141,10 +129,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract signed/unsigned 32-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = va[i:i+31] - vb[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -154,10 +140,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sub_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Subtract signed/unsigned 64-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = va[i:i+63] - vb[i:i+63];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -167,10 +151,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Subtract single-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = va[i:i+31] - vb[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -180,23 +162,19 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
  *  \brief Subtract double-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = va[i:i+63] - vb[i:i+63];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
  *  \return vc
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_fmadd(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
  *  \brief Fused multiply-add single-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vd[i:i+31] = va[i:i+31] * vb[i:i+31] + vc[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -204,13 +182,11 @@
  *  \return vd
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_fmadd(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
  *  \brief Fused multiply-add double-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vd[i:i+63] = va[i:i+63] * vb[i:i+63] + vc[i:i+63];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -218,13 +194,11 @@
  *  \return vd
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_fmsub(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
  *  \brief Fused multiply-subtract single-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vd[i:i+31] = va[i:i+31] * vb[i:i+31] - vc[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -232,13 +206,11 @@
  *  \return vd
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_fmsub(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
  *  \brief Fused multiply-subtract double-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vd[i:i+63] = va[i:i+63] * vb[i:i+63] - vc[i:i+63];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -249,10 +221,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_16(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed/unsigned 16-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
- *      int i = j * 16;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
  *      vc[i:i+15] = va[i:i+15] * vb[i:i+15];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -262,10 +232,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed/unsigned 32-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = va[i:i+31] * vb[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -275,10 +243,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed/unsigned 64-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = va[i:i+63] * vb[i:i+63];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -288,10 +254,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_mul(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Multiply single-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = va[i:i+31] * vb[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -301,10 +265,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_mul(const SIMD_DBL va, const SIMD_DBL vb)
  *  \brief Multiply double-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = va[i:i+63] * vb[i:i+63];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -314,10 +276,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_i16_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed 16-bit integers and store result as 32-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = va[i:i+15] * vb[i:i+15];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -327,10 +287,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_i32_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply signed 32-bit integers and store result as 64-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = va[i:i+31] * vb[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -340,10 +298,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_u16_32(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply unsigned 16-bit integers and store result as 32-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = va[i:i+15] * vb[i:i+15];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -353,10 +309,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_mul_u32_64(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Multiply unsigned 32-bit integers and store result as 64-bit integers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = va[i:i+31] * vb[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -366,10 +320,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_div(const SIMD_FLT va, const SIMD_FLT vb)
  *  \brief Divide single-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = va[i:i+31] / vb[i:i+31];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -379,10 +331,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_div(const SIMD_DBL va, const SIMD_DBL vb)
  *  \brief Divide double-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = va[i:i+63] / vb[i:i+63];
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -392,10 +342,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_sqrt(const SIMD_FLT va)
  *  \brief Calculate square root of single-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
  *      vc[i:i+31] = SQRT(va[i:i+31]);
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \return vc
@@ -404,10 +352,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_sqrt(const SIMD_DBL va)
  *  \brief Calculate square root of double-precision floating-point numbers
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
  *      vc[i:i+63] = SQRT(va[i:i+63]);
- *  }
  *  \endcode
  *  \param[in] va First operand
  *  \return vc
@@ -425,7 +371,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_and(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Bitwise AND of 128-bit integer registers
  *  \code{.c}
- *      vc[0:SIMD_WIDTH_BITS-1] = va[0:SIMD_WIDTH_BITS-1] & vb[0:SIMD_WIDTH_BITS-1];
+ *  vc = va & vb;
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -435,7 +381,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_and(const SIMD_FLT va, const SIMD_INT vb)
  *  \brief Bitwise AND of single-precision floating-point number and 128-bit integer register
  *  \code{.c}
- *      vc[0:SIMD_WIDTH_BITS-1] = (SIMD_FLT)((SIMD_INT)va[0:SIMD_WIDTH_BITS-1] & vb[0:SIMD_WIDTH_BITS-1]);
+ *  vc = (SIMD_FLT)((SIMD_INT)va & vb);
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -445,7 +391,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_and(const SIMD_DBL va, const SIMD_INT vb)
  *  \brief Bitwise AND of double-precision floating-point number and 128-bit integer register
  *  \code{.c}
- *      vc[0:SIMD_WIDTH_BITS-1] = (SIMD_DBL)((SIMD_INT)va[0:SIMD_WIDTH_BITS-1] & vb[0:SIMD_WIDTH_BITS-1]);
+ *  vc = (SIMD_DBL)((SIMD_INT)va & vb);
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -455,7 +401,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_or(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Bitwise OR of 128-bit integer registers
  *  \code{.c}
- *      vc[0:SIMD_WIDTH_BITS-1] = va[0:SIMD_WIDTH_BITS-1] | vb[0:SIMD_WIDTH_BITS-1];
+ *  vc = va | vb;
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -465,7 +411,7 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_xor(const SIMD_INT va, const SIMD_INT vb)
  *  \brief Bitwise XOR of 128-bit integer registers
  *  \code{.c}
- *      vc[0:SIMD_WIDTH_BITS-1] = va[0:SIMD_WIDTH_BITS-1] ^ vb[0:SIMD_WIDTH_BITS-1];
+ *  vc = va ^ vb;
  *  \endcode
  *  \param[in] va First operand
  *  \param[in] vb Second operand
@@ -475,13 +421,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_16(const SIMD_INT va, const int8_t shft)
  *  \brief Shift left logical packed 16-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
- *      int i = j * 16;
- *      if (shft > 15)
- *          vc[i:i+15] = 0;
- *      else
- *          vc[i:i+15] = ZeroExtend(va[i:i+15] << shft);
- *  }
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
+ *      vc[i:i+15] = (shft > 15) ? 0 : ZeroExtend(va[i:i+15] << shft);
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -491,13 +432,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_32(const SIMD_INT va, const int8_t shft)
  *  \brief Shift left logical packed 32-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
- *      if (shft > 31)
- *          vc[i:i+31] = 0;
- *      else
- *          vc[i:i+31] = ZeroExtend(va[i:i+31] << shft);
- *  }
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *      vc[i:i+31] = (shft > 31) ? 0 : ZeroExtend(va[i:i+31] << shft);
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -507,13 +443,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_sll_64(const SIMD_INT va, const int8_t shft)
  *  \brief Shift left logical packed 64-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
- *      if (shft > 63)
- *          vc[i:i+63] = 0;
- *      else
- *          vc[i:i+63] = ZeroExtend(va[i:i+63] << shft);
- *  }
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *      vc[i:i+63] = (shft > 63) ? 0 : ZeroExtend(va[i:i+63] << shft);
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -525,7 +456,7 @@
  *  \code{.c}
  *  if (shft > 15)
  *      shft = 16;
- *  vc[0:127] = va[0:127] << (shft * 8);
+ *  vc = va << (shft * 8);
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -535,13 +466,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_16(const SIMD_INT va, const int8_t shft)
  *  \brief Shift right logical packed 16-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_16; ++j) {
- *      int i = j * 16;
- *      if (shft > 15)
- *          vc[i:i+15] = 0;
- *      else
- *          vc[i:i+15] = ZeroExtend(va[i:i+15] >> shft);
- *  }
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=16)
+ *      vc[i:i+15] = (shft > 15) ? 0 : ZeroExtend(va[i:i+15] >> shft);
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -551,13 +477,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_32(const SIMD_INT va, const int8_t shft)
  *  \brief Shift right logical packed 32-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_32; ++j) {
- *      int i = j * 32;
- *      if (shft > 31)
- *          vc[i:i+31] = 0;
- *      else
- *          vc[i:i+31] = ZeroExtend(va[i:i+31] >> shft);
- *  }
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=32)
+ *      vc[i:i+31] = (shft > 31) ? 0 : ZeroExtend(va[i:i+31] >> shft);
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -567,13 +488,8 @@
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_srl_64(const SIMD_INT va, const int8_t shft)
  *  \brief Shift right logical packed 64-bit integers while shifting in zeros
  *  \code{.c}
- *  for (int j = 0; j < SIMD_STREAMS_64; ++j) {
- *      int i = j * 64;
- *      if (shft > 63)
- *          vc[i:i+63] = 0;
- *      else
- *          vc[i:i+63] = ZeroExtend(va[i:i+63] >> shft);
- *  }
+ *  for (int i = 0; i < SIMD_WIDTH_BITS; i+=64)
+ *      vc[i:i+63] = (shft > 63) ? 0 : ZeroExtend(va[i:i+63] >> shft);
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -585,7 +501,7 @@
  *  \code{.c}
  *  if (shft > 15)
  *      shft = 16;
- *  vc[0:127] = va[0:127] >> (shft * 8);
+ *  vc = va >> (shft * 8);
  *  \endcode
  *  \param[in] va Vector register to shift
  *  \param[in] shft Shift amount
@@ -620,7 +536,7 @@
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_merge_lo(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Merge low parts from pair of 16/32/64-bit integer registers
+ *  \brief Merge lower half from pair of integer registers
  *  \code{.c}
  *  vc[0:63] = va[0:63]
  *  vc[64:127] = vb[0:63]
@@ -631,7 +547,7 @@
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_merge_lo(const SIMD_FLT va, const SIMD_FLT vb)
- *  \brief Merge low parts from pair of single-precision floating point registers
+ *  \brief Merge lower half from pair of single-precision floating-point registers
  *  \code{.c}
  *  vc[0:31] = va[0:31]
  *  vc[32:63] = va[32:63]
@@ -644,7 +560,7 @@
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_merge_lo(const SIMD_DBL va, const SIMD_DBL vb)
- *  \brief Merge low parts from pair of double-precision floating point registers
+ *  \brief Merge lower half from pair of double-precision floating-point registers
  *  \code{.c}
  *  vc[0:63] = va[0:63]
  *  vc[64:127] = vb[0:63]
@@ -655,7 +571,7 @@
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_merge_hi(const SIMD_INT va, const SIMD_INT vb)
- *  \brief Merge high parts from pair of 16/32/64-bit integer registers
+ *  \brief Merge upper half from pair of integer registers
  *  \code{.c}
  *  vc[0:63] = va[64:127]
  *  vc[64:127] = vb[64:127]
@@ -666,7 +582,7 @@
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_merge_hi(const SIMD_FLT va, const SIMD_FLT vb)
- *  \brief Merge high parts from pair of single-precision floating point registers
+ *  \brief Merge upper half from pair of single-precision floating-point registers
  *  \code{.c}
  *  vc[0:31] = va[64:95]
  *  vc[32:63] = va[96:127]
@@ -679,7 +595,7 @@
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
- *  \brief Merge high parts from pair of double-precision floating point registers
+ *  \brief Merge upper half from pair of double-precision floating-point registers
  *  \code{.c}
  *  vc[0:63] = va[64:127]
  *  vc[64:127] = vb[64:127]
@@ -689,29 +605,62 @@
  *  \return vc
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_packmerge_lo(SIMD_INT va, SIMD_INT vb)
- *  \brief Pack and merge the low 32-bit integers from 64-bit elements
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_pack_8(const SIMD_INT va)
+ *  \brief Pack into first half of register the lower 8-bit integers from 16-bit elements
+ *         and pack into second half of register the upper 8-bit integers from 16-bit elements
  *  \code{.c}
- *  vc[0:31] = va[0:31]
- *  vc[32:63] = va[64:95]
- *  vc[64:95] = vb[0:31]
- *  vc[96:127] = vb[64:95]
+ *  for (int i = 0; i < 64; i+=8)
+ *      int k = i * 2;
+ *      vc[i:i+7] = va[k:k+7];
+ *  for (int i = 0; i < 64; i+=8)
+ *      int j = i + 64;
+ *      int k = i * 2 + 8;
+ *      vc[j:j+7] = va[k:k+7];
  *  \endcode
  *  \param[in] va First operand
- *  \param[in] vb Second operand
  *  \return vc
  *
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_packmerge_lo(const SIMD_FLT va, const SIMD_FLT vb)
- *  \brief Pack and merge the low single-precision floating-point number from 64-bit elements
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_pack_16(const SIMD_INT va)
+ *  \brief Pack into first half of register the lower 16-bit integers from 32-bit elements
+ *         and pack into second half of register the upper 16-bit integers from 32-bit elements
+ *  \code{.c}
+ *  vc[0:15] = va[0:15]
+ *  vc[16:31] = va[32:47]
+ *  vc[32:47] = va[64:79] 
+ *  vc[48:63] = va[96:111] 
+ *  vc[64:79] = va[16:31]
+ *  vc[80:95] = va[48:63]
+ *  vc[96:111] = va[80:95] 
+ *  vc[112:127] = va[112:127] 
+ *  \endcode
+ *  \param[in] va First operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_pack_32(const SIMD_INT va)
+ *  \brief Pack into first half of register the lower 32-bit integers from 64-bit elements
+ *         and pack into second half of register the upper 32-bit integers from 64-bit elements
  *  \code{.c}
  *  vc[0:31] = va[0:31]
  *  vc[32:63] = va[64:95]
- *  vc[64:95] = vb[0:31]
- *  vc[96:127] = vb[64:95]
+ *  vc[64:95] = va[32:63] 
+ *  vc[96:127] = va[96:127] 
  *  \endcode
  *  \param[in] va First operand
- *  \param[in] vb Second operand
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_pack(const SIMD_FLT va)
+ *  \brief Pack into first half of register the lower single-precision floating-point numbers from 64-bit elements
+ *         and pack into second half of register the upper single-precision floating-point numbers from 64-bit elements
+ *  \code{.c}
+ *  vc[0:31] = va[0:31]
+ *  vc[32:63] = va[64:95]
+ *  vc[64:95] = va[32:63] 
+ *  vc[96:127] = va[96:127] 
+ *  \endcode
+ *  \param[in] va First operand
  *  \return vc
  *
  *  \}
@@ -780,46 +729,46 @@ SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_sub_pd(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_fmadd(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 {
 #if defined(__FMA__)
     return _mm_fmadd_ps(va, vb, vc);
 #else
-    va = _mm_mul_ps(va, vb);
-    return _mm_add_ps(va, vc);
+    const SIMD_FLT vab = _mm_mul_ps(va, vb);
+    return _mm_add_ps(vab, vc);
 #endif
 }
 
 static SIMD_FUNC_INLINE
-SIMD_DBL simd_fmadd(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+SIMD_DBL simd_fmadd(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
 #if defined(__FMA__)
     return _mm_fmadd_pd(va, vb, vc);
 #else
-    va = _mm_mul_pd(va, vb);
-    return _mm_add_pd(va, vc);
+    const SIMD_DBL vab = _mm_mul_pd(va, vb);
+    return _mm_add_pd(vab, vc);
 #endif
 }
 
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_fmsub(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
+SIMD_FLT simd_fmsub(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)
 {
 #if defined(__FMA__)
     return _mm_fmsub_ps(va, vb, vc);
 #else
-    va = _mm_mul_ps(va, vb);
-    return _mm_sub_ps(va, vc);
+    const SIMD_FLT vab = _mm_mul_ps(va, vb);
+    return _mm_sub_ps(vab, vc);
 #endif
 }
 
 static SIMD_FUNC_INLINE
-SIMD_DBL simd_fmsub(SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
+SIMD_DBL simd_fmsub(const SIMD_DBL va, const SIMD_DBL vb, const SIMD_DBL vc)
 {
 #if defined(__FMA__)
     return _mm_fmsub_pd(va, vb, vc);
 #else
-    va = _mm_mul_pd(va, vb);
-    return _mm_sub_pd(va, vc);
+    const SIMD_DBL vab = _mm_mul_pd(va, vb);
+    return _mm_sub_pd(vab, vc);
 #endif
 }
 
@@ -837,7 +786,7 @@ SIMD_INT simd_mul_32(const SIMD_INT va, const SIMD_INT vb)
 static SIMD_FUNC_INLINE
 SIMD_INT simd_mul_64(const SIMD_INT va, const SIMD_INT vb)
 {
-    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
+    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000);
     SIMD_INT vlo, vhi;
     vlo = _mm_shuffle_epi32(vb, 0xB1);  // shuffle multiplier
     vhi = _mm_mullo_epi32(va, vlo);     // xl * yh, xh * yl
@@ -846,18 +795,6 @@ SIMD_INT simd_mul_64(const SIMD_INT va, const SIMD_INT vb)
     vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
     vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
     return _mm_add_epi64(vlo, vhi);     // l + h
-/*
-    // This implementation uses a temp register
-    const SIMD_INT vmsk = _mm_set1_epi64x(0xFFFFFFFF00000000UL);
-    SIMD_INT vtmp, vhi, vlo;
-    vtmp = _mm_shuffle_epi32(vb, 0xB1); // shuffle multiplier
-    vhi = _mm_mullo_epi32(va, vtmp);    // xl * yh, xh * yl
-    vtmp = _mm_slli_epi64(vhi, 0x20);   // shift << 32
-    vhi = _mm_add_epi64(vhi, vtmp);     // h = h1 + h2
-    vhi = _mm_and_si128(vhi, vmsk);     // h & 0xFFFFFFFF00000000
-    vlo = _mm_mul_epu32(va, vb);        // l = xl * yl
-    return _mm_add_epi64(vlo, vhi);     // l + h
-*/
 }
 
 static SIMD_FUNC_INLINE
@@ -1064,23 +1001,26 @@ SIMD_DBL simd_merge_hi(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_unpackhi_pd(va, vb); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_packmerge_lo(SIMD_INT va, SIMD_INT vb)
+SIMD_INT simd_pack_8(const SIMD_INT va)
 {
-    va = _mm_shuffle_epi32(va, 0xD8);   // pack into low part of register
-    vb = _mm_shuffle_epi32(vb, 0xD8);   // pack into low part of register
-    return _mm_unpacklo_epi64(va, vb);  // merge packed registers
+    const SIMD_INT vmsk = _mm_set_epi64x(0x0F0D0B0907050301, 0x0E0C0A0806040200);
+    return _mm_shuffle_epi8(va, vmsk);
 }
 
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_packmerge_lo(const SIMD_FLT va, const SIMD_FLT vb)
+SIMD_INT simd_pack_16(const SIMD_INT va)
 {
-    SIMD_INT va_int = _mm_castps_si128(va);
-    SIMD_INT vb_int = _mm_castps_si128(vb);
-    va_int = _mm_shuffle_epi32(va_int, 0xD8);     // pack into low part of register
-    vb_int = _mm_shuffle_epi32(vb_int, 0xD8);     // pack into low part of register
-    va_int = _mm_unpacklo_epi64(va_int, vb_int);  // merge packed registers
-    return _mm_castsi128_ps(va_int);
+    const SIMD_INT vmsk = _mm_set_epi64x(0x0F0E0B0A07060302, 0x0D0C090805040100);
+    return _mm_shuffle_epi8(va, vmsk);
 }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_pack_32(const SIMD_INT va)
+{ return _mm_shuffle_epi32(va, 0xD8); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_pack(const SIMD_FLT va)
+{ return _mm_shuffle_ps(va, va, 0xD8); }
 
 
 /**********************

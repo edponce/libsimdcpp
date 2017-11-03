@@ -132,7 +132,7 @@ int worker_main(int * const manager_to_worker, int * const worker_to_manager, co
 
             // Run test
             int test_result = SUCCESS_TEST;
-            for (int i = 0; i < MAX_RUNS_PER_TEST; ++i)
+            for (int i = 0; i < RUNS_PER_TEST; ++i)
                 test_result += tests[current_test - 1].test_func();
 
             // Validate test
