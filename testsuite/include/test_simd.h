@@ -6,6 +6,73 @@
 #if defined(SIMD_MODE)
 
 
+/*!
+ *  \addtogroup Testsuite Testsuite
+ *  \{
+ *
+ *    \defgroup Testcases Test cases
+ *    \brief Test cases
+ *    \{
+ *
+ *  \fn int test_simd_add_sub(void)
+ *  \brief Add and subtract test cases
+ *  Add/subtract signed/unsigned 16/32/64-bit integers and single/double-precision floating-point numbers
+ *  \return Test result, 0 = PASSED and # = FAILED
+ *
+ *
+ *  \fn int test_simd_fm_add_sub(void)
+ *  \brief Fused-multiply add and subtract test cases
+ *  Fused multiply-add/subtract single/double-precision floating-point numbers
+ *  \return Test result, 0 = PASSED and # = FAILED
+ *
+ *
+ *  \fn int test_simd_mul(void)
+ *  \brief Multiply test cases
+ *  Multiply signed/unsigned 16/32/64-bit integers and single/double-precision floating-point numbers
+ *  \return Test result, 0 = PASSED and # = FAILED
+ *
+ *
+ *  \fn int test_simd_div_sqrt(void)
+ *  \brief Divide and square root test cases
+ *  Divide/sqrt single/double-precision floating-point numbers
+ *  \return Test result, 0 = PASSED and # = FAILED
+ *
+ *
+ *  \fn int test_simd_logic(void)
+ *  \brief Logical test cases
+ *  Logical and/or/xor for integers and floating-point numbers
+ *  \return Test result, 0 = PASSED and # = FAILED
+ *
+ *
+ *  \fn int test_simd_shift(void)
+ *  \brief Shift test cases
+ *  Shift left/right 16/32/64/128-bit integers
+ *  \return Test result, 0 = PASSED and # = FAILED
+ *
+ *
+ *  \fn int test_simd_merge(void)
+ *  \brief Merge test cases
+ *  Merge low/high parts from pair of integers/floating-point numbers
+ *  \return Test result, 0 = PASSED and # = FAILED
+ *
+ *
+ *  \fn int test_simd_pack(void)
+ *  \brief Pack test cases
+ *  Pack 8/16/32-bit integers and single-precision floating-point numbers
+ *  \return Test result, 0 = PASSED and # = FAILED
+ *
+ *
+ *  \fn int test_simd_shuffle(void)
+ *  \brief Shuffle test cases
+ *  Shuffle 16/32/64-bit integers and single/double-precision floating-point numbers
+ *  \return Test result, 0 = PASSED and # = FAILED
+ *
+ *    \}
+ *
+ *  \}
+ */
+
+
 int test_simd_add_sub(void);
 int test_simd_fm_add_sub(void);
 int test_simd_mul(void);

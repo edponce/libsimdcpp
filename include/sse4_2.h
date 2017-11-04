@@ -18,7 +18,23 @@
 #define _SSE4_2_H
 
 
-// NOTE: Include comments inside namespace for correct module listing in documentation
+#ifndef _SHUFFLE_CTRL_
+#define _SHUFFLE_CTRL_
+/*!
+ *  Control values for shuffle operations
+ *  \todo Move this enum to a global area, all SIMD modes will use it
+ */
+enum SHUFFLE_CTRL { XCHG = 0, // Exchange lower/upper halfs of register
+                    XCHG8,    // Exchange pairs of 8-bit elements
+                    XCHG16,   // Exchange pairs of 16-bit elements
+                    XCHG32,   // Exchange pairs of 32-bit elements
+                    XCHG64,   // Exchange pairs of 64-bit elements
+                    DUPL,     // Duplicate lower half into upper half of register
+                    DUPH };   // Duplicate upper half into lower half of register
+#endif
+
+
+//! \note Include comments inside namespace for correct module listing in documentation
 namespace SSE4_2 {
 
 
@@ -645,21 +661,54 @@ namespace SSE4_2 {
  *  \param[in] va Vector register to pack
  *  \return vc
  *
- *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_shuffle_32(const SIMD_INT va, const int8_t ctrl)
- *  \brief Shuffle 32-bit integers
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_shuffle(const SIMD_INT va, const SHUFFLE_CTRL ctrl)
+ *  \brief Shuffle integer vector register
  *  \code{.c}
- *  for (int i = 0; i < 4; ++i) {
- *      int j = i * 32;
- *      int k = i * 2;
- *      switch (ctrl[k:k+1]) {
- *          case 0: vc[j:j+31] = va[0:31]; break;
- *          case 1: vc[j:j+31] = va[32:63]; break;
- *          case 2: vc[j:j+31] = va[64:95]; break;
- *          case 3: vc[j:j+31] = va[96:127]; break;
- *      }
+ *  switch (ctrl) {
+ *      case XCHG:    // Exchange lower/upper halfs of register
+ *      case XCHG8:   // Exchange pairs of 8-bit elements
+ *      case XCHG16:  // Exchange pairs of 16-bit elements
+ *      case XCHG32:  // Exchange pairs of 32-bit elements
+ *      case XCHG64:  // Exchange pairs of 64-bit elements
+ *      case DUPL:    // Duplicate lower half into upper half of register
+ *      case DUPH:    // Duplicate upper half into lower half of register
+ *      default: return va;
  *  }
  *  \endcode
  *  \param[in] va Vector register to shuffle
+ *  \param[in] ctrl Shuffle control
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_shuffle(const SIMD_FLT va, const SHUFFLE_CTRL ctrl)
+ *  \code{.c}
+ *  switch (ctrl) {
+ *      case XCHG:    // Exchange lower/upper halfs of register
+ *      case XCHG32:  // Exchange pairs of 32-bit elements
+ *      case XCHG64:  // Exchange pairs of 64-bit elements
+ *      case DUPL:    // Duplicate lower half into upper half of register
+ *      case DUPH:    // Duplicate upper half into lower half of register
+ *      default: return va;
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to shuffle
+ *  \param[in] ctrl Shuffle control
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_shuffle(const SIMD_DBL va, const SHUFFLE_CTRL ctrl)
+ *  \code{.c}
+ *  switch (ctrl) {
+ *      case XCHG:    // Exchange lower/upper halfs of register
+ *      case XCHG64:  // Exchange pairs of 64-bit elements
+ *      case DUPL:    // Duplicate lower half into upper half of register
+ *      case DUPH:    // Duplicate upper half into lower half of register
+ *      default: return va;
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to shuffle
+ *  \param[in] ctrl Shuffle control
  *  \return vc
  *
  *  \}
@@ -1014,26 +1063,24 @@ static SIMD_FUNC_INLINE
 SIMD_FLT simd_pack(const SIMD_FLT va)
 { return _mm_shuffle_ps(va, va, 0xD8); }
 
-
-//! \todo Move this to somewhere else
-enum SHUFFLE_CTRL { XCHG = 0, // Exchange lower/upper halfs of register
-                    XCHG8,    // Exchange pairs of 8-bit elements
-                    XCHG16,   // Exchange pairs of 16-bit elements
-                    XCHG32,   // Exchange pairs of 32-bit elements
-                    XCHG64,   // Exchange pairs of 64-bit elements
-                    DUPL,     // Duplicate lower half into upper half of register
-                    DUPH      // Duplicate upper half into lower half of register
-                  };
-
-
-
+//! \note Shuffle assumes that vector register width is a multiple of 32
 static SIMD_FUNC_INLINE
 SIMD_INT simd_shuffle(const SIMD_INT va, const SHUFFLE_CTRL ctrl)
 {
-    //! \note Options assume that vector register width is a multiple of 32
-    //! \todo Missing XCHG8 and XCHG16
     switch (ctrl) {
         case XCHG: return _mm_shuffle_epi32(va, 0x4E); break;
+        case XCHG8:
+        {
+            const SIMD_INT vmsk = _mm_set_epi64x(0x0E0F0C0D0A0B0809, 0x0607040502030001);
+            return _mm_shuffle_epi8(va, vmsk);
+        }
+        break;
+        case XCHG16:
+        {
+            const SIMD_INT vmsk = _mm_set_epi64x(0x0D0C0F0E09080B0A, 0x0504070601000302);
+            return _mm_shuffle_epi8(va, vmsk);
+        }
+        break;
         case XCHG32: return _mm_shuffle_epi32(va, 0xB1); break;
         case XCHG64: return _mm_shuffle_epi32(va, 0x4E); break;
         case DUPL: return _mm_shuffle_epi32(va, 0x44); break;
@@ -1042,12 +1089,36 @@ SIMD_INT simd_shuffle(const SIMD_INT va, const SHUFFLE_CTRL ctrl)
     }
 }
 
-
-#if !defined(__clang__)
+//! \note Shuffle assumes that vector register width is a multiple of 32
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_shuffle(const SIMD_FLT va, const SIMD_FLT vb, const int8_t ctrl)
-{ return _mm_shuffle_ps(va, vb, ctrl); }
-#endif
+SIMD_FLT simd_shuffle(const SIMD_FLT va, const SHUFFLE_CTRL ctrl)
+{
+    SIMD_INT va_int = _mm_castps_si128(va);
+    switch (ctrl) {
+        case XCHG: va_int = _mm_shuffle_epi32(va_int, 0x4E); break;
+        case XCHG32: va_int = _mm_shuffle_epi32(va_int, 0xB1); break;
+        case XCHG64: va_int = _mm_shuffle_epi32(va_int, 0x4E); break;
+        case DUPL: va_int = _mm_shuffle_epi32(va_int, 0x44); break;
+        case DUPH: va_int = _mm_shuffle_epi32(va_int, 0xEE); break;
+        default: break;
+    }
+    return _mm_castsi128_ps(va_int);
+}
+
+//! \note Shuffle assumes that vector register width is a multiple of 32
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_shuffle(const SIMD_DBL va, const SHUFFLE_CTRL ctrl)
+{
+    SIMD_INT va_int = _mm_castpd_si128(va);
+    switch (ctrl) {
+        case XCHG: va_int = _mm_shuffle_epi32(va_int, 0x4E); break;
+        case XCHG64: va_int = _mm_shuffle_epi32(va_int, 0x4E); break;
+        case DUPL: va_int = _mm_shuffle_epi32(va_int, 0x44); break;
+        case DUPH: va_int = _mm_shuffle_epi32(va_int, 0xEE); break;
+        default: break;
+    }
+    return _mm_castsi128_pd(va_int);
+}
 
 
 /**********************

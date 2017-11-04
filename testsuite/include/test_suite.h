@@ -2,16 +2,25 @@
 #define _TEST_SUITE_H
 
 
+/*!
+ *  \addtogroup Testsuite Testsuite
+ *  \brief Test suite control 
+ *  \{
+ *
+ *
+ *  \}
+ */
+
+
+#include "test_simd.h"
+
+
 // Setup handler of tests to run
 typedef int (*test_handler)();
 struct TEST_T {
     test_handler test_func;
     const char *test_name;
 };
-
-
-// Header files for test cases
-#include "test_simd.h"
 
 
 // Array of test cases
@@ -35,7 +44,7 @@ struct TEST_T TESTS[] =
 
 
 const int MAX_WORKERS = 4;
-const int RUNS_PER_TEST = 1;
+const int RUNS_PER_TEST = 10;
 
 
 int test_suite(const struct TEST_T * const, const int, const int);
