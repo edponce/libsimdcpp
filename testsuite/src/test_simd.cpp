@@ -2179,7 +2179,7 @@ int test_simd_cvt_u64_fp()
     {
         const int num_elems = SIMD_STREAMS_32;
         const TEST_TYPES test_type = TEST_FLT;
-        unsigned long int *A = NULL;
+        long int *A = NULL;
         float *C1 = NULL, *C2 = NULL;
 
         create_test_array(TEST_U64, (void **)&A, SIMD_STREAMS_64, alignment);
@@ -2187,7 +2187,7 @@ int test_simd_cvt_u64_fp()
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
         SIMD_INT va = simd_load(A);
-        SIMD_FLT vc = simd_cvt_u64_f32(va);
+        SIMD_FLT vc = simd_cvt_i64_f32(va);
 
         for (int i = 0; i < num_elems/2; ++i)
             C2[i] = (float)A[i];
@@ -2206,7 +2206,7 @@ int test_simd_cvt_u64_fp()
     {
         const int num_elems = SIMD_STREAMS_64;
         const TEST_TYPES test_type = TEST_DBL;
-        unsigned long int *A = NULL;
+        long int *A = NULL;
         double *C1 = NULL, *C2 = NULL;
 
         create_test_array(TEST_U64, (void **)&A, SIMD_STREAMS_64, alignment);
@@ -2214,7 +2214,7 @@ int test_simd_cvt_u64_fp()
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
         SIMD_INT va = simd_load(A);
-        SIMD_DBL vc = simd_cvt_u64_f64(va);
+        SIMD_DBL vc = simd_cvt_i64_f64(va);
 
         for (int i = 0; i < num_elems; ++i)
             C2[i] = (double)A[i];

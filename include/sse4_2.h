@@ -13,6 +13,10 @@
  *  \author Eduardo Ponce
  *  \version 1.0
  *  \date 10/30/2017
+ *
+ *  \todo Verify sign extension in functions that unpack/convert elements to a larger width
+ *  \todo Remove SIMD_ from functions
+ *  \todo Change data types to int8_v, int16_v, int32_v, int64_v, flt32_v, flt64_v (and unsigned integer versions)
  */
 #ifndef _SSE4_2_H
 #define _SSE4_2_H
@@ -682,6 +686,7 @@ namespace SSE4_2 {
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_shuffle(const SIMD_FLT va, const SHUFFLE_CTRL ctrl)
+ *  \brief Shuffle single-precision floating-point vector register
  *  \code{.c}
  *  switch (ctrl) {
  *      case XCHG:    // Exchange lower/upper halfs of register
@@ -698,6 +703,7 @@ namespace SSE4_2 {
  *
  *
  *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_shuffle(const SIMD_DBL va, const SHUFFLE_CTRL ctrl)
+ *  \brief Shuffle second-precision floating-point vector register
  *  \code{.c}
  *  switch (ctrl) {
  *      case XCHG:    // Exchange lower/upper halfs of register
@@ -712,6 +718,234 @@ namespace SSE4_2 {
  *  \return vc
  *
  *  \}
+ */
+
+
+/*!
+ *  \defgroup Convert_SSE4_2 Convert instructions
+ *  \ingroup SSE4_2
+ *  \brief Convert instructions supported by SIMD interface
+ *  \todo Check if upper half of register is zeroed when converting bigger-to-smallest elements
+ *  \todo Complete convert functions 64-to-64
+ *  \{
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_cvt_i16_i32(const SIMD_INT va)
+ *  \brief Sign extend packed 16-bit integers to packed 32-bit integers
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=16) {
+ *      int k = i * 2;
+ *      vc[k:k+31] = (int32_t)va[i:i+15];
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_cvt_i32_i64(const SIMD_INT va)
+ *  \brief Sign extend packed 32-bit integers to packed 64-bit integers
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=32) {
+ *      int k = i * 2;
+ *      vc[k:k+63] = (int64_t)va[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_cvt_i32_f32(const SIMD_INT va)
+ *  \brief Convert packed 32-bit integers to packed single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int i = 0; i < 128; i+=32)
+ *      vc[i:i+31] = (float)va[i:i+31];
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va)
+ *  \brief Convert packed 32-bit integers to packed double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=32) {
+ *      int k = i * 2;
+ *      vc[k:k+63] = (double)va[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_cvt_i64_f32(const SIMD_INT va)
+ *  \brief Convert packed 64-bit integers to packed single-precision floating-point numbers and zero upper half of vector register
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=64) {
+ *      int k = i / 2;
+ *      vc[k:k+31] = (float)va[i:i+63];
+ *  }
+ *  vc[64:128] = 0.0;
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_cvt_i64_f64(const SIMD_INT va)
+ *  \brief Convert packed 64-bit integers to packed double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int i = 0; i < 128; i+=64)
+ *      vc[i:i+63] = (double)va[i:i+63];
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_cvt_u16_i32(const SIMD_INT va)
+ *  \brief Zero extend packed unsigned 16-bit integers to packed 32-bit integers
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=16) {
+ *      int k = i * 2;
+ *      vc[k:k+31] = (uint32_t)va[i:i+15];
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_cvt_u32_i64(const SIMD_INT va)
+ *  \brief Zero extend unsigned packed 32-bit integers to packed 64-bit integers
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=32) {
+ *      int k = i * 2;
+ *      vc[k:k+63] = (uint64_t)va[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_cvt_u32_f32(const SIMD_INT va)
+ *  \brief Convert packed unsigned 32-bit integers to packed single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int i = 0; i < 128; i+=32)
+ *      vc[i:i+31] = (float)va[i:i+31];
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_cvt_u32_f64(const SIMD_INT va)
+ *  \brief Convert packed unsigned 32-bit integers to packed double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=32) {
+ *      int k = i * 2;
+ *      vc[k:k+63] = (double)va[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
+ *  \brief Convert packed unsigned 64-bit integers to packed single-precision floating-point numbers and zero upper half of vector register
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=64) {
+ *      int k = i / 2;
+ *      vc[k:k+31] = (float)va[i:i+63];
+ *  }
+ *  vc[64:128] = 0.0;
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
+ *  \brief Convert packed unsigned 64-bit integers to packed double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int i = 0; i < 128; i+=64)
+ *      vc[i:i+63] = (double)va[i:i+63];
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_cvt_f32_i32(const SIMD_FLT va)
+ *  \brief Convert packed single-precision floating-point numbers to packed 32-bit integers
+ *  \code{.c}
+ *  for (int i = 0; i < 128; i+=32)
+ *      vc[i:i+31] = (int32_t)va[i:i+31];
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_DBL simd_cvt_f32_f64(const SIMD_FLT va)
+ *  \brief Convert packed single-precision floating-point numbers to packed double-precision floating-point numbers
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=32) {
+ *      int k = i * 2;
+ *      vc[k:k+63] = (double)va[i:i+31];
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_INT simd_cvt_f64_i32(const SIMD_DBL va)
+ *  \brief Convert packed double-precision floating-point numbers to packed 32-bit integers
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=64) {
+ *      int k = i / 2;
+ *      vc[k:k+31] = (int32_t)va[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *
+ *  \fn static SIMD_FUNC_INLINE SIMD_FLT simd_cvt_f64_f32(const SIMD_DBL va)
+ *  \brief Convert packed double-precision floating-point numbers to packed single-precision floating-point numbers
+ *  \code{.c}
+ *  for (int i = 0; i < 64; i+=64) {
+ *      int k = i / 2;
+ *      vc[k:k+31] = (float)va[i:i+63];
+ *  }
+ *  \endcode
+ *  \param[in] va Vector register to convert
+ *  \return vc
+ *
+ *  \}
+ */
+
+
+/*!
+ *  \defgroup Set_SSE4_2 Set instructions
+ *  \ingroup SSE4_2
+ *  \brief Set instructions supported by SIMD interface
+ *  \{
+ *
+ *
+ *  /}
+ */
+
+
+/*!
+ *  \defgroup Load_SSE4_2 Load instructions
+ *  \ingroup SSE4_2
+ *  \brief Load instructions supported by SIMD interface
+ *  \{
+ *
+ *
+ *  /}
+ */
+
+
+/*!
+ *  \defgroup Store_SSE4_2 Store instructions
+ *  \ingroup SSE4_2
+ *  \brief Store instructions supported by SIMD interface
+ *  \{
+ *
+ *
+ *  /}
  */
 
 
@@ -1121,17 +1355,132 @@ SIMD_DBL simd_shuffle(const SIMD_DBL va, const SHUFFLE_CTRL ctrl)
 }
 
 
+/**************************
+ *  Convert instructions  *
+ **************************/
+static SIMD_FUNC_INLINE
+SIMD_INT simd_cvt_i16_i32(const SIMD_INT va)
+{ return _mm_cvtepi16_epi32(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_cvt_i32_i64(const SIMD_INT va)
+{ return _mm_cvtepi32_epi64(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_cvt_i32_f32(const SIMD_INT va)
+{ return _mm_cvtepi32_ps(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va)
+{ return _mm_cvtepi32_pd(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_cvt_i64_f32(const SIMD_INT va)
+{
+    /*!
+     *  \note Type conversion performed with scalar unit since
+     *        vector extensions do not support direct conversion
+     */
+    int64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    float sa_flt[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    _mm_store_si128((SIMD_INT *)sa, va);
+    #pragma unroll
+    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
+        sa_flt[i] = (float)sa[i];
+    #pragma unroll
+    for (int32_t i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
+        sa_flt[i] = 0.0f;
+    return _mm_load_ps(sa_flt);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_cvt_i64_f64(const SIMD_INT va)
+{
+    /*!
+     *  \note Type conversion performed with scalar unit since
+     *        vector extensions do not support direct conversion
+     */
+    int64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    double sa_dbl[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    _mm_store_si128((SIMD_INT *)sa, va);
+    #pragma unroll
+    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
+        sa_dbl[i] = (double)sa[i];
+    return _mm_load_pd(sa_dbl);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_cvt_u16_i32(const SIMD_INT va)
+{ return _mm_cvtepu16_epi32(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_cvt_u32_i64(const SIMD_INT va)
+{ return _mm_cvtepu32_epi64(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_cvt_u32_f32(const SIMD_INT va)
+{ return _mm_cvtepi32_ps(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_cvt_u32_f64(const SIMD_INT va)
+{ return _mm_cvtepi32_pd(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
+{
+    /*!
+     *  \note Type conversion performed with scalar unit since
+     *        vector extensions do not support direct conversion
+     */
+    uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    float sa_flt[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    _mm_store_si128((SIMD_INT *)sa, va);
+    #pragma unroll
+    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
+        sa_flt[i] = (float)sa[i];
+    #pragma unroll
+    for (int32_t i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
+        sa_flt[i] = 0.0f;
+    return _mm_load_ps(sa_flt);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
+{
+    /*!
+     *  \note Type conversion performed with scalar unit since
+     *        vector extensions do not support direct conversion
+     */
+    uint64_t sa[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    double sa_dbl[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    _mm_store_si128((SIMD_INT *)sa, va);
+    #pragma unroll
+    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
+        sa_dbl[i] = (double)sa[i];
+    return _mm_load_pd(sa_dbl);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_cvt_f32_i32(const SIMD_FLT va)
+{ return _mm_cvtps_epi32(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_cvt_f32_f64(const SIMD_FLT va)
+{ return _mm_cvtps_pd(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_cvt_f64_i32(const SIMD_DBL va)
+{ return _mm_cvtpd_epi32(va); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_cvt_f64_f32(const SIMD_DBL va)
+{ return _mm_cvtpd_ps(va); }
+
+
 /**********************
  *  Set instructions  *
  **********************/
 /*!
- *  \defgroup Set_SSE4_2 Set instructions
- *  \ingroup SSE4_2
- *  \brief Set instructions supported by SIMD interface
- *  \{
- */
-
-/*
  *  Set vector to zero. Use pointer for function overloading.
  */
 static SIMD_FUNC_INLINE
@@ -1146,7 +1495,7 @@ static SIMD_FUNC_INLINE
 void simd_set_zero(SIMD_DBL * const va)
 { *va = _mm_setzero_pd(); }
 
-/*
+/*!
  *  Set 32-bit integers to either 32/64 slots.
  */
 static SIMD_FUNC_INLINE
@@ -1226,95 +1575,10 @@ SIMD_INT simd_set(const uint64_t * const sa, const int32_t n)
         return _mm_setzero_si128();
 }
 
-/*!
- *  \}
- */
-
-
-/**************************
- *  Convert instructions  *
- **************************/
-/*!
- *  \defgroup Convert_SSE4_2 Convert instructions
- *  \ingroup SSE4_2
- *  \brief Convert instructions supported by SIMD interface
- *  \{
- */
-
-/*!
- *  Convert packed 32-bit integer elements
- *  to packed 32-bit floating-point elements.
- */
-static SIMD_FUNC_INLINE
-SIMD_FLT simd_cvt_i32_f32(const SIMD_INT va)
-{ return _mm_cvtepi32_ps(va); }
-
-/*!
- *  Convert packed 32-bit integer elements
- *  to packed 64-bit floating-point elements.
- */
-static SIMD_FUNC_INLINE
-SIMD_DBL simd_cvt_i32_f64(const SIMD_INT va)
-{ return _mm_cvtepi32_pd(va); }
-
-/*!
- *  Convert packed unsigned 64-bit integer elements
- *  to packed 32-bit floating-point elements, the high half of the register is set to 0.0.
- *  NOTE: type conversion performed with scalar FPU since vector extensions do not support 64-bit integer conversions.
- */
-static SIMD_FUNC_INLINE
-SIMD_FLT simd_cvt_u64_f32(const SIMD_INT va)
-{
-    uint64_t sa_ul[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    float sa_flt[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-
-    _mm_store_si128((SIMD_INT *)sa_ul, va);
-
-    #pragma vector aligned
-    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
-        sa_flt[i] = (float)sa_ul[i];
-
-    #pragma vector aligned
-    for (int32_t i = SIMD_STREAMS_64; i < SIMD_STREAMS_32; ++i)
-        sa_flt[i] = 0.0f;
-
-    return _mm_load_ps(sa_flt);
-}
-
-/*!
- *  Convert unsigned 64-bit integers to 64-bit floating-point elements.
- *  NOTE: type conversion performed with scalar FPU since vector extensions do not support 64-bit integer conversions.
- */
-static SIMD_FUNC_INLINE
-SIMD_DBL simd_cvt_u64_f64(const SIMD_INT va)
-{
-    uint64_t sa_ul[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-    double sa_dbl[SIMD_STREAMS_64] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
-
-    _mm_store_si128((SIMD_INT *)sa_ul, va);
-
-    #pragma vector aligned
-    for (int32_t i = 0; i < SIMD_STREAMS_64; ++i)
-        sa_dbl[i] = (double)sa_ul[i];
-
-    return _mm_load_pd(sa_dbl);
-}
-
-/*!
- *  \}
- */
-
 
 /***********************
  *  Load instructions  *
  ***********************/
-/*!
- *  \defgroup Load_SSE4_2 Load instructions
- *  \ingroup SSE4_2
- *  \brief Load instructions supported by SIMD interface
- *  \{
- */
-
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const int8_t * const sa)
 { return _mm_load_si128((SIMD_INT *)sa); }
@@ -1403,21 +1667,10 @@ static SIMD_FUNC_INLINE
 SIMD_DBL simd_loadu(const double * const sa)
 { return _mm_loadu_pd(sa); }
 
-/*!
- *  \}
- */
-
 
 /************************
  *  Store instructions  *
  ************************/
-/*!
- *  \defgroup Store_SSE4_2 Store instructions
- *  \ingroup SSE4_2
- *  \brief Store instructions supported by SIMD interface
- *  \{
- */
-
 static SIMD_FUNC_INLINE
 void simd_store(int8_t * const sa, const SIMD_INT va)
 { _mm_store_si128((SIMD_INT *)sa, va); }
@@ -1497,10 +1750,6 @@ void simd_store(double * const sa, const SIMD_DBL va)
 static SIMD_FUNC_INLINE
 void simd_storeu(double * const sa, const SIMD_DBL va)
 { _mm_storeu_pd(sa, va); }
-
-/*!
- *  \}
- */
 
 
 }  // SSE4_2 namespace
