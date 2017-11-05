@@ -1868,8 +1868,8 @@ int test_simd_shuffle(void)
         create_test_array(test_type, (void **)&C1, num_elems, alignment);
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
-        SIMD_INT va = simd_load(A);
-        SIMD_INT vc = simd_shuffle(va, XCHG);
+        SIMD_FLT va = simd_load(A);
+        SIMD_FLT vc = simd_shuffle(va, XCHG);
         simd_store(C1, vc);
 
         const int mid = num_elems / 2;
@@ -1894,8 +1894,8 @@ int test_simd_shuffle(void)
         create_test_array(test_type, (void **)&C1, num_elems, alignment);
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
-        SIMD_INT va = simd_load(A);
-        SIMD_INT vc = simd_shuffle(va, XCHG32);
+        SIMD_FLT va = simd_load(A);
+        SIMD_FLT vc = simd_shuffle(va, XCHG32);
         simd_store(C1, vc);
 
         for (int i = 0; i < num_elems; i+=2) {
@@ -1919,8 +1919,8 @@ int test_simd_shuffle(void)
         create_test_array(test_type, (void **)&C1, num_elems, alignment);
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
-        SIMD_INT va = simd_load(A);
-        SIMD_INT vc = simd_shuffle(va, XCHG64);
+        SIMD_FLT va = simd_load(A);
+        SIMD_FLT vc = simd_shuffle(va, XCHG64);
         simd_store(C1, vc);
 
         const int mid = num_elems / 2;
@@ -1945,8 +1945,8 @@ int test_simd_shuffle(void)
         create_test_array(test_type, (void **)&C1, num_elems, alignment);
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
-        SIMD_INT va = simd_load(A);
-        SIMD_INT vc = simd_shuffle(va, DUPL);
+        SIMD_FLT va = simd_load(A);
+        SIMD_FLT vc = simd_shuffle(va, DUPL);
         simd_store(C1, vc);
 
         const int mid = num_elems / 2;
@@ -1971,8 +1971,8 @@ int test_simd_shuffle(void)
         create_test_array(test_type, (void **)&C1, num_elems, alignment);
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
-        SIMD_INT va = simd_load(A);
-        SIMD_INT vc = simd_shuffle(va, DUPH);
+        SIMD_FLT va = simd_load(A);
+        SIMD_FLT vc = simd_shuffle(va, DUPH);
         simd_store(C1, vc);
 
         const int mid = num_elems / 2;
@@ -1997,8 +1997,8 @@ int test_simd_shuffle(void)
         create_test_array(test_type, (void **)&C1, num_elems, alignment);
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
-        SIMD_INT va = simd_load(A);
-        SIMD_INT vc = simd_shuffle(va, XCHG);
+        SIMD_DBL va = simd_load(A);
+        SIMD_DBL vc = simd_shuffle(va, XCHG);
         simd_store(C1, vc);
 
         const int mid = num_elems / 2;
@@ -2023,8 +2023,8 @@ int test_simd_shuffle(void)
         create_test_array(test_type, (void **)&C1, num_elems, alignment);
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
-        SIMD_INT va = simd_load(A);
-        SIMD_INT vc = simd_shuffle(va, XCHG64);
+        SIMD_DBL va = simd_load(A);
+        SIMD_DBL vc = simd_shuffle(va, XCHG64);
         simd_store(C1, vc);
 
         for (int i = 0; i < num_elems; i+=4) {
@@ -2048,8 +2048,8 @@ int test_simd_shuffle(void)
         create_test_array(test_type, (void **)&C1, num_elems, alignment);
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
-        SIMD_INT va = simd_load(A);
-        SIMD_INT vc = simd_shuffle(va, DUPL);
+        SIMD_DBL va = simd_load(A);
+        SIMD_DBL vc = simd_shuffle(va, DUPL);
         simd_store(C1, vc);
 
         const int mid = num_elems / 2;
@@ -2074,8 +2074,8 @@ int test_simd_shuffle(void)
         create_test_array(test_type, (void **)&C1, num_elems, alignment);
         create_test_array(test_type, (void **)&C2, num_elems, alignment);
 
-        SIMD_INT va = simd_load(A);
-        SIMD_INT vc = simd_shuffle(va, DUPH);
+        SIMD_DBL va = simd_load(A);
+        SIMD_DBL vc = simd_shuffle(va, DUPH);
         simd_store(C1, vc);
 
         const int mid = num_elems / 2;

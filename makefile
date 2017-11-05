@@ -12,9 +12,9 @@ export TOPDIR := $(strip $(patsubst %/, %, $(dir $(MAKEFILE))))
 # g++: 5.4.0
 # icpc: ?
 # clang++: 4.0
-#export CXX := g++
+export CXX := g++
 #export CXX := icpc
-export CXX := clang++-4.0
+#export CXX := clang++-4.0
 
 # GNU/Intel SIMD extensions
 # -mmmx
@@ -34,17 +34,19 @@ export CXX := clang++-4.0
 export SIMDFLAGS
 
 # GNU compiler and linker options
-export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
-#export CXXFLAGS := $(SIMDFLAGS) -m32 -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
+export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
+#export CXXFLAGS := $(SIMDFLAGS) -m32 -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
 
 # Intel compiler and linker options
-#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
+#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
 
 # Clang compiler and linker options
-#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98 -funroll-loops
+#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
 
 # Linker options
-export LFLAGS :=
+export LFLAGS := -funroll-loops
+export LFLAGS += -fopenmp # GNU compiler
+#export LFLAGS += -openmp  # Intel compiler
 
 # Preprocessor definitions
 # SIMD modes: -DSIMD_MODE (auto)

@@ -1,6 +1,6 @@
 ## Compiler, tools and options
-CC      = gcc
-CFLAGS =
+CXX      = g++
+CXXFLAGS =
 
 #DEFINES = -DUSE_MONOTONIC_CLOCK
 
@@ -9,16 +9,16 @@ OBJECTS = timers_test.o timers.o
 TARGET  = timer
 
 ## Implicit rules
-.SUFFIXES: .c
+.SUFFIXES: .cpp
 
-.c.o:
-	$(CC) $(DEFINES) -c $(CFLAGS) $<
+.cpp.o:
+	$(CXX) $(DEFINES) -c $(CXXFLAGS) $<
 
 ## Build rules
 all: $(TARGET)
 
 $(TARGET): $(OBJECTS)
-	$(CC) -o $@ $(OBJECTS)
+	$(CXX) -o $@ $(OBJECTS)
 
 clean:
 	rm -f $(OBJECTS) $(TARGET)
