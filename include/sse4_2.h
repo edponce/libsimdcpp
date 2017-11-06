@@ -17,6 +17,10 @@
  *  \todo Verify sign extension in functions that unpack/convert elements to a larger width
  *  \todo Remove SIMD_ from functions
  *  \todo Change data types to int8_v, int16_v, int32_v, int64_v, flt32_v, flt64_v (and unsigned integer versions)
+ *  \todo For OO interface, define macros to eliminate user from scoping class, e.g. #define vadd(a,b) int32_v::add(a,b)
+ *  \todo For OO interface, add automatic prefetching when it makes sense
+ *  \todo Load/store with aligned/unaligned and streaming
+ *  \todo Add const * const where applicable, use uint32_t for array sizes
  */
 #ifndef _SSE4_2_H
 #define _SSE4_2_H
@@ -1598,8 +1602,19 @@ SIMD_INT simd_loadu(const int16_t * const sa)
 { return _mm_lddqu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_load(const int32_t * const sa)
-{ return _mm_load_si128((SIMD_INT *)sa); }
+SIMD_INT simd_load(const int32_t * const sa, const uint32_t n = SIMD_STREAMS_32, const uint32_t h = 0)
+{
+    SIMD_INT va;
+    switch (n) {
+        case 1: va = _mm_set_epi32(0, 0, 0, sa[0]); break;
+        //case 2: va = _mm_set_epi32(0, 0, sa[1], sa[0]); break;
+        case 2: va = _mm_loadl_epi64((SIMD_INT *)sa); break;
+        case 3: va = _mm_set_epi32(0, sa[2], sa[1], sa[0]); break;
+        case 4: va = (h) ? (_mm_stream_load_si128((SIMD_INT *)sa)) : (_mm_load_si128((SIMD_INT *)sa)); break;
+        default: va = _mm_setzero_si128(); break;
+    }
+    return va;
+}
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const int32_t * const sa)
@@ -1652,16 +1667,36 @@ SIMD_INT simd_loadu(const uint64_t * const sa)
 { return _mm_lddqu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_load(const float * const sa)
-{ return _mm_load_ps(sa); }
+SIMD_FLT simd_load(const float * const sa, const uint32_t n = SIMD_STREAMS_32, const uint32_t h = 0)
+{
+    SIMD_FLT va;
+    switch (n) {
+        case 1: va = _mm_load_ss(sa); break;
+        case 2: va = _mm_set_ps(0.0f, 0.0f, sa[1], sa[0]); break;
+        case 3: va = _mm_set_ps(0.0f, sa[2], sa[1], sa[0]); break;
+        //case 4: va = _mm_load_ps(sa); break;
+        case 4: va = (h) ? (_mm_castsi128_ps(_mm_stream_load_si128((SIMD_INT *)sa))) : (_mm_load_ps(sa)); break;
+        default: va = _mm_setzero_ps(); break;
+    }
+    return va;
+}
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_loadu(const float * const sa)
 { return _mm_loadu_ps(sa); }
 
 static SIMD_FUNC_INLINE
-SIMD_DBL simd_load(const double * const sa)
-{ return _mm_load_pd(sa); }
+SIMD_DBL simd_load(const double * const sa, const uint32_t n = SIMD_STREAMS_64, const uint32_t h = 0)
+{
+    SIMD_DBL va;
+    switch (n) {
+        case 1: va = _mm_load_sd(sa); break;
+        //case 2: va = _mm_load_pd(sa); break;
+        case 2: va = (h) ? (_mm_castsi128_pd(_mm_stream_load_si128((SIMD_INT *)sa))) : (_mm_load_pd(sa)); break;
+        default: va = _mm_setzero_pd(); break;
+    }
+    return va;
+}
 
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_loadu(const double * const sa)
@@ -1688,8 +1723,21 @@ void simd_storeu(int16_t * const sa, const SIMD_INT va)
 { _mm_storeu_si128((SIMD_INT *)sa, va); }
 
 static SIMD_FUNC_INLINE
-void simd_store(int32_t * const sa, const SIMD_INT va)
-{ _mm_store_si128((SIMD_INT *)sa, va); }
+void simd_store(int32_t * const sa, const SIMD_INT va, const uint32_t n = SIMD_STREAMS_32, const uint32_t h = 0)
+{
+    int32_t tmp[SIMD_STREAMS_32];
+    switch (n) {
+        case 1:
+        case 2:
+        case 3:
+            _mm_store_si128((SIMD_INT *)tmp, va);
+            for (uint32_t i = 0; i < n; ++i)
+                sa[i] = tmp[i];
+            break;
+        case 4: (h) ? (_mm_stream_si128((SIMD_INT *)sa, va)) : (_mm_store_si128((SIMD_INT *)sa, va)); break;
+        default: break;
+    }
+}
 
 static SIMD_FUNC_INLINE
 void simd_storeu(int32_t * const sa, const SIMD_INT va)
@@ -1736,20 +1784,492 @@ void simd_storeu(uint64_t * const sa, const SIMD_INT va)
 { _mm_storeu_si128((SIMD_INT *)sa, va); }
 
 static SIMD_FUNC_INLINE
-void simd_store(float * const sa, const SIMD_FLT va)
-{ _mm_store_ps(sa, va); }
+void simd_store(float * const sa, const SIMD_FLT va, const uint32_t n = SIMD_STREAMS_32, const uint32_t h = 0)
+{
+    float tmp[SIMD_STREAMS_32];
+    switch (n) {
+        case 1: _mm_store_ss(sa, va); break;
+        case 2:
+        case 3:
+            _mm_store_ps(tmp, va);
+            for (uint32_t i = 0; i < n; ++i)
+                sa[i] = tmp[i];
+            break;
+        case 4: (h) ? (_mm_stream_ps(sa, va)) : (_mm_store_ps(sa, va)); break;
+        default: break;
+    }
+}
 
 static SIMD_FUNC_INLINE
 void simd_storeu(float * const sa, const SIMD_FLT va)
 { _mm_storeu_ps(sa, va); }
 
 static SIMD_FUNC_INLINE
-void simd_store(double * const sa, const SIMD_DBL va)
-{ _mm_store_pd(sa, va); }
+void simd_store(double * const sa, const SIMD_DBL va, const uint32_t n = SIMD_STREAMS_64, const uint32_t h = 0)
+{
+    switch (n) {
+        case 1: _mm_store_sd(sa, va); break;
+        case 2: (h) ? (_mm_stream_pd(sa, va)) : (_mm_store_pd(sa, va)); break;
+        default: break;
+    }
+}
 
 static SIMD_FUNC_INLINE
 void simd_storeu(double * const sa, const SIMD_DBL va)
 { _mm_storeu_pd(sa, va); }
+
+
+
+///////////////////////////////////////////////////////////////////////////////
+#include <stdio.h>
+#include <stdlib.h>   // NULL, free, posix_memalign, getenv, atoi
+
+
+/*
+ *  Identify OpenMP support
+ */
+#if defined(_OPENMP)
+#   include <omp.h>
+#endif
+
+#include <unistd.h>  // sysconf
+
+class SYSCONF {
+    private:
+        static uint32_t omp_enabled;
+        static int32_t omp_threads;
+
+    public:
+        /************
+         *  OpenMP  *
+         ************/
+        /*!
+         *  If \c nthreads < 1, the environment variable OMP_NUM_THREADS is used
+         *  OpenMP only gets activated if set_omp() is invoked
+         */
+        static void set_omp(const int32_t nthreads)
+        {
+        #if defined(_OPENMP)
+            if (nthreads == 0) {
+                omp_threads = 1;
+                omp_enabled = 0;
+            } else {
+                int32_t nt = atoi(getenv("OMP_NUM_THREADS"));
+                if (nt > 0)
+                    nt = (nthreads > 0) ? (nthreads) : (nt);
+                else
+                    nt = (nthreads > 0) ? (nthreads) : (1);
+                //omp_set_num_threads(nt);
+                omp_threads = nt;
+                omp_enabled = 1;
+            }
+            //setenv("OMP_PROC_BIND","TRUE",1);
+            //setenv("GOMP_CPU_AFFINITY","0,2,4,6,1,3,5,7",1);
+            //setenv("GOMP_CPU_AFFINITY","0,1,2,3",1);
+            //setenv("OMP_PLACES","sockets{2}",1);
+            //setenv("OMP_PLACES","cores",1);
+            //setenv("OMP_PLACES","threads",1);
+        #else
+            (void)nthreads;
+            omp_threads = 1;
+            omp_enabled = 0;
+        #endif
+        }
+
+        static uint32_t get_omp(void)
+        { return omp_enabled; }
+
+        static int32_t get_threads(void)
+        { return omp_threads; }
+
+        static void omp_settings(void)
+        {
+        #if defined(_OPENMP)
+            if (get_omp()) {
+                fprintf(stdout, "OpenMP is enabled\n");
+                fprintf(stdout, "OpenMP max threads = %d\n", get_threads());
+            }
+            else {
+                fprintf(stdout, "OpenMP is disabled\n");
+            }
+        #else
+            omp_enabled = 0;
+            fprintf(stdout, "OpenMP is disabled\n");
+        #endif
+        }
+
+        /*!
+         *  Print some system configurations
+         */
+        static void printSysconf(void)
+        {
+            fprintf(stdout, "Number of processors online = %ld\n", getNumProcOnline());
+            fprintf(stdout, "Page size = %ld B\n", getPageSz());
+
+            fprintf(stdout, "L1 data cache size = %ld B\n", getL1Sz());
+            fprintf(stdout, "L1 data cache line size = %ld B\n", getL1LineSz());
+            fprintf(stdout, "L1 data cache associativity = %ld\n", getL1Assoc());
+
+            fprintf(stdout, "L2 cache size = %ld B\n", getL2Sz());
+            fprintf(stdout, "L2 cache line size = %ld B\n", getL2LineSz());
+            fprintf(stdout, "L2 cache associativity = %ld\n", getL2Assoc());
+
+            fprintf(stdout, "L3 cache size = %ld B\n", getL3Sz());
+            fprintf(stdout, "L3 cache line size = %ld B\n", getL3LineSz());
+            fprintf(stdout, "L3 cache associativity = %ld\n", getL3Assoc());
+        }
+
+        /*!
+         *  Get the number of processors currently online (available)
+         */
+        static long int getNumProcOnline(void)
+        { return sysconf(_SC_NPROCESSORS_ONLN); }
+        //{ return sysconf(_SC_NPROCESSORS_CONF); }
+
+        /*!
+         *  Get the size of page in bytes
+         */
+        static long int getPageSz(void)
+        { return sysconf(_SC_PAGESIZE); }
+        //{ return sysconf(_SC_PAGE_SIZE); }
+
+        /*!
+         *  Get the size in bytes of L1 data cache
+         */
+        static long int getL1Sz(void)
+        { return sysconf(_SC_LEVEL1_DCACHE_SIZE); }
+
+        /*!
+         *  Get the line size in bytes of L1 data cache
+         */
+        static long int getL1LineSz(void)
+        { return sysconf(_SC_LEVEL1_DCACHE_LINESIZE); }
+
+        /*!
+         *  Get the associativity of L1 data cache
+         */
+        static long int getL1Assoc(void)
+        { return sysconf(_SC_LEVEL1_DCACHE_ASSOC); }
+
+        /*!
+         *  Get the size in bytes of L2 cache
+         */
+        static long int getL2Sz(void)
+        { return sysconf(_SC_LEVEL2_CACHE_SIZE); }
+
+        /*!
+         *  Get the line size in bytes of L2 cache
+         */
+        static long int getL2LineSz(void)
+        { return sysconf(_SC_LEVEL2_CACHE_LINESIZE); }
+
+        /*!
+         *  Get the associativity of L2 cache
+         */
+        static long int getL2Assoc(void)
+        { return sysconf(_SC_LEVEL2_CACHE_ASSOC); }
+
+        /*!
+         *  Get the size in bytes of L3 cache
+         */
+        static long int getL3Sz(void)
+        { return sysconf(_SC_LEVEL3_CACHE_SIZE); }
+
+        /*!
+         *  Get the line size in bytes of L3 cache
+         */
+        static long int getL3LineSz(void)
+        { return sysconf(_SC_LEVEL3_CACHE_LINESIZE); }
+
+        /*!
+         *  Get the associativity of L3 cache
+         */
+        static long int getL3Assoc(void)
+        { return sysconf(_SC_LEVEL3_CACHE_ASSOC); }
+};
+
+
+#define VCLASS int32_v
+#define VTYPE SIMD_INT
+#define STYPE int32_t
+class VCLASS: public SYSCONF {
+    private:
+        VTYPE v;
+        static const uint32_t nstreams = SIMD_STREAMS_32;
+
+    public:
+
+        /*************
+         *  Get/set  *
+         *************/
+        static SIMD_FUNC_INLINE uint32_t get_nstreams(void)
+        { return nstreams; }
+
+        SIMD_FUNC_INLINE void set_vector(const VTYPE va)
+        { v = va; }
+
+        SIMD_FUNC_INLINE VTYPE get_vector(void) const
+        { return v; }
+
+        /******************
+         *  Constructors  *
+         ******************/
+        VCLASS(void)
+        { simd_set_zero(&v); }
+
+        VCLASS(const VTYPE va)
+        { v = va; }
+
+        VCLASS(const VCLASS &va): v(va.v)
+        { }
+
+        VCLASS(const STYPE * const sa, const uint32_t n = nstreams, const uint32_t h = 0)
+        { load(sa, n, h); }
+
+        ~VCLASS(void)
+        { }
+
+        /****************
+         *  Operations  *
+         ****************/
+        //! \note Should this be a static method?
+        // return object to allow composite function calling
+        // e.g. va.add(vb.add(vc, vd), ve)
+        // instead of
+        // vb.add(vc, vd)
+        // va.add(vb, ve)
+        SIMD_FUNC_INLINE VCLASS add(const VTYPE va, const VTYPE vb)
+        {
+            v = simd_add_32(va, vb);
+            return *this;
+        }
+
+        //! \note Should this be a static method?
+        SIMD_FUNC_INLINE VCLASS add(const VCLASS va, const VCLASS vb)
+        {
+            add(va.v, vb.v);
+            return *this;
+        }
+
+        //! \todo Set scheduling and prefetching offset based on cache line size
+        static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const uint64_t n)
+        {
+            STYPE *ptr = NULL;
+            if (!posix_memalign((void **)&ptr, SIMD_WIDTH_BYTES, n * sizeof(STYPE))) {
+                const uint64_t rem = n % nstreams;
+                const uint64_t nn = n - rem;
+                #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if (SYSCONF::get_omp() > 0)
+                for (uint64_t i = 0; i < nn; i+=nstreams) {
+                    //_mm_prefetch(sa + i + 16, _MM_HINT_NTA);
+                    //_mm_prefetch(sb + i + 16, _MM_HINT_NTA);
+                    const VCLASS va(sa + i, nstreams, 1);
+                    VCLASS vb(sb + i, nstreams, 1);
+                    vb.add(va.v, vb.v);
+                    vb.store(ptr + i, nstreams, 1);
+                }
+                if (rem > 0) {
+                    const VCLASS va(sa + nn, rem, 1);
+                    VCLASS vb(sb + nn, rem, 1);
+                    vb.add(va.v, vb.v);
+                    vb.store(ptr + nn, rem, 1);
+                }
+            }
+            return ptr;
+        }
+
+        /****************
+         *  Load/Store  *
+         ****************/
+        SIMD_FUNC_INLINE void load(const STYPE * const sa, const uint32_t n = nstreams, const uint32_t h = 0)
+        { v = simd_load(sa, n, h); }
+
+        SIMD_FUNC_INLINE void store(STYPE * const sa, const uint32_t n = nstreams, const uint32_t h = 0) const
+        { simd_store(sa, v, n, h); }
+};
+#undef STYPE
+#undef VTYPE
+#undef VCLASS
+
+
+#define VCLASS flt32_v
+#define VTYPE SIMD_FLT
+#define STYPE float
+class VCLASS: public SYSCONF {
+    private:
+        VTYPE v;
+        static const uint32_t nstreams = SIMD_STREAMS_32;
+
+    public:
+        /*************
+         *  Get/set  *
+         *************/
+        static SIMD_FUNC_INLINE uint32_t get_nstreams(void)
+        { return nstreams; }
+
+        SIMD_FUNC_INLINE void set_vector(const VTYPE va)
+        { v = va; }
+
+        SIMD_FUNC_INLINE VTYPE get_vector(void) const
+        { return v; }
+
+        /******************
+         *  Constructors  *
+         ******************/
+        VCLASS(void)
+        { simd_set_zero(&v); }
+
+        VCLASS(const VTYPE va)
+        { v = va; }
+
+        VCLASS(const VCLASS &va): v(va.v)
+        { }
+
+        VCLASS(const STYPE * const sa, const uint32_t n = nstreams, const uint32_t h = 0)
+        { load(sa, n, h); }
+
+        /****************
+         *  Operations  *
+         ****************/
+        SIMD_FUNC_INLINE VCLASS add(const VTYPE va, const VTYPE vb)
+        {
+            v = simd_add(va, vb);
+            return *this;
+        }
+
+        SIMD_FUNC_INLINE VCLASS add(const VCLASS va, const VCLASS vb)
+        {
+            add(va.v, vb.v);
+            return *this;
+        }
+
+        static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const uint64_t n)
+        {
+            STYPE *ptr = NULL;
+            if (!posix_memalign((void **)&ptr, SIMD_WIDTH_BYTES, n * sizeof(STYPE))) {
+                const uint64_t rem = n % nstreams;
+                const uint64_t nn = n - rem;
+                #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if (SYSCONF::get_omp() > 0)
+                for (uint64_t i = 0; i < nn; i+=nstreams) {
+                    //_mm_prefetch(sa + i + 16, _MM_HINT_NTA);
+                    //_mm_prefetch(sb + i + 16, _MM_HINT_NTA);
+                    const VCLASS va(sa + i, nstreams, 1);
+                    VCLASS vb(sb + i, nstreams, 1);
+                    vb.add(va.v, vb.v);
+                    vb.store(ptr + i, nstreams, 1);
+                }
+                if (rem > 0) {
+                    const VCLASS va(sa + nn, rem, 1);
+                    VCLASS vb(sb + nn, rem, 1);
+                    vb.add(va.v, vb.v);
+                    vb.store(ptr + nn, rem, 1);
+                }
+            }
+            return ptr;
+        }
+
+        /****************
+         *  Load/Store  *
+         ****************/
+        SIMD_FUNC_INLINE void load(const STYPE * const sa, const uint32_t n = nstreams, const uint32_t h = 0)
+        { v = simd_load(sa, n, h); }
+
+        SIMD_FUNC_INLINE void store(STYPE * const sa, const uint32_t n = nstreams, const uint32_t h = 0) const
+        { simd_store(sa, v, n, h); }
+};
+#undef STYPE
+#undef VTYPE
+#undef VCLASS
+
+
+#define VCLASS flt64_v
+#define VTYPE SIMD_DBL
+#define STYPE double
+class VCLASS: public SYSCONF {
+    private:
+        VTYPE v;
+        static const uint32_t nstreams = SIMD_STREAMS_64;
+
+    public:
+        /*************
+         *  Get/set  *
+         *************/
+        static SIMD_FUNC_INLINE uint32_t get_nstreams(void)
+        { return nstreams; }
+
+        SIMD_FUNC_INLINE void set_vector(const VTYPE va)
+        { v = va; }
+
+        SIMD_FUNC_INLINE VTYPE get_vector(void) const
+        { return v; }
+
+        /******************
+         *  Constructors  *
+         ******************/
+        VCLASS(void)
+        { simd_set_zero(&v); }
+
+        VCLASS(const VTYPE va)
+        { v = va; }
+
+        VCLASS(const VCLASS &va): v(va.v)
+        { }
+
+        VCLASS(const STYPE * const sa, const uint32_t n = nstreams, const uint32_t h = 0)
+        { load(sa, n, h); }
+
+        /****************
+         *  Operations  *
+         ****************/
+        SIMD_FUNC_INLINE VCLASS add(const VTYPE va, const VTYPE vb)
+        {
+            v = simd_add(va, vb);
+            return *this;
+        }
+
+        SIMD_FUNC_INLINE VCLASS add(const VCLASS va, const VCLASS vb)
+        {
+            add(va.v, vb.v);
+            return *this;
+        }
+
+        static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const uint64_t n)
+        {
+            STYPE *ptr = NULL;
+            if (!posix_memalign((void **)&ptr, SIMD_WIDTH_BYTES, n * sizeof(STYPE))) {
+                const uint64_t rem = n % nstreams;
+                const uint64_t nn = n - rem;
+                #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if (SYSCONF::get_omp() > 0)
+                for (uint64_t i = 0; i < nn; i+=nstreams) {
+                    //_mm_prefetch(sa + i + 16, _MM_HINT_NTA);
+                    //_mm_prefetch(sb + i + 16, _MM_HINT_NTA);
+                    const VCLASS va(sa + i, nstreams, 1);
+                    VCLASS vb(sb + i, nstreams, 1);
+                    vb.add(va.v, vb.v);
+                    vb.store(ptr + i, nstreams, 1);
+                }
+                if (rem > 0) {
+                    const VCLASS va(sa + nn, rem, 1);
+                    VCLASS vb(sb + nn, rem, 1);
+                    vb.add(va.v, vb.v);
+                    vb.store(ptr + nn, rem, 1);
+                }
+            }
+            return ptr;
+        }
+
+        /****************
+         *  Load/Store  *
+         ****************/
+        SIMD_FUNC_INLINE void load(const STYPE * const sa, const uint32_t n = nstreams, const uint32_t h = 0)
+        { v = simd_load(sa, n, h); }
+
+        SIMD_FUNC_INLINE void store(STYPE * const sa, const uint32_t n = nstreams, const uint32_t h = 0) const
+        { simd_store(sa, v, n, h); }
+};
+#undef STYPE
+#undef VTYPE
+#undef VCLASS
+///////////////////////////////////////////////////////////////////////////////
 
 
 }  // SSE4_2 namespace

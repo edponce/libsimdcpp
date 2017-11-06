@@ -1,8 +1,9 @@
 #include <stdio.h>
+#include "environ.h"
 #include "compiler_builtins.h"
 
 
-static void print_feature_support(const char *feature, int supported) {
+static void print_feature_support(const char *feature, const int supported) {
     fprintf(stdout, "%s: %s\n", feature, (supported) ? ("YES") : ("NO"));
 }
 
