@@ -10,12 +10,16 @@
 #include "test_utils.h"
 #include "test_simd.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 
 // Deallocate dynamic memory and nullify pointer
 #define FREE(p) free(p); p = NULL
 
 
-int test_simd_add_sub(void)
+int test_simd_add_sub()
 {
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
@@ -440,7 +444,7 @@ int test_simd_add_sub(void)
 }
 
 
-int test_simd_fm_add_sub(void)
+int test_simd_fm_add_sub()
 {
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
@@ -565,7 +569,7 @@ int test_simd_fm_add_sub(void)
 }
 
 
-int test_simd_mul(void)
+int test_simd_mul()
 {
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
@@ -898,7 +902,7 @@ int test_simd_mul(void)
 }
 
 
-int test_simd_div_sqrt(void)
+int test_simd_div_sqrt()
 {
 
     int test_result = 0;
@@ -1006,7 +1010,7 @@ int test_simd_div_sqrt(void)
 }
 
 
-int test_simd_logic(void)
+int test_simd_logic()
 {
 
     int test_result = 0;
@@ -1158,7 +1162,7 @@ int test_simd_logic(void)
 }
 
 
-int test_simd_shift(void)
+int test_simd_shift()
 {
 
     int test_result = 0;
@@ -1175,7 +1179,8 @@ int test_simd_shift(void)
 
         SIMD_INT va = simd_load(A);
 
-        for (int32_t shft = 0; shft < (SIMD_WIDTH_BITS / num_elems); ++shft) {
+        int32_t n = (SIMD_WIDTH_BITS / num_elems);
+        for (int32_t shft = 0; shft < n; ++shft) {
             SIMD_INT vc = simd_sll_16(va, shft);
             simd_store(C1, vc);
 
@@ -1201,7 +1206,8 @@ int test_simd_shift(void)
 
         SIMD_INT va = simd_load(A);
 
-        for (int32_t shft = 0; shft < (SIMD_WIDTH_BITS / num_elems); ++shft) {
+        int32_t n = (SIMD_WIDTH_BITS / num_elems);
+        for (int32_t shft = 0; shft < n; ++shft) {
             SIMD_INT vc = simd_sll_32(va, shft);
             simd_store(C1, vc);
 
@@ -1227,7 +1233,8 @@ int test_simd_shift(void)
 
         SIMD_INT va = simd_load(A);
 
-        for (int32_t shft = 0; shft < (SIMD_WIDTH_BITS / num_elems); ++shft) {
+        int32_t n = (SIMD_WIDTH_BITS / num_elems);
+        for (int32_t shft = 0; shft < n; ++shft) {
             SIMD_INT vc = simd_sll_64(va, shft);
             simd_store(C1, vc);
 
@@ -1281,7 +1288,8 @@ int test_simd_shift(void)
 
         SIMD_INT va = simd_load(A);
 
-        for (int32_t shft = 0; shft < (SIMD_WIDTH_BITS / num_elems); ++shft) {
+        int32_t n = (SIMD_WIDTH_BITS / num_elems);
+        for (int32_t shft = 0; shft < n; ++shft) {
             SIMD_INT vc = simd_srl_16(va, shft);
             simd_store(C1, vc);
 
@@ -1307,7 +1315,8 @@ int test_simd_shift(void)
 
         SIMD_INT va = simd_load(A);
 
-        for (int32_t shft = 0; shft < (SIMD_WIDTH_BITS / num_elems); ++shft) {
+        int32_t n = (SIMD_WIDTH_BITS / num_elems);
+        for (int32_t shft = 0; shft < n; ++shft) {
             SIMD_INT vc = simd_srl_32(va, shft);
             simd_store(C1, vc);
 
@@ -1333,7 +1342,8 @@ int test_simd_shift(void)
 
         SIMD_INT va = simd_load(A);
 
-        for (int32_t shft = 0; shft < (SIMD_WIDTH_BITS / num_elems); ++shft) {
+        int32_t n = (SIMD_WIDTH_BITS / num_elems);
+        for (int32_t shft = 0; shft < n; ++shft) {
             SIMD_INT vc = simd_srl_64(va, shft);
             simd_store(C1, vc);
 
@@ -1380,7 +1390,7 @@ int test_simd_shift(void)
 }
 
 
-int test_simd_merge(void)
+int test_simd_merge()
 {
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
@@ -1563,7 +1573,7 @@ int test_simd_merge(void)
 }
 
 
-int test_simd_pack(void)
+int test_simd_pack()
 {
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
@@ -1676,7 +1686,7 @@ int test_simd_pack(void)
 }
 
 
-int test_simd_shuffle(void)
+int test_simd_shuffle()
 {
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
@@ -2263,7 +2273,7 @@ int test_simd_set_32()
 }
 
 
-int test_simd_loadstore(void)
+int test_simd_loadstore()
 {
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
@@ -2308,7 +2318,7 @@ int test_simd_loadstore(void)
 }
 
 
-int test_simd_loadstoreu(void)
+int test_simd_loadstoreu()
 {
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;

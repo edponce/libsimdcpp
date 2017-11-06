@@ -10,6 +10,10 @@
 #include "test_suite.h"
 #include "environ.h"   // detectCPU, detectSIMD
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 
 int main()
 {
@@ -19,7 +23,7 @@ int main()
     // Seed RNG
     srand(time(NULL));
 
-    fprintf(stdout, "SIMD TESTSUITE (%d-bits)\n", SIMD_WIDTH_BITS);
+    cout << "SIMD TESTSUITE (" << SIMD_WIDTH_BITS << "-bits)" << endl;
     detectCPU();
     detectSIMD();
 
@@ -60,11 +64,11 @@ int test_suite(const struct TEST_T * const tests, const int num_tests, const int
 
     // Create unnamed and blocking pipes for IPC
     if (pipe2(manager_to_worker, 0) == -1) {
-        fprintf(stdout, "(MANAGER %d) ERROR: failed to create manager to worker pipe\n", manager_pid);
+        cout << "(MANAGER " << manager_pid << ") ERROR: failed to create manager to worker pipe" << endl;
         return -1;
     }
     if (pipe2(worker_to_manager, 0) == -1) {
-        fprintf(stdout, "(MANAGER %d) ERROR: failed to create worker to manager pipe\n", manager_pid);
+        cout << "(MANAGER " << manager_pid << ") ERROR: failed to create worker to manager pipe" << endl;
         return -1;
     }
 
@@ -128,7 +132,7 @@ int worker_main(int * const manager_to_worker, int * const worker_to_manager, co
 
         // Validate test ID
         if (current_test > 0 && current_test <= num_tests) {
-            //fprintf(stdout, "(WORKER  %d) Running test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
+            //cout << "(WORKER  " << worker_pid << ") Running test " << current_test << " ... " << tests[current_test - 1].test_name << endl;
 
             // Run test
             int test_result = SUCCESS_TEST;
@@ -137,12 +141,12 @@ int worker_main(int * const manager_to_worker, int * const worker_to_manager, co
 
             // Validate test
             if (test_result != SUCCESS_TEST) {
-                fprintf(stdout, "(WORKER  %d) FAILED test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
+                cout << "(WORKER  " << worker_pid << ") FAILED test " << current_test << " ... " << tests[current_test - 1].test_name << endl;
                 //current_test = FAILED_TEST;
                 current_test = -current_test;
             }
             else {
-                fprintf(stdout, "(WORKER  %d) PASSED test %d ... %s\n", (int)worker_pid, current_test, tests[current_test - 1].test_name);
+                cout << "(WORKER  " << worker_pid << ") PASSED test " << current_test << " ... " << tests[current_test - 1].test_name << endl;
             }
         }
 
@@ -170,8 +174,8 @@ int manager_main(int * const manager_to_worker, int * const worker_to_manager, c
     // Use entry 0 for global test results calculated by manager process.
     int *test_results = (int *)malloc((num_tests + 1) * sizeof(int));
 
-    fprintf(stdout, "(MANAGER %d) Total tests = %d\n", manager_pid, num_tests);
-    fprintf(stdout, "(MANAGER %d) Total workers = %d\n", manager_pid, num_workers);
+    cout << "(MANAGER " << manager_pid << ") Total tests = " << num_tests << endl;
+    cout << "(MANAGER " << manager_pid << ") Total workers = " << num_workers << endl;
 
     // Send test IDs to all workers
     for (current_test = 1; current_test <= num_workers; ++current_test) {
@@ -203,7 +207,7 @@ int manager_main(int * const manager_to_worker, int * const worker_to_manager, c
         if (test_results[i] > 0)
             tests_passed++;
     }
-    fprintf(stdout, "(MANAGER %d) Successful tests ... %d of %d\n", manager_pid, tests_passed, num_tests);
+    cout << "(MANAGER " << manager_pid << ") Successful tests ... " << tests_passed << " of " << num_tests << endl;
     test_results[0] = (tests_passed == num_tests) ? (SUCCESS_TEST) : (FAILED_TEST);
 
     free(test_results); test_results = NULL;
@@ -235,7 +239,7 @@ pid_t create_workers(int * const manager_to_worker, const int num_workers)
 
         // Cancel active workers
         if (worker_pid < 0) {
-            fprintf(stdout, "(MANAGER %d) ERROR: failed to fork worker #%d\n", manager_pid, current_worker + 1);
+            cout << "(MANAGER " << manager_pid << ") ERROR: failed to fork worker #" << current_worker + 1 << endl;
             cancel_workers(manager_to_worker, current_worker);
             break;
         }
@@ -269,7 +273,7 @@ int cancel_workers(int * const manager_to_worker, const int num_workers)
     for (int current_worker = 0; current_worker < num_workers; ++current_worker) {
         int worker_status = 0;
         pid_t wait_pid = waitpid(-1, &worker_status, WUNTRACED | WCONTINUED);
-        fprintf(stdout, "(MANAGER %d) Worker %d completed\n", manager_pid, wait_pid);
+        cout << "(MANAGER " << manager_pid << ") Worker " << wait_pid << " completed" << endl;
     }
 
     return 0;

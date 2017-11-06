@@ -54,6 +54,8 @@ int detectCPU(void)
     if (support_feature)
         print_feature_support("KNL CPU", support_feature);
 
+    (void)support_feature;
+
     return 0;
 }
 
@@ -134,6 +136,8 @@ int detectSIMD(void)
     if (support_feature)
         print_feature_support("KNCNI", support_feature);
     #endif
+
+    (void)support_feature;
 
     return 0;
 }

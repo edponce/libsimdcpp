@@ -4,8 +4,9 @@
 
 /*
  *  Identify compiler and find version as an integer representation
- *  NOTE: Not all compilers represent versions as single integers
- *  NOTE: https://sourceforge.net/p/predef/wiki/Compilers/
+ *  \note Not all compilers represent versions as single integers
+ *  \note https://sourceforge.net/p/predef/wiki/Compilers/
+ *  \todo Separate architecture from compiler
  */
 
 // Clang
@@ -16,6 +17,10 @@
 // Intel C/C++
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
 #   define INTEL_VERSION (__INTEL_COMPILER)  // VRP
+
+// GNU C/C++ powerPC
+#elif defined(__PPC__)
+#   error "PowerPC compiler/architecture is not supported."
 
 // Portland Group C++
 // NOTE: Imitated GNUC, need to verify

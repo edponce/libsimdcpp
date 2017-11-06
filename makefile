@@ -15,6 +15,7 @@ export TOPDIR := $(strip $(patsubst %/, %, $(dir $(MAKEFILE))))
 export CXX := g++
 #export CXX := icpc
 #export CXX := clang++-4.0
+#export CXX := powerpc64-linux-gnu-g++-5
 
 # GNU/Intel SIMD extensions
 # -mmmx
@@ -42,6 +43,9 @@ export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wex
 
 # Clang compiler and linker options
 #export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
+
+# IBM/GNU PowerPC
+#export CXXFLAGS := $(SIMDFLAGS) -mpowerpc64 -maltivec -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
 
 # Linker options
 export LFLAGS := -funroll-loops
