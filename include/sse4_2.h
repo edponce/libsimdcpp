@@ -29,6 +29,13 @@
 #define _SSE4_2_H
 
 
+#include <stdio.h>
+#include <stdlib.h>   // NULL, free, posix_memalign, getenv, atoi
+#include <iostream>
+using std::cout;
+using std::endl;
+
+
 #ifndef _SHUFFLE_CTRL_
 #define _SHUFFLE_CTRL_
 /*!
@@ -1618,9 +1625,21 @@ SIMD_INT simd_load(const int32_t * const sa, const size_t n = SIMD_STREAMS_32, c
 }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_loadu(const int32_t * const sa)
-//{ return _mm_loadu_si128((SIMD_INT *)sa); }
-{ return _mm_lddqu_si128((SIMD_INT *)sa); }
+SIMD_INT simd_loadu(const int32_t * const sa, const size_t n = SIMD_STREAMS_32)
+{
+    //return _mm_loadu_si128((SIMD_INT *)sa);
+    //return _mm_lddqu_si128((SIMD_INT *)sa);
+    SIMD_INT va;
+    switch (n) {
+        case 1: va = _mm_set_epi32(0, 0, 0, sa[0]); break;
+        //case 2: va = _mm_set_epi32(0, 0, sa[1], sa[0]); break;
+        case 2: va = _mm_loadl_epi64((SIMD_INT *)sa); break;
+        case 3: va = _mm_set_epi32(0, sa[2], sa[1], sa[0]); break;
+        case 4: va = _mm_lddqu_si128((SIMD_INT *)sa); break;
+        default: va = _mm_setzero_si128(); break;
+    }
+    return va;
+}
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_load(const uint8_t * const sa)
@@ -1726,7 +1745,7 @@ void simd_storeu(int16_t * const sa, const SIMD_INT va)
 static SIMD_FUNC_INLINE
 void simd_store(int32_t * const sa, const SIMD_INT va, const size_t n = SIMD_STREAMS_32, const bool strmHint = false)
 {
-    int32_t tmp[SIMD_STREAMS_32];
+    int32_t tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     switch (n) {
         case 1:
         case 2:
@@ -1741,8 +1760,22 @@ void simd_store(int32_t * const sa, const SIMD_INT va, const size_t n = SIMD_STR
 }
 
 static SIMD_FUNC_INLINE
-void simd_storeu(int32_t * const sa, const SIMD_INT va)
-{ _mm_storeu_si128((SIMD_INT *)sa, va); }
+void simd_storeu(int32_t * const sa, const SIMD_INT va, const size_t n = SIMD_STREAMS_32)
+{
+    //_mm_storeu_si128((SIMD_INT *)sa, va);
+    int32_t tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    switch (n) {
+        case 1:
+        case 2:
+        case 3:
+        case 4:
+            _mm_store_si128((SIMD_INT *)tmp, va);
+            for (size_t i = 0; i < n; ++i)
+                sa[i] = tmp[i];
+            break;
+        default: break;
+    }
+}
 
 static SIMD_FUNC_INLINE
 void simd_store(uint8_t * const sa, const SIMD_INT va)
@@ -1822,8 +1855,6 @@ void simd_storeu(double * const sa, const SIMD_DBL va)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-#include <stdio.h>
-#include <stdlib.h>   // NULL, free, posix_memalign, getenv, atoi
 
 /*
  *  Identify OpenMP support
@@ -1854,7 +1885,7 @@ class SYSCONF
         static void set_omp(const int32_t nthreads)
         {
         #if defined(_OPENMP)
-            if (nthreads == 0) {
+            if (nthreads == 0 || nthreads == 1) {
                 omp_threads = 1;
                 omp_enabled = false;
             } else {
@@ -1890,15 +1921,15 @@ class SYSCONF
         {
         #if defined(_OPENMP)
             if (get_omp()) {
-                fprintf(stdout, "OpenMP is enabled\n");
-                fprintf(stdout, "OpenMP max threads = %d\n", get_threads());
+                cout << "OpenMP is enabled" << endl;
+                cout << "OpenMP max threads = " << get_threads() << endl;
             }
             else {
-                fprintf(stdout, "OpenMP is disabled\n");
+                cout << "OpenMP is disabled" << endl;
             }
         #else
             omp_enabled = false;
-            fprintf(stdout, "OpenMP is disabled\n");
+            cout << "OpenMP is disabled" << endl;
         #endif
         }
 
@@ -1907,20 +1938,20 @@ class SYSCONF
          */
         static void printSysconf()
         {
-            fprintf(stdout, "Number of processors online = %ld\n", getNumProcOnline());
-            fprintf(stdout, "Page size = %ld B\n", getPageSz());
+            cout << "Number of processors online = " << getNumProcOnline() << endl;
+            cout << "Page size = " << getPageSz() << " B" << endl;
 
-            fprintf(stdout, "L1 data cache size = %ld B\n", getL1Sz());
-            fprintf(stdout, "L1 data cache line size = %ld B\n", getL1LineSz());
-            fprintf(stdout, "L1 data cache associativity = %ld\n", getL1Assoc());
+            cout << "L1 data cache size = " << getL1Sz() << " B" << endl;
+            cout << "L1 data cache line size = " << getL1LineSz() << " B" << endl;
+            cout << "L1 data cache associativity = " << getL1Assoc() << endl;
 
-            fprintf(stdout, "L2 cache size = %ld B\n", getL2Sz());
-            fprintf(stdout, "L2 cache line size = %ld B\n", getL2LineSz());
-            fprintf(stdout, "L2 cache associativity = %ld\n", getL2Assoc());
+            cout << "L2 cache size = " << getL2Sz() << " B" << endl;
+            cout << "L2 cache line size = " << getL2LineSz() << " B" << endl;
+            cout << "L2 cache associativity = " << getL2Assoc() << endl;
 
-            fprintf(stdout, "L3 cache size = %ld B\n", getL3Sz());
-            fprintf(stdout, "L3 cache line size = %ld B\n", getL3LineSz());
-            fprintf(stdout, "L3 cache associativity = %ld\n", getL3Assoc());
+            cout << "L3 cache size = " << getL3Sz() << " B" << endl;
+            cout << "L3 cache line size = " << getL3LineSz() << " B" << endl;
+            cout << "L3 cache associativity = " << getL3Assoc() << endl;
         }
 
         /*!
@@ -2019,6 +2050,7 @@ class VCLASS: public base_v, public SYSCONF
         VTYPE v;
         static const size_t nstreams = SIMD_STREAMS_32;
         static const size_t nbytes = SIMD_WIDTH_BYTES;
+        static size_t L2_nelems;
 
     public:
         /******************
@@ -2085,8 +2117,8 @@ class VCLASS: public base_v, public SYSCONF
                 const size_t nn = n - rem;
                 #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if (SYSCONF::get_omp() > 0)
                 for (size_t i = 0; i < nn; i+=nstreams) {
-                    _mm_prefetch(sa + i + 16, _MM_HINT_NTA);
-                    _mm_prefetch(sb + i + 16, _MM_HINT_NTA);
+                    _mm_prefetch(sa + i + L2_nelems, _MM_HINT_NTA);
+                    _mm_prefetch(sb + i + L2_nelems, _MM_HINT_NTA);
                     const VCLASS va(sa + i, nstreams, true);
                     VCLASS vb(sb + i, nstreams, true);
                     vb.add(va.v, vb.v);
@@ -2102,6 +2134,79 @@ class VCLASS: public base_v, public SYSCONF
             return ptr;
         }
 
+        /*!
+         *  \note Use low-level SIMD interface for flexibility to provide better optimization
+         *  \todo What if sa and sb are have different alignments? Need to GCD(sa, sb)
+         */
+        static SIMD_FUNC_INLINE STYPE * add2(const STYPE * const sa, const STYPE * const sb, const size_t n)
+        {
+            if (n == 0)
+                return NULL;
+
+            STYPE *sc = NULL;
+            if (!posix_memalign((void **)&sc, nbytes, n * sizeof(STYPE))) {
+                VCLASS va;
+                VCLASS vb;
+
+                // Single core: single vector
+                if (n <= nstreams) {
+                    //cout << "Single core: single vector" << endl;
+                    va.loadu(sa, n);
+                    vb.loadu(sb, n);
+                    vb.add(va, vb);
+                    vb.storeu(sc, n);
+                }
+                // Single core: single L2 cache line, so align to MVL
+                else if (n <= L2_nelems) {
+                    //cout << "Single core: multiple vectors" << endl;
+
+                    const STYPE *psa = sa;
+                    const STYPE *psb = sb;
+                    STYPE *psc = sc;
+                    //const size_t ob_sa = (size_t)sa % nbytes;
+                    const size_t ob_sb = (size_t)sb % nbytes;
+                    //const size_t ob_sc = (size_t)sc % nbytes;
+
+                    size_t rem = 0;
+                    //if (ob_sa > 0) {
+                    //    const size_t of_sa = nstreams - (ob_sa / sizeof(*sa));
+                        //psa += of_sa;  // move traverse pointer to aligned position
+                    //}
+
+                    //if (ob_sb > 0) {
+                        const size_t of_sb = nstreams - (ob_sb / sizeof(*sb));
+                        //psb += of_sb;  // move traverse pointer to aligned position
+                        rem = of_sb;  // same for both inputs
+                    //}
+
+                    // Strip mining
+                    //cout << "Remainder elements: " << rem << endl;
+                    //cout << "Address: (" << sa << ", " << sb << ", " << sc << ")" << endl;
+                    for (size_t i = 0; i < rem; ++i)
+                        sc[i] = sa[i] + sb[i];
+
+                    // Move traverse pointer to aligned position
+                    psa += rem;
+                    psb += rem;
+                    psc += rem;
+
+                    const size_t nn = n - rem;
+                    for (size_t i = 0; i < nn; i+=nstreams) {
+                        va.load(psa + i);
+                        vb.load(psb + i);
+                        vb.add(va, vb);
+                        vb.store(psc + i);
+                    }
+                }
+                // Multicore: multiple L2 cache lines, so align to cache line size
+                else {
+                    cout << "Multiple cores: multiple vectors" << endl;
+                    cout << "Under construction: size too large" << endl;
+                }
+            }
+            return sc;
+        }
+
         /****************
          *  Load/Store  *
          ****************/
@@ -2110,6 +2215,12 @@ class VCLASS: public base_v, public SYSCONF
 
         SIMD_FUNC_INLINE void store(STYPE * const sa, const size_t n = nstreams, const bool strmHint = false) const
         { simd_store((STYPE * const)sa, v, n, strmHint); }
+
+        SIMD_FUNC_INLINE void loadu(const STYPE * const sa, const size_t n = nstreams)
+        { v = simd_loadu((const STYPE *)sa, n); }
+
+        SIMD_FUNC_INLINE void storeu(STYPE * const sa, const size_t n = nstreams) const
+        { simd_storeu((STYPE * const)sa, v, n); }
 };
 #undef STYPE
 #undef VTYPE

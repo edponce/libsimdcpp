@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>   // free, posix_memalign, _Exit, EXIT_SUCCESS/FAILURE
+#include <stdlib.h>   // atoi, free, posix_memalign, _Exit, EXIT_SUCCESS/FAILURE
 #include <stdint.h>
 #include "simd.h"
 #include "environ.h"  // detectCPU, detectSIMD, printSysconf
@@ -13,12 +13,12 @@ using std::endl;
 #define FREE(p) while(0) { if(p) { free(p); p = NULL; } }
 
 #define FUNC_VERSION 0
-#define OO_VERSION 1
-#define CLASSIC_VERSION 0
-#define VALIDATE_VERSIONS 0
-#define NUM_THREADS 4
+#define OO_VERSION 2
+#define CLASSIC_VERSION 1
+#define VALIDATE_VERSIONS 1
+#define NUM_THREADS 1
 
-#define N 100000000
+#define N 16
 #define DATATYPE 0 // 0 = int32, 1 = flt32, 2 = flt64
 
 #if DATATYPE == 0
@@ -44,17 +44,22 @@ using std::endl;
  */
 bool SYSCONF::omp_enabled = false;
 int32_t SYSCONF::omp_threads = 1;
+size_t int32_v::L2_nelems = (size_t)SYSCONF::getL2LineSz() / sizeof(int32_t);
 
 
-int main()
+int main(int argc, char *argv[])
 {
     long int timer[2];
     double elapsed = 0.0;
 
     int result = 0;
     const size_t alignment = SIMD_WIDTH_BYTES;
-    const size_t n = VCLASS::get_nstreams() * N;
     STYPE *A = NULL, *B = NULL, *C1 = NULL, *C2 = NULL;
+
+    size_t n = N;
+    if (argc > 1) {
+        n = atoi(argv[1]);
+    }
 
     detectCPU();
     detectSIMD();
@@ -76,10 +81,10 @@ int main()
 
     // Run
 #if FUNC_VERSION == 1
-    tic(timer);
-
     if (posix_memalign((void **)&C1, alignment, n * sizeof(STYPE)))
         _Exit(EXIT_FAILURE);
+
+    tic(timer);
 
     VTYPE va = simd_load(A);
     VTYPE vb = simd_load(B);
@@ -92,12 +97,12 @@ int main()
 
 
 #if CLASSIC_VERSION == 1
-    tic(timer);
-
     if (posix_memalign((void **)&C2, alignment, n * sizeof(STYPE)))
         _Exit(EXIT_FAILURE);
 
-    #pragma omp parallel for default(shared) schedule(static) num_threads(NUM_THREADS)
+    tic(timer);
+
+    #pragma omp parallel for default(shared) schedule(static) num_threads(NUM_THREADS) if(NUM_THREADS > 1)
     for (size_t i = 0; i < n; ++i) {
         C2[i] = A[i] + B[i];
     }
@@ -120,12 +125,25 @@ int main()
 #endif
 
 
+#if OO_VERSION == 2
+    SYSCONF::set_omp(NUM_THREADS);
+    SYSCONF::omp_settings();
+
+    tic(timer);
+
+    C1 = VCLASS::add2(A, B, n);
+
+    elapsed = toc(timer);
+    cout << "Elapsed time (OO2 version): " << elapsed << " seconds" << endl;
+#endif
+
+
 #if VALIDATE_VERSIONS == 1
     // Validate
     for (size_t i = 0; i < n; ++i) {
         if (C1[i] != C2[i])
             result += 1;
-        if (n < 9)
+        if (n <= (2 * (SYSCONF::getL2LineSz() / sizeof(*A))))
             cout << C1[i] << " == " << C2[i] << endl;
     }
 #endif
