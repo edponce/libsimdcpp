@@ -985,6 +985,10 @@ typedef __m128d SIMD_DBL;
  *  Arithmetic instructions  *
  *****************************/
 static SIMD_FUNC_INLINE
+SIMD_INT simd_add_8(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_add_epi8(va, vb); }
+
+static SIMD_FUNC_INLINE
 SIMD_INT simd_add_16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_add_epi16(va, vb); }
 
@@ -1003,6 +1007,10 @@ SIMD_FLT simd_add(const SIMD_FLT va, const SIMD_FLT vb)
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_add_pd(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_sub_8(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_sub_epi8(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_16(const SIMD_INT va, const SIMD_INT vb)
@@ -1508,7 +1516,7 @@ void simd_set_zero(SIMD_DBL * const va)
 { *va = _mm_setzero_pd(); }
 
 /*!
- *  Set 32-bit integers to either 32/64 slots.
+ *  Set vector with 32/64 elements.
  */
 static SIMD_FUNC_INLINE
 SIMD_INT simd_set(const int32_t sa)
@@ -2137,6 +2145,7 @@ class VCLASS: public base_v, public SYSCONF
         /*!
          *  \note Use low-level SIMD interface for flexibility to provide better optimization
          *  \todo What if sa and sb are have different alignments? Need to GCD(sa, sb)
+         *  \todo Allocate sc with alignment conformant to sa and sb
          */
         static SIMD_FUNC_INLINE STYPE * add2(const STYPE * const sa, const STYPE * const sb, const size_t n)
         {
@@ -2150,58 +2159,82 @@ class VCLASS: public base_v, public SYSCONF
 
                 // Single core: single vector
                 if (n <= nstreams) {
-                    //cout << "Single core: single vector" << endl;
+                    cout << "Single core: single vector" << endl;
                     va.loadu(sa, n);
                     vb.loadu(sb, n);
                     vb.add(va, vb);
-                    vb.storeu(sc, n);
+                    vb.store(sc, n);
                 }
                 // Single core: single L2 cache line, so align to MVL
-                else if (n <= L2_nelems) {
-                    //cout << "Single core: multiple vectors" << endl;
-
-                    const STYPE *psa = sa;
-                    const STYPE *psb = sb;
-                    STYPE *psc = sc;
-                    //const size_t ob_sa = (size_t)sa % nbytes;
-                    const size_t ob_sb = (size_t)sb % nbytes;
-                    //const size_t ob_sc = (size_t)sc % nbytes;
-
-                    size_t rem = 0;
-                    //if (ob_sa > 0) {
-                    //    const size_t of_sa = nstreams - (ob_sa / sizeof(*sa));
-                        //psa += of_sa;  // move traverse pointer to aligned position
-                    //}
-
-                    //if (ob_sb > 0) {
-                        const size_t of_sb = nstreams - (ob_sb / sizeof(*sb));
-                        //psb += of_sb;  // move traverse pointer to aligned position
-                        rem = of_sb;  // same for both inputs
-                    //}
-
-                    // Strip mining
-                    //cout << "Remainder elements: " << rem << endl;
-                    //cout << "Address: (" << sa << ", " << sb << ", " << sc << ")" << endl;
-                    for (size_t i = 0; i < rem; ++i)
-                        sc[i] = sa[i] + sb[i];
-
-                    // Move traverse pointer to aligned position
-                    psa += rem;
-                    psb += rem;
-                    psc += rem;
-
-                    const size_t nn = n - rem;
-                    for (size_t i = 0; i < nn; i+=nstreams) {
-                        va.load(psa + i);
-                        vb.load(psb + i);
-                        vb.add(va, vb);
-                        vb.store(psc + i);
-                    }
-                }
                 // Multicore: multiple L2 cache lines, so align to cache line size
                 else {
-                    cout << "Multiple cores: multiple vectors" << endl;
-                    cout << "Under construction: size too large" << endl;
+                    const STYPE * psa = sa;
+                    const STYPE * psb = sb;
+                    STYPE * psc = sc;
+                    const size_t bo_sa = (size_t)sa % nbytes;
+                    //const size_t bo_sb = (size_t)sb % nbytes;
+                    size_t rem2 = 0;
+
+                    // Both input pointers are misaligned
+                    if (bo_sa > 0) {
+
+                        // Both input arrays have same byte offset misalignment
+                        //if (bo_sa == bo_sb) {
+                        //    const size_t eo_s = bo_sa / sizeof(STYPE);
+                        //    rem = nstreams - eo_s;
+                        //}
+
+                        const size_t eo_s = bo_sa / sizeof(STYPE);
+                        const size_t rem1 = nstreams - eo_s;
+                        cout << "Pre-rem: " << rem1 << endl;
+
+                        // (Pre) Strip mining
+                        for (size_t i = 0; i < rem1; ++i)
+                            psc[i] = psa[i] + psb[i];
+
+                        psa += rem1;
+                        psb += rem1;
+                        psc += rem1;
+                        rem2 = (n - rem1) % nstreams;
+                    }
+                    else {
+                        rem2 = n % nstreams;
+                    }
+
+                    const size_t nn = n - rem2;
+/*
+                    cout << "Elements aligned: " << nn << endl;
+                    cout << "Post-rem: " << rem2 << endl;
+                    cout << "Orig addresses: " << sa << " , " << (size_t)sa % nbytes << endl;
+                    cout << "Shift addresses: " << psa << " , " << (size_t)psa % nbytes << endl;
+                    cout << "L2 elems: " << L2_nelems << endl;
+*/
+
+                    //#pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() > 0) || (n > (4 * L2_nelems)))
+                    #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() > 0) && (nn > 256))
+                    for (size_t i = 0; i < nn; i+=nstreams) {
+                        _mm_prefetch(psa + i + L2_nelems, _MM_HINT_NTA);
+                        _mm_prefetch(psb + i + L2_nelems, _MM_HINT_NTA);
+                        va.load(psa + i, nstreams, true);
+                        vb.load(psb + i, nstreams, true);
+                        vb.add(va, vb);
+                        vb.storeu(psc + i);
+                    }
+
+                    // (Post) Strip mining
+                    psa += nn;
+                    psb += nn;
+                    psc += nn;
+                    for (size_t i = 0; i < rem2; ++i)
+                        psc[i] = psa[i] + psb[i];
+/*
+                    if (rem2 > 0) {
+                        va.load(psa + nn, rem2);
+                        vb.load(psb + nn, rem2);
+                        vb.add(va, vb);
+                        vb.storeu(psc + nn, rem2);
+                    }
+*/
                 }
             }
             return sc;

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <stdlib.h>   // atoi, free, posix_memalign, _Exit, EXIT_SUCCESS/FAILURE
+#include <stdlib.h>   // atoi, malloc, free, posix_memalign, _Exit, EXIT_SUCCESS/FAILURE
 #include <stdint.h>
 #include "simd.h"
 #include "environ.h"  // detectCPU, detectSIMD, printSysconf
@@ -9,14 +9,14 @@
 using std::cout;
 using std::endl;
 
-
 #define FREE(p) while(0) { if(p) { free(p); p = NULL; } }
 
 #define FUNC_VERSION 0
-#define OO_VERSION 2
+#define OO_VERSION 0
 #define CLASSIC_VERSION 1
-#define VALIDATE_VERSIONS 1
-#define NUM_THREADS 1
+#define VALIDATE_VERSIONS 0
+#define NUM_THREADS 4
+#define ELEM_OFFS 0
 
 #define N 16
 #define DATATYPE 0 // 0 = int32, 1 = flt32, 2 = flt64
@@ -74,8 +74,9 @@ int main(int argc, char *argv[])
     if (posix_memalign((void **)&B, alignment, n * sizeof(STYPE)))
         _Exit(EXIT_FAILURE);
 
+
     for (size_t i = 0; i < n; ++i) {
-        A[i] = 15;
+        A[i] = i + 1;
         B[i] = i;
     }
 
@@ -103,7 +104,7 @@ int main(int argc, char *argv[])
     tic(timer);
 
     #pragma omp parallel for default(shared) schedule(static) num_threads(NUM_THREADS) if(NUM_THREADS > 1)
-    for (size_t i = 0; i < n; ++i) {
+    for (size_t i = ELEM_OFFS; i < n; ++i) {
         C2[i] = A[i] + B[i];
     }
 
@@ -118,7 +119,7 @@ int main(int argc, char *argv[])
 
     tic(timer);
 
-    C1 = VCLASS::add(A, B, n);
+    C1 = VCLASS::add(&A[ELEM_OFFS], &B[ELEM_OFFS], n - ELEM_OFFS);
 
     elapsed = toc(timer);
     cout << "Elapsed time (OO version): " << elapsed << " seconds" << endl;
@@ -131,7 +132,7 @@ int main(int argc, char *argv[])
 
     tic(timer);
 
-    C1 = VCLASS::add2(A, B, n);
+    C1 = VCLASS::add2(&A[ELEM_OFFS], &B[ELEM_OFFS], n - ELEM_OFFS);
 
     elapsed = toc(timer);
     cout << "Elapsed time (OO2 version): " << elapsed << " seconds" << endl;
@@ -140,11 +141,11 @@ int main(int argc, char *argv[])
 
 #if VALIDATE_VERSIONS == 1
     // Validate
-    for (size_t i = 0; i < n; ++i) {
-        if (C1[i] != C2[i])
+    for (size_t i = ELEM_OFFS; i < n; ++i) {
+        if (C1[i-ELEM_OFFS] != C2[i])
             result += 1;
         if (n <= (2 * (SYSCONF::getL2LineSz() / sizeof(*A))))
-            cout << C1[i] << " == " << C2[i] << endl;
+            cout << C1[i-ELEM_OFFS] << " == " << C2[i] << endl;
     }
 #endif
 

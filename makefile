@@ -1,5 +1,5 @@
 # Eduardo Ponce
-# 10/2017
+# 11/2017
 # Makefile for libsimdcpp
 
 # NOTE: paths or file names cannot have whitespaces.
@@ -124,9 +124,9 @@ BENCHMARKDIR := benchmarks
 #######################################
 
 # Targets that are not real files
-.PHONY: all clean simd clean_tests clean_examples clean_all
+.PHONY: all clean simd clean_test clean_example clean_benchmark clean_all
 
-all: simd testsuite examples benchmarks
+all: simd test example benchmark
 
 # SIMD library
 simd: $(OBJ)
@@ -138,47 +138,26 @@ $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE)
 clean:
 	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
 
-# Tests
-testsuite: $(OBJ) $(HEADERS) $(MAKEFILE)
+# Testsuite
+test:
 	$(MAKE) -C $(TESTDIR)
 
-clean_tests:
+clean_test:
 	$(MAKE) -C $(TESTDIR) clean
 
 # Examples
-examples: $(OBJ) $(HEADERS) $(MAKEFILE)
+example:
 	$(MAKE) -C $(EXAMPLEDIR)
 
-clean_examples:
+clean_example:
 	$(MAKE) -C $(EXAMPLEDIR) clean
 
 # Benchmarks
-benchmarks: $(OBJ) $(HEADERS) $(MAKEFILE)
+benchmark:
 	$(MAKE) -C $(BENCHMARKDIR)
 
-clean_benchmarks:
+clean_benchmark:
 	$(MAKE) -C $(BENCHMARKDIR) clean
 
-clean_all: clean clean_tests clean_examples clean_benchmarks
-
-# Force
-force:
-	$(MAKE) clean
-	$(MAKE)
-
-force_tests:
-	$(MAKE) clean_tests
-	$(MAKE) testsuite
-
-force_examples:
-	$(MAKE) clean_examples
-	$(MAKE) examples
-
-force_benchmarks:
-	$(MAKE) clean_benchmarks
-	$(MAKE) benchmarks
-
-force_all:
-	$(MAKE) clean_all
-	$(MAKE)
+clean_all: clean clean_test clean_example clean_benchmark
 

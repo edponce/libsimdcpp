@@ -1,5 +1,5 @@
 # Eduardo Ponce
-# 10/2017
+# 11/2017
 # Makefile for libsimdcpp-benchmarks
 
 # Compiler and linker options
@@ -34,11 +34,11 @@ EXE := benchmark
 #######################################
 
 # Targets that are not real files
-.PHONY: all clean
+.PHONY: all clean timer
 
-all: timers $(EXE)
+all: $(EXE) timer
 
-$(EXE): $(DRIVER) $(OBJ)
+$(EXE): $(DRIVER) $(OBJ) $(HEADERS) $(MAKEFILE_LIST)
 	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $< -o $@ $(OBJ) $(LIBS)
 
 $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
@@ -49,6 +49,6 @@ clean:
 	@test -x $(EXE) && rm $(EXE) || true
 	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
 
-timers:
+timer:
 	$(MAKE) -C timers
 

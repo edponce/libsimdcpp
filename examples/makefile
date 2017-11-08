@@ -1,5 +1,5 @@
 # Eduardo Ponce
-# 10/2017
+# 11/2017
 # Makefile for libsimdcpp-examples
 
 # Compiler and linker options
@@ -38,7 +38,7 @@ EXE := example
 
 all: $(EXE)
 
-$(EXE): $(DRIVER) $(OBJ)
+$(EXE): $(DRIVER) $(OBJ) $(HEADERS) $(MAKEFILE_LIST)
 	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $< -o $@ $(OBJ) $(LIBS)
 
 $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
