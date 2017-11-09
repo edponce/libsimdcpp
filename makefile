@@ -4,7 +4,7 @@
 
 # NOTE: paths or file names cannot have whitespaces.
 
-# Get name of makefile and top directoryd
+# Get name of makefile and top directory
 MAKEFILE := $(abspath $(lastword $(MAKEFILE_LIST)))
 export TOPDIR := $(strip $(patsubst %/, %, $(dir $(MAKEFILE))))
 
@@ -99,6 +99,7 @@ export DEFINES
 export INCDIR := -I$(TOPDIR)/include
 
 # Define library paths in addition to standard paths
+#export LIBDIR := -L$(TOPDIR)/somelibrary
 export LIBDIR :=
 
 # Define libraries to link into executable
@@ -136,7 +137,7 @@ $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE)
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
-	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
+	rm -rf $(OBJDIR)
 
 # Testsuite
 test:

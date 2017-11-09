@@ -1,25 +1,57 @@
-## Compiler, tools and options
-CXX      = g++
-CXXFLAGS =
+# Eduardo Ponce
+# 11/2017
+# Makefile for timers
 
-#DEFINES = -DUSE_MONOTONIC_CLOCK
+# C++ compilers
+ifndef CXX
+CXX := g++
+endif
 
-## Files
-OBJECTS = timers_test.o timers.o
-TARGET  = timer
+# Compiler and linker options
+CXXFLAGS +=
 
-## Implicit rules
-.SUFFIXES: .cpp
+# Linker options
+LFLAGS +=
 
-.cpp.o:
-	$(CXX) $(DEFINES) -c $(CXXFLAGS) $<
+# Preprocessor definitions
+#DEFINES := -DUSE_MONOTONIC_CLOCK
+DEFINES +=
 
-## Build rules
-all: $(TARGET)
+# Define header paths in addition to standard paths
+INCDIR := -Iinclude
 
-$(TARGET): $(OBJECTS)
-	$(CXX) -o $@ $(OBJECTS)
+# Define library paths in addition to standard paths
+LIBDIR :=
+
+# Define libraries to link into executable
+LIBS :=
+
+# Header files
+HEADERS := include/timers.h
+
+# Example
+OBJDIR := obj
+SRC := src/timers.cpp
+OBJ := $(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(SRC)))
+
+DRIVER := timer_example.cpp
+EXE := timer_example
+
+#######################################
+
+# Targets that are not real files
+.PHONY: all clean
+
+all: $(OBJ)
+
+$(EXE): $(DRIVER) $(OBJ) $(HEADERS) $(MAKEFILE_LIST)
+	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $< -o $@ $(OBJ) $(LIBS)
+
+$(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
+	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
+	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
-	rm -f $(OBJECTS) $(TARGET)
+	rm -f $(EXE)
+	rm -rf $(OBJDIR)
 

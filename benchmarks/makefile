@@ -12,7 +12,7 @@ LFLAGS +=
 DEFINES +=
 
 # Define header paths in addition to standard paths
-INCDIR += -Itimers
+INCDIR += -Itimers/include
 
 # Define library paths in addition to standard paths
 LIBDIR +=
@@ -26,7 +26,7 @@ HEADERS +=
 # Example
 OBJDIR := obj
 SRC :=
-OBJ += $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC))) timers/timers.o
+OBJ += $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC))) timers/obj/timers.o
 
 DRIVER := benchmark.cpp
 EXE := benchmark
@@ -36,7 +36,7 @@ EXE := benchmark
 # Targets that are not real files
 .PHONY: all clean timer
 
-all: $(EXE) timer
+all: $(EXE)
 
 $(EXE): $(DRIVER) $(OBJ) $(HEADERS) $(MAKEFILE_LIST)
 	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $< -o $@ $(OBJ) $(LIBS)
@@ -46,9 +46,9 @@ $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
-	@test -x $(EXE) && rm $(EXE) || true
-	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
+	rm -f $(EXE)
+	rm -rf $(OBJDIR)
 
-timer:
+timers/obj/%.o:
 	$(MAKE) -C timers
 
