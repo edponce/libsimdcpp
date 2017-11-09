@@ -28,7 +28,7 @@ OBJDIR := obj
 SRC :=
 OBJ += $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 
-DRIVER := driver.cpp
+DRIVER := example.cpp
 EXE := example
 
 #######################################
@@ -46,6 +46,6 @@ $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
-	@test -x $(EXE) && rm $(EXE) || true
-	@test -d $(OBJDIR) && rm -r $(OBJDIR) || true
+	rm -f $(EXE)
+	rm -rf $(OBJDIR)
 

@@ -981,6 +981,21 @@ typedef __m128  SIMD_FLT;
 typedef __m128d SIMD_DBL;
 
 
+/***********************
+ *  Misc instructions  *
+ ***********************/
+static SIMD_FUNC_INLINE
+void simd_prefetch(const void *sa, const int32_t hint)
+{
+    switch (hint) {
+        case 0: _mm_prefetch((char *)sa, _MM_HINT_T0); break;
+        case 1: _mm_prefetch((char *)sa, _MM_HINT_T1); break;
+        case 2: _mm_prefetch((char *)sa, _MM_HINT_T2); break;
+        case 3: _mm_prefetch((char *)sa, _MM_HINT_NTA); break;
+    }
+}
+
+
 /*****************************
  *  Arithmetic instructions  *
  *****************************/
@@ -1878,9 +1893,14 @@ void simd_storeu(double * const sa, const SIMD_DBL va)
  */
 class SYSCONF
 {
-    private:
+    protected:
         static bool omp_enabled;
         static int32_t omp_threads;
+        static size_t L1l_elems_i32;
+        static size_t L1c_elems_i32;
+        static size_t L2l_elems_i32;
+        static size_t L2c_elems_i32;
+        static size_t page_sz;
 
     public:
         /************
@@ -1939,6 +1959,22 @@ class SYSCONF
             omp_enabled = false;
             cout << "OpenMP is disabled" << endl;
         #endif
+        }
+
+        /*!
+         *  Initialize system configurations
+         */
+        static int32_t initSysconf()
+        {
+            omp_enabled = false;
+            omp_threads = 1;
+            L1l_elems_i32 = (size_t)getL1LineSz() / sizeof(int32_t);
+            L1c_elems_i32 = (size_t)getL1Sz() / sizeof(int32_t);
+            L2l_elems_i32 = (size_t)getL2LineSz() / sizeof(int32_t);
+            L2c_elems_i32 = (size_t)getL2Sz() / sizeof(int32_t);
+            page_sz = (size_t)getPageSz();
+
+            return 0;
         }
 
         /*!
@@ -2058,7 +2094,6 @@ class VCLASS: public base_v, public SYSCONF
         VTYPE v;
         static const size_t nstreams = SIMD_STREAMS_32;
         static const size_t nbytes = SIMD_WIDTH_BYTES;
-        static size_t L2_nelems;
 
     public:
         /******************
@@ -2117,40 +2152,49 @@ class VCLASS: public base_v, public SYSCONF
         }
 
         //! \todo Set scheduling and prefetching offset based on cache line size
-        static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n)
+        static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n, const bool run_par = true)
         {
-            STYPE *ptr = NULL;
-            if (!posix_memalign((void **)&ptr, nbytes, n * sizeof(STYPE))) {
-                const size_t rem = n % nstreams;
-                const size_t nn = n - rem;
-                #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if (SYSCONF::get_omp() > 0)
+            STYPE *sc = NULL;
+            if (!posix_memalign((void **)&sc, nbytes, n * sizeof(STYPE))) {
+                const size_t rem = n & (nstreams - 1);
+                const size_t nn = (rem == 0) ? (n) : (n - rem);
+                //const size_t tmp = page_sz / nbytes;
+                //#pragma omp parallel for default(shared) schedule(static,page_sz/nbytes) num_threads(omp_threads) if ((omp_enabled & run_par) == true)
+                #pragma omp parallel for default(shared) schedule(static) num_threads(omp_threads) if ((omp_enabled & run_par) == true)
                 for (size_t i = 0; i < nn; i+=nstreams) {
-                    _mm_prefetch(sa + i + L2_nelems, _MM_HINT_NTA);
-                    _mm_prefetch(sb + i + L2_nelems, _MM_HINT_NTA);
                     const VCLASS va(sa + i, nstreams, true);
                     VCLASS vb(sb + i, nstreams, true);
                     vb.add(va.v, vb.v);
-                    vb.store(ptr + i, nstreams, true);
+                    vb.store(sc + i, nstreams, true);
                 }
-                if (rem > 0) {
-                    const VCLASS va(sa + nn, rem, true);
-                    VCLASS vb(sb + nn, rem, true);
-                    vb.add(va.v, vb.v);
-                    vb.store(ptr + nn, rem, true);
+                for (size_t i = nn; i < n; ++i) {
+                    sc[i] = sa[i] + sb[i];
                 }
             }
-            return ptr;
+            (void)run_par;  // used in OpenMP pragma but compiler identifies it as not used
+            return sc;
         }
 
         /*!
          *  \note Use low-level SIMD interface for flexibility to provide better optimization
-         *  \todo What if sa and sb are have different alignments? Need to GCD(sa, sb)
+         *  \todo What if sa and sb have different alignments? Need to GCD(sa, sb)
          *  \todo Allocate sc with alignment conformant to sa and sb
          */
         static SIMD_FUNC_INLINE STYPE * add2(const STYPE * const sa, const STYPE * const sb, const size_t n)
         {
             if (n == 0)
                 return NULL;
+
+            // Check if pointer is aligned
+            // Pointer is aligned to 16-byte boundary iff (p & 15) == 0
+            const size_t align_req = nbytes - 1;
+            //const size_t asa = (size_t)sa & align_req;
+            //const size_t asb = (size_t)sb & align_req;
+            //if (asa > 0)
+            //    cout << "A is not aligned " << asa << " bytes == " << asa / sizeof(STYPE) << " elems" << endl;
+            //if (asb > 0)
+            //    cout << "B is not aligned " << asb << " bytes == " << asb / sizeof(STYPE) << " elems" << endl;
+
 
             STYPE *sc = NULL;
             if (!posix_memalign((void **)&sc, nbytes, n * sizeof(STYPE))) {
@@ -2160,10 +2204,14 @@ class VCLASS: public base_v, public SYSCONF
                 // Single core: single vector
                 if (n <= nstreams) {
                     cout << "Single core: single vector" << endl;
+/*
                     va.loadu(sa, n);
                     vb.loadu(sb, n);
                     vb.add(va, vb);
                     vb.store(sc, n);
+*/
+                    for (size_t i = 0; i < n; ++i)
+                        sc[i] = sa[i] + sb[i];
                 }
                 // Single core: single L2 cache line, so align to MVL
                 // Multicore: multiple L2 cache lines, so align to cache line size
@@ -2171,20 +2219,14 @@ class VCLASS: public base_v, public SYSCONF
                     const STYPE * psa = sa;
                     const STYPE * psb = sb;
                     STYPE * psc = sc;
-                    const size_t bo_sa = (size_t)sa % nbytes;
-                    //const size_t bo_sb = (size_t)sb % nbytes;
+                    const size_t bo_s = (size_t)sa & align_req;
                     size_t rem2 = 0;
 
                     // Both input pointers are misaligned
-                    if (bo_sa > 0) {
+                    if (bo_s > 0) {
+                        cout << "Multi-core: unaligned vector" << endl;
 
-                        // Both input arrays have same byte offset misalignment
-                        //if (bo_sa == bo_sb) {
-                        //    const size_t eo_s = bo_sa / sizeof(STYPE);
-                        //    rem = nstreams - eo_s;
-                        //}
-
-                        const size_t eo_s = bo_sa / sizeof(STYPE);
+                        const size_t eo_s = bo_s / sizeof(STYPE);
                         const size_t rem1 = nstreams - eo_s;
                         cout << "Pre-rem: " << rem1 << endl;
 
@@ -2213,8 +2255,8 @@ class VCLASS: public base_v, public SYSCONF
                     //#pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() > 0) || (n > (4 * L2_nelems)))
                     #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() > 0) && (nn > 256))
                     for (size_t i = 0; i < nn; i+=nstreams) {
-                        _mm_prefetch(psa + i + L2_nelems, _MM_HINT_NTA);
-                        _mm_prefetch(psb + i + L2_nelems, _MM_HINT_NTA);
+                        _mm_prefetch(psa + i + L2l_elems_i32, _MM_HINT_NTA);
+                        _mm_prefetch(psb + i + L2l_elems_i32, _MM_HINT_NTA);
                         va.load(psa + i, nstreams, true);
                         vb.load(psb + i, nstreams, true);
                         vb.add(va, vb);
@@ -2225,16 +2267,9 @@ class VCLASS: public base_v, public SYSCONF
                     psa += nn;
                     psb += nn;
                     psc += nn;
-                    for (size_t i = 0; i < rem2; ++i)
+                    for (size_t i = 0; i < rem2; ++i) {
                         psc[i] = psa[i] + psb[i];
-/*
-                    if (rem2 > 0) {
-                        va.load(psa + nn, rem2);
-                        vb.load(psb + nn, rem2);
-                        vb.add(va, vb);
-                        vb.storeu(psc + nn, rem2);
                     }
-*/
                 }
             }
             return sc;

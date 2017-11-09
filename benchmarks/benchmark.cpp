@@ -12,8 +12,8 @@ using std::endl;
 #define FREE(p) while(0) { if(p) { free(p); p = NULL; } }
 
 #define FUNC_VERSION 0
-#define OO_VERSION 0
-#define CLASSIC_VERSION 1
+#define OO_VERSION 1
+#define CLASSIC_VERSION 0
 #define VALIDATE_VERSIONS 0
 #define NUM_THREADS 4
 #define ELEM_OFFS 0
@@ -42,9 +42,13 @@ using std::endl;
 /*!
  *  \todo Move this defnition of omp_enabled to .cpp definition file, placed here temporarily to prevent multiple definition error
  */
-bool SYSCONF::omp_enabled = false;
-int32_t SYSCONF::omp_threads = 1;
-size_t int32_v::L2_nelems = (size_t)SYSCONF::getL2LineSz() / sizeof(int32_t);
+bool SYSCONF::omp_enabled; // = false;
+int32_t SYSCONF::omp_threads; // = 1;
+size_t SYSCONF::L1l_elems_i32;
+size_t SYSCONF::L1c_elems_i32;
+size_t SYSCONF::L2l_elems_i32;
+size_t SYSCONF::L2c_elems_i32;
+size_t SYSCONF::page_sz;
 
 
 int main(int argc, char *argv[])
@@ -57,16 +61,20 @@ int main(int argc, char *argv[])
     STYPE *A = NULL, *B = NULL, *C1 = NULL, *C2 = NULL;
 
     size_t n = N;
-    if (argc > 1) {
+    size_t elem_offs = ELEM_OFFS;
+    if (argc > 1)
         n = atoi(argv[1]);
-    }
+    if (argc > 2)
+        elem_offs = atoi(argv[2]);
 
     detectCPU();
     detectSIMD();
+    SYSCONF::initSysconf();
     SYSCONF::printSysconf();
 
     cout << "Alignment: " << alignment << endl;
     cout << "Num. elems: " << n << endl;
+    cout << "Elem offset: " << elem_offs << endl;
 
     // Initialize
     if (posix_memalign((void **)&A, alignment, n * sizeof(STYPE)))
@@ -104,7 +112,7 @@ int main(int argc, char *argv[])
     tic(timer);
 
     #pragma omp parallel for default(shared) schedule(static) num_threads(NUM_THREADS) if(NUM_THREADS > 1)
-    for (size_t i = ELEM_OFFS; i < n; ++i) {
+    for (size_t i = elem_offs; i < n; ++i) {
         C2[i] = A[i] + B[i];
     }
 
@@ -119,7 +127,7 @@ int main(int argc, char *argv[])
 
     tic(timer);
 
-    C1 = VCLASS::add(&A[ELEM_OFFS], &B[ELEM_OFFS], n - ELEM_OFFS);
+    C1 = VCLASS::add(&A[elem_offs], &B[elem_offs], n - elem_offs);
 
     elapsed = toc(timer);
     cout << "Elapsed time (OO version): " << elapsed << " seconds" << endl;
@@ -132,7 +140,7 @@ int main(int argc, char *argv[])
 
     tic(timer);
 
-    C1 = VCLASS::add2(&A[ELEM_OFFS], &B[ELEM_OFFS], n - ELEM_OFFS);
+    C1 = VCLASS::add2(&A[elem_offs], &B[elem_offs], n - elem_offs);
 
     elapsed = toc(timer);
     cout << "Elapsed time (OO2 version): " << elapsed << " seconds" << endl;
@@ -141,11 +149,11 @@ int main(int argc, char *argv[])
 
 #if VALIDATE_VERSIONS == 1
     // Validate
-    for (size_t i = ELEM_OFFS; i < n; ++i) {
-        if (C1[i-ELEM_OFFS] != C2[i])
+    for (size_t i = elem_offs; i < n; ++i) {
+        if (C1[i-elem_offs] != C2[i])
             result += 1;
         if (n <= (2 * (SYSCONF::getL2LineSz() / sizeof(*A))))
-            cout << C1[i-ELEM_OFFS] << " == " << C2[i] << endl;
+            cout << C1[i-elem_offs] << " == " << C2[i] << endl;
     }
 #endif
 
