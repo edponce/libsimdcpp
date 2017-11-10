@@ -1651,7 +1651,6 @@ static SIMD_FUNC_INLINE
 SIMD_INT simd_loadu(const int32_t * const sa, const size_t n = SIMD_STREAMS_32)
 {
     //return _mm_loadu_si128((SIMD_INT *)sa);
-    //return _mm_lddqu_si128((SIMD_INT *)sa);
     SIMD_INT va;
     switch (n) {
         case 1: va = _mm_set_epi32(0, 0, 0, sa[0]); break;
@@ -1717,7 +1716,6 @@ SIMD_FLT simd_load(const float * const sa, const size_t n = SIMD_STREAMS_32, con
         case 1: va = _mm_load_ss(sa); break;
         case 2: va = _mm_set_ps(0.0f, 0.0f, sa[1], sa[0]); break;
         case 3: va = _mm_set_ps(0.0f, sa[2], sa[1], sa[0]); break;
-        //case 4: va = _mm_load_ps(sa); break;
         case 4: va = (strmHint) ? (_mm_castsi128_ps(_mm_stream_load_si128((SIMD_INT *)sa))) : (_mm_load_ps(sa)); break;
         default: va = _mm_setzero_ps(); break;
     }
@@ -1725,8 +1723,18 @@ SIMD_FLT simd_load(const float * const sa, const size_t n = SIMD_STREAMS_32, con
 }
 
 static SIMD_FUNC_INLINE
-SIMD_FLT simd_loadu(const float * const sa)
-{ return _mm_loadu_ps(sa); }
+SIMD_FLT simd_loadu(const float * const sa, const size_t n = SIMD_STREAMS_32)
+{
+    SIMD_FLT va;
+    switch (n) {
+        case 1: va = _mm_load_ss(sa); break;
+        case 2: va = _mm_set_ps(0.0f, 0.0f, sa[1], sa[0]); break;
+        case 3: va = _mm_set_ps(0.0f, sa[2], sa[1], sa[0]); break;
+        case 4: va = _mm_loadu_ps(sa); break;
+        default: va = _mm_setzero_ps(); break;
+    }
+    return va;
+}
 
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_load(const double * const sa, const size_t n = SIMD_STREAMS_64, const bool strmHint = false)
@@ -1734,7 +1742,6 @@ SIMD_DBL simd_load(const double * const sa, const size_t n = SIMD_STREAMS_64, co
     SIMD_DBL va;
     switch (n) {
         case 1: va = _mm_load_sd(sa); break;
-        //case 2: va = _mm_load_pd(sa); break;
         case 2: va = (strmHint) ? (_mm_castsi128_pd(_mm_stream_load_si128((SIMD_INT *)sa))) : (_mm_load_pd(sa)); break;
         default: va = _mm_setzero_pd(); break;
     }
@@ -1742,8 +1749,16 @@ SIMD_DBL simd_load(const double * const sa, const size_t n = SIMD_STREAMS_64, co
 }
 
 static SIMD_FUNC_INLINE
-SIMD_DBL simd_loadu(const double * const sa)
-{ return _mm_loadu_pd(sa); }
+SIMD_DBL simd_loadu(const double * const sa, const size_t n = SIMD_STREAMS_64)
+{
+    SIMD_DBL va;
+    switch (n) {
+        case 1: va = _mm_load_sd(sa); break;
+        case 2: va = _mm_loadu_pd(sa); break;
+        default: va = _mm_setzero_pd(); break;
+    }
+    return va;
+}
 
 
 /************************
@@ -1768,14 +1783,16 @@ void simd_storeu(int16_t * const sa, const SIMD_INT va)
 static SIMD_FUNC_INLINE
 void simd_store(int32_t * const sa, const SIMD_INT va, const size_t n = SIMD_STREAMS_32, const bool strmHint = false)
 {
-    int32_t tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     switch (n) {
         case 1:
         case 2:
         case 3:
-            _mm_store_si128((SIMD_INT *)tmp, va);
-            for (size_t i = 0; i < n; ++i)
-                sa[i] = tmp[i];
+            {
+                int32_t tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+                _mm_store_si128((SIMD_INT *)tmp, va);
+                for (size_t i = 0; i < n; ++i)
+                    sa[i] = tmp[i];
+            }
             break;
         case 4: (strmHint) ? (_mm_stream_si128((SIMD_INT *)sa, va)) : (_mm_store_si128((SIMD_INT *)sa, va)); break;
         default: break;
@@ -1785,17 +1802,18 @@ void simd_store(int32_t * const sa, const SIMD_INT va, const size_t n = SIMD_STR
 static SIMD_FUNC_INLINE
 void simd_storeu(int32_t * const sa, const SIMD_INT va, const size_t n = SIMD_STREAMS_32)
 {
-    //_mm_storeu_si128((SIMD_INT *)sa, va);
-    int32_t tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
     switch (n) {
         case 1:
         case 2:
         case 3:
-        case 4:
-            _mm_store_si128((SIMD_INT *)tmp, va);
-            for (size_t i = 0; i < n; ++i)
-                sa[i] = tmp[i];
+            {
+                int32_t tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+                _mm_store_si128((SIMD_INT *)tmp, va);
+                for (size_t i = 0; i < n; ++i)
+                    sa[i] = tmp[i];
+            }
             break;
+        case 4: _mm_storeu_si128((SIMD_INT *)sa, va); break;
         default: break;
     }
 }
@@ -1843,14 +1861,16 @@ void simd_storeu(uint64_t * const sa, const SIMD_INT va)
 static SIMD_FUNC_INLINE
 void simd_store(float * const sa, const SIMD_FLT va, const size_t n = SIMD_STREAMS_32, const bool strmHint = false)
 {
-    float tmp[SIMD_STREAMS_32];
     switch (n) {
         case 1: _mm_store_ss(sa, va); break;
         case 2:
         case 3:
-            _mm_store_ps(tmp, va);
-            for (size_t i = 0; i < n; ++i)
-                sa[i] = tmp[i];
+            {
+                float tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+                _mm_store_ps(tmp, va);
+                for (size_t i = 0; i < n; ++i)
+                    sa[i] = tmp[i];
+            }
             break;
         case 4: (strmHint) ? (_mm_stream_ps(sa, va)) : (_mm_store_ps(sa, va)); break;
         default: break;
@@ -1858,8 +1878,23 @@ void simd_store(float * const sa, const SIMD_FLT va, const size_t n = SIMD_STREA
 }
 
 static SIMD_FUNC_INLINE
-void simd_storeu(float * const sa, const SIMD_FLT va)
-{ _mm_storeu_ps(sa, va); }
+void simd_storeu(float * const sa, const SIMD_FLT va, const size_t n = SIMD_STREAMS_32)
+{
+    switch (n) {
+        case 1: _mm_store_ss(sa, va); break;
+        case 2:
+        case 3:
+            {
+                float tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+                _mm_store_ps(tmp, va);
+                for (size_t i = 0; i < n; ++i)
+                    sa[i] = tmp[i];
+            }
+            break;
+        case 4: _mm_store_ps(sa, va); break;
+        default: break;
+    }
+}
 
 static SIMD_FUNC_INLINE
 void simd_store(double * const sa, const SIMD_DBL va, const size_t n = SIMD_STREAMS_64, const bool strmHint = false)
@@ -1872,8 +1907,14 @@ void simd_store(double * const sa, const SIMD_DBL va, const size_t n = SIMD_STRE
 }
 
 static SIMD_FUNC_INLINE
-void simd_storeu(double * const sa, const SIMD_DBL va)
-{ _mm_storeu_pd(sa, va); }
+void simd_storeu(double * const sa, const SIMD_DBL va, const size_t n = SIMD_STREAMS_64)
+{
+    switch (n) {
+        case 1: _mm_store_sd(sa, va); break;
+        case 2: _mm_storeu_pd(sa, va); break;
+        default: break;
+    }
+}
 
 
 
@@ -2088,7 +2129,7 @@ class base_v
  *  \class int32_v
  *  \brief Class to represent a 32-bit integer vector
  */
-class VCLASS: public base_v, public SYSCONF
+class VCLASS: public base_v
 {
     private:
         VTYPE v;
@@ -2096,20 +2137,28 @@ class VCLASS: public base_v, public SYSCONF
         static const size_t nbytes = SIMD_WIDTH_BYTES;
 
     public:
+
         /******************
          *  Constructors  *
          ******************/
+        //! Constructor with no parameters
         VCLASS()
         { simd_set_zero(&v); }
 
-        VCLASS(const VTYPE va)
-        { v = va; }
+        //! (Low-level) Copy constructor
+        VCLASS(const VTYPE va): v(va)
+        { }
 
+        //! Copy constructor
         VCLASS(const VCLASS &va): v(va.v)
         { }
 
-        VCLASS(const STYPE * const sa, const size_t n = nstreams, const bool strmHint = false)
-        { load(sa, n, strmHint); }
+        /*!
+         *  Constructor with scalar pointer parameter
+         *  Does not assumes \c sa alignment is conformant
+         */
+        VCLASS(const STYPE * const sa, const size_t n = nstreams)
+        { loadu(sa, n); }
 
         ~VCLASS()
         { }
@@ -2132,147 +2181,10 @@ class VCLASS: public base_v, public SYSCONF
         /****************
          *  Operations  *
          ****************/
-        //! \note Should this be a static method?
-        // return object to allow composite function calling
-        // e.g. va.add(vb.add(vc, vd), ve)
-        // instead of
-        // vb.add(vc, vd)
-        // va.add(vb, ve)
-        SIMD_FUNC_INLINE VCLASS add(const VTYPE va, const VTYPE vb)
+        SIMD_FUNC_INLINE VCLASS operator+(const VCLASS& vb) const
         {
-            v = simd_add_32(va, vb);
-            return *this;
-        }
-
-        //! \note Should this be a static method?
-        SIMD_FUNC_INLINE VCLASS add(const VCLASS va, const VCLASS vb)
-        {
-            add(va.v, vb.v);
-            return *this;
-        }
-
-        //! \todo Set scheduling and prefetching offset based on cache line size
-        static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n, const bool run_par = true)
-        {
-            STYPE *sc = NULL;
-            if (!posix_memalign((void **)&sc, nbytes, n * sizeof(STYPE))) {
-                const size_t rem = n & (nstreams - 1);
-                const size_t nn = (rem == 0) ? (n) : (n - rem);
-                //const size_t tmp = page_sz / nbytes;
-                //#pragma omp parallel for default(shared) schedule(static,page_sz/nbytes) num_threads(omp_threads) if ((omp_enabled & run_par) == true)
-                #pragma omp parallel for default(shared) schedule(static) num_threads(omp_threads) if ((omp_enabled & run_par) == true)
-                for (size_t i = 0; i < nn; i+=nstreams) {
-                    const VCLASS va(sa + i, nstreams, true);
-                    VCLASS vb(sb + i, nstreams, true);
-                    vb.add(va.v, vb.v);
-                    vb.store(sc + i, nstreams, true);
-                }
-                for (size_t i = nn; i < n; ++i) {
-                    sc[i] = sa[i] + sb[i];
-                }
-            }
-            (void)run_par;  // used in OpenMP pragma but compiler identifies it as not used
-            return sc;
-        }
-
-        /*!
-         *  \note Use low-level SIMD interface for flexibility to provide better optimization
-         *  \todo What if sa and sb have different alignments? Need to GCD(sa, sb)
-         *  \todo Allocate sc with alignment conformant to sa and sb
-         */
-        static SIMD_FUNC_INLINE STYPE * add2(const STYPE * const sa, const STYPE * const sb, const size_t n)
-        {
-            if (n == 0)
-                return NULL;
-
-            // Check if pointer is aligned
-            // Pointer is aligned to 16-byte boundary iff (p & 15) == 0
-            const size_t align_req = nbytes - 1;
-            //const size_t asa = (size_t)sa & align_req;
-            //const size_t asb = (size_t)sb & align_req;
-            //if (asa > 0)
-            //    cout << "A is not aligned " << asa << " bytes == " << asa / sizeof(STYPE) << " elems" << endl;
-            //if (asb > 0)
-            //    cout << "B is not aligned " << asb << " bytes == " << asb / sizeof(STYPE) << " elems" << endl;
-
-
-            STYPE *sc = NULL;
-            if (!posix_memalign((void **)&sc, nbytes, n * sizeof(STYPE))) {
-                VCLASS va;
-                VCLASS vb;
-
-                // Single core: single vector
-                if (n <= nstreams) {
-                    cout << "Single core: single vector" << endl;
-/*
-                    va.loadu(sa, n);
-                    vb.loadu(sb, n);
-                    vb.add(va, vb);
-                    vb.store(sc, n);
-*/
-                    for (size_t i = 0; i < n; ++i)
-                        sc[i] = sa[i] + sb[i];
-                }
-                // Single core: single L2 cache line, so align to MVL
-                // Multicore: multiple L2 cache lines, so align to cache line size
-                else {
-                    const STYPE * psa = sa;
-                    const STYPE * psb = sb;
-                    STYPE * psc = sc;
-                    const size_t bo_s = (size_t)sa & align_req;
-                    size_t rem2 = 0;
-
-                    // Both input pointers are misaligned
-                    if (bo_s > 0) {
-                        cout << "Multi-core: unaligned vector" << endl;
-
-                        const size_t eo_s = bo_s / sizeof(STYPE);
-                        const size_t rem1 = nstreams - eo_s;
-                        cout << "Pre-rem: " << rem1 << endl;
-
-                        // (Pre) Strip mining
-                        for (size_t i = 0; i < rem1; ++i)
-                            psc[i] = psa[i] + psb[i];
-
-                        psa += rem1;
-                        psb += rem1;
-                        psc += rem1;
-                        rem2 = (n - rem1) % nstreams;
-                    }
-                    else {
-                        rem2 = n % nstreams;
-                    }
-
-                    const size_t nn = n - rem2;
-/*
-                    cout << "Elements aligned: " << nn << endl;
-                    cout << "Post-rem: " << rem2 << endl;
-                    cout << "Orig addresses: " << sa << " , " << (size_t)sa % nbytes << endl;
-                    cout << "Shift addresses: " << psa << " , " << (size_t)psa % nbytes << endl;
-                    cout << "L2 elems: " << L2_nelems << endl;
-*/
-
-                    //#pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() > 0) || (n > (4 * L2_nelems)))
-                    #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() > 0) && (nn > 256))
-                    for (size_t i = 0; i < nn; i+=nstreams) {
-                        _mm_prefetch(psa + i + L2l_elems_i32, _MM_HINT_NTA);
-                        _mm_prefetch(psb + i + L2l_elems_i32, _MM_HINT_NTA);
-                        va.load(psa + i, nstreams, true);
-                        vb.load(psb + i, nstreams, true);
-                        vb.add(va, vb);
-                        vb.storeu(psc + i);
-                    }
-
-                    // (Post) Strip mining
-                    psa += nn;
-                    psb += nn;
-                    psc += nn;
-                    for (size_t i = 0; i < rem2; ++i) {
-                        psc[i] = psa[i] + psb[i];
-                    }
-                }
-            }
-            return sc;
+            VCLASS vc(simd_add_32(v, vb.v));
+            return vc;
         }
 
         /****************
@@ -2290,6 +2202,36 @@ class VCLASS: public base_v, public SYSCONF
         SIMD_FUNC_INLINE void storeu(STYPE * const sa, const size_t n = nstreams) const
         { simd_storeu((STYPE * const)sa, v, n); }
 };
+
+static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n = SIMD_STREAMS_32, const bool run_par = true)
+{
+    STYPE *sc = NULL;
+    if (!posix_memalign((void **)&sc, SIMD_WIDTH_BYTES, n * sizeof(STYPE))) {
+        const size_t rem = n & (SIMD_STREAMS_32 - 1);
+        const size_t nn = n - rem;
+        const size_t salign = (((size_t)sa & (SIMD_WIDTH_BYTES - 1)) | ((size_t)sb & (SIMD_WIDTH_BYTES - 1)));
+        #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() & run_par) == true)
+        for (size_t i = 0; i < nn; i+=SIMD_STREAMS_32) {
+            VTYPE va, vb;
+            if (salign == 0) {
+                //va = simd_load(sa + i, SIMD_STREAMS_32, true);
+                //vb = simd_load(sb + i, SIMD_STREAMS_32, true);
+                va = simd_load(sa + i);
+                vb = simd_load(sb + i);
+            } else {
+                va = simd_loadu(sa + i);
+                vb = simd_loadu(sb + i);
+            }
+            vb = simd_add_32(va, vb);
+            simd_store(sc + i, vb, SIMD_STREAMS_32, true);
+        }
+        for (size_t i = nn; i < n; ++i) {
+            sc[i] = sa[i] + sb[i];
+        }
+    }
+    (void)run_par;  // used in OpenMP pragma but compiler identifies it as not used
+    return sc;
+}
 #undef STYPE
 #undef VTYPE
 #undef VCLASS
@@ -2302,7 +2244,7 @@ class VCLASS: public base_v, public SYSCONF
  *  \class flt32_v
  *  \brief Class to represent a single-precision floating-point vector
  */
-class VCLASS: public base_v, public SYSCONF
+class VCLASS: public base_v
 {
     private:
         VTYPE v;
@@ -2316,14 +2258,17 @@ class VCLASS: public base_v, public SYSCONF
         VCLASS()
         { simd_set_zero(&v); }
 
-        VCLASS(const VTYPE va)
-        { v = va; }
+        VCLASS(const VTYPE va): v(va)
+        { }
 
         VCLASS(const VCLASS &va): v(va.v)
         { }
 
-        VCLASS(const STYPE * const sa, const size_t n = nstreams, const bool strmHint = false)
-        { load(sa, n, strmHint); }
+        VCLASS(const STYPE * const sa, const size_t n = nstreams)
+        { loadu(sa, n); }
+
+        ~VCLASS()
+        { }
 
         /*************
          *  Get/set  *
@@ -2343,52 +2288,57 @@ class VCLASS: public base_v, public SYSCONF
         /****************
          *  Operations  *
          ****************/
-        SIMD_FUNC_INLINE VCLASS add(const VTYPE va, const VTYPE vb)
+        SIMD_FUNC_INLINE VCLASS operator+(const VCLASS& vb) const
         {
-            v = simd_add(va, vb);
-            return *this;
-        }
-
-        SIMD_FUNC_INLINE VCLASS add(const VCLASS va, const VCLASS vb)
-        {
-            add(va.v, vb.v);
-            return *this;
-        }
-
-        static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n)
-        {
-            STYPE *ptr = NULL;
-            if (!posix_memalign((void **)&ptr, nbytes, n * sizeof(STYPE))) {
-                const size_t rem = n % nstreams;
-                const size_t nn = n - rem;
-                #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if (SYSCONF::get_omp() > 0)
-                for (size_t i = 0; i < nn; i+=nstreams) {
-                    _mm_prefetch(sa + i + 16, _MM_HINT_NTA);
-                    _mm_prefetch(sb + i + 16, _MM_HINT_NTA);
-                    const VCLASS va(sa + i, nstreams, true);
-                    VCLASS vb(sb + i, nstreams, true);
-                    vb.add(va.v, vb.v);
-                    vb.store(ptr + i, nstreams, true);
-                }
-                if (rem > 0) {
-                    const VCLASS va(sa + nn, rem, true);
-                    VCLASS vb(sb + nn, rem, true);
-                    vb.add(va.v, vb.v);
-                    vb.store(ptr + nn, rem, true);
-                }
-            }
-            return ptr;
+            VCLASS vc(simd_add(v, vb.v));
+            return vc;
         }
 
         /****************
          *  Load/Store  *
          ****************/
         SIMD_FUNC_INLINE void load(const STYPE * const sa, const size_t n = nstreams, const bool strmHint = false)
-        { v = simd_load(sa, n, strmHint); }
+        { v = simd_load((const STYPE *)sa, n, strmHint); }
 
         SIMD_FUNC_INLINE void store(STYPE * const sa, const size_t n = nstreams, const bool strmHint = false) const
-        { simd_store(sa, v, n, strmHint); }
+        { simd_store((STYPE * const)sa, v, n, strmHint); }
+
+        SIMD_FUNC_INLINE void loadu(const STYPE * const sa, const size_t n = nstreams)
+        { v = simd_loadu((const STYPE *)sa, n); }
+
+        SIMD_FUNC_INLINE void storeu(STYPE * const sa, const size_t n = nstreams) const
+        { simd_storeu((STYPE * const)sa, v, n); }
 };
+
+static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n = SIMD_STREAMS_32, const bool run_par = true)
+{
+    STYPE *sc = NULL;
+    if (!posix_memalign((void **)&sc, SIMD_WIDTH_BYTES, n * sizeof(STYPE))) {
+        const size_t rem = n & (SIMD_STREAMS_32 - 1);
+        const size_t nn = n - rem;
+        const size_t salign = (((size_t)sa & (SIMD_WIDTH_BYTES - 1)) | ((size_t)sb & (SIMD_WIDTH_BYTES - 1)));
+        #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() & run_par) == true)
+        for (size_t i = 0; i < nn; i+=SIMD_STREAMS_32) {
+            VTYPE va, vb;
+            if (salign == 0) {
+                //va = simd_load(sa + i, SIMD_STREAMS_32, true);
+                //vb = simd_load(sb + i, SIMD_STREAMS_32, true);
+                va = simd_load(sa + i);
+                vb = simd_load(sb + i);
+            } else {
+                va = simd_loadu(sa + i);
+                vb = simd_loadu(sb + i);
+            }
+            vb = simd_add(va, vb);
+            simd_store(sc + i, vb, SIMD_STREAMS_32, true);
+        }
+        for (size_t i = nn; i < n; ++i) {
+            sc[i] = sa[i] + sb[i];
+        }
+    }
+    (void)run_par;  // used in OpenMP pragma but compiler identifies it as not used
+    return sc;
+}
 #undef STYPE
 #undef VTYPE
 #undef VCLASS
@@ -2401,7 +2351,7 @@ class VCLASS: public base_v, public SYSCONF
  *  \class flt64_v
  *  \brief Class to represent a double-precision floating-point vector
  */
-class VCLASS: public base_v, public SYSCONF
+class VCLASS: public base_v
 {
     private:
         VTYPE v;
@@ -2415,14 +2365,17 @@ class VCLASS: public base_v, public SYSCONF
         VCLASS()
         { simd_set_zero(&v); }
 
-        VCLASS(const VTYPE va)
-        { v = va; }
+        VCLASS(const VTYPE va): v(va)
+        { }
 
         VCLASS(const VCLASS &va): v(va.v)
         { }
 
-        VCLASS(const STYPE * const sa, const size_t n = nstreams, const bool strmHint = false)
-        { load(sa, n, strmHint); }
+        VCLASS(const STYPE * const sa, const size_t n = nstreams)
+        { loadu(sa, n); }
+
+        ~VCLASS()
+        { }
 
         /*************
          *  Get/set  *
@@ -2442,52 +2395,57 @@ class VCLASS: public base_v, public SYSCONF
         /****************
          *  Operations  *
          ****************/
-        SIMD_FUNC_INLINE VCLASS add(const VTYPE va, const VTYPE vb)
+        SIMD_FUNC_INLINE VCLASS operator+(const VCLASS& vb) const
         {
-            v = simd_add(va, vb);
-            return *this;
-        }
-
-        SIMD_FUNC_INLINE VCLASS add(const VCLASS va, const VCLASS vb)
-        {
-            add(va.v, vb.v);
-            return *this;
-        }
-
-        static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n)
-        {
-            STYPE *ptr = NULL;
-            if (!posix_memalign((void **)&ptr, nbytes, n * sizeof(STYPE))) {
-                const size_t rem = n % nstreams;
-                const size_t nn = n - rem;
-                #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if (SYSCONF::get_omp() > 0)
-                for (size_t i = 0; i < nn; i+=nstreams) {
-                    _mm_prefetch(sa + i + 16, _MM_HINT_NTA);
-                    _mm_prefetch(sb + i + 16, _MM_HINT_NTA);
-                    const VCLASS va(sa + i, nstreams, true);
-                    VCLASS vb(sb + i, nstreams, true);
-                    vb.add(va.v, vb.v);
-                    vb.store(ptr + i, nstreams, true);
-                }
-                if (rem > 0) {
-                    const VCLASS va(sa + nn, rem, true);
-                    VCLASS vb(sb + nn, rem, true);
-                    vb.add(va.v, vb.v);
-                    vb.store(ptr + nn, rem, true);
-                }
-            }
-            return ptr;
+            VCLASS vc(simd_add(v, vb.v));
+            return vc;
         }
 
         /****************
          *  Load/Store  *
          ****************/
         SIMD_FUNC_INLINE void load(const STYPE * const sa, const size_t n = nstreams, const bool strmHint = false)
-        { v = simd_load(sa, n, strmHint); }
+        { v = simd_load((const STYPE *)sa, n, strmHint); }
 
         SIMD_FUNC_INLINE void store(STYPE * const sa, const size_t n = nstreams, const bool strmHint = false) const
-        { simd_store(sa, v, n, strmHint); }
+        { simd_store((STYPE * const)sa, v, n, strmHint); }
+
+        SIMD_FUNC_INLINE void loadu(const STYPE * const sa, const size_t n = nstreams)
+        { v = simd_loadu((const STYPE *)sa, n); }
+
+        SIMD_FUNC_INLINE void storeu(STYPE * const sa, const size_t n = nstreams) const
+        { simd_storeu((STYPE * const)sa, v, n); }
 };
+
+static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n = SIMD_STREAMS_64, const bool run_par = true)
+{
+    STYPE *sc = NULL;
+    if (!posix_memalign((void **)&sc, SIMD_WIDTH_BYTES, n * sizeof(STYPE))) {
+        const size_t rem = n & (SIMD_STREAMS_64 - 1);
+        const size_t nn = n - rem;
+        const size_t salign = (((size_t)sa & (SIMD_WIDTH_BYTES - 1)) | ((size_t)sb & (SIMD_WIDTH_BYTES - 1)));
+        #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() & run_par) == true)
+        for (size_t i = 0; i < nn; i+=SIMD_STREAMS_64) {
+            VTYPE va, vb;
+            if (salign == 0) {
+                //va = simd_load(sa + i, SIMD_STREAMS_64, true);
+                //vb = simd_load(sb + i, SIMD_STREAMS_64, true);
+                va = simd_load(sa + i);
+                vb = simd_load(sb + i);
+            } else {
+                va = simd_loadu(sa + i);
+                vb = simd_loadu(sb + i);
+            }
+            vb = simd_add(va, vb);
+            simd_store(sc + i, vb, SIMD_STREAMS_64, true);
+        }
+        for (size_t i = nn; i < n; ++i) {
+            sc[i] = sa[i] + sb[i];
+        }
+    }
+    (void)run_par;  // used in OpenMP pragma but compiler identifies it as not used
+    return sc;
+}
 #undef STYPE
 #undef VTYPE
 #undef VCLASS

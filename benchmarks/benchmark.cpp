@@ -13,13 +13,13 @@ using std::endl;
 
 #define FUNC_VERSION 0
 #define OO_VERSION 1
-#define CLASSIC_VERSION 0
-#define VALIDATE_VERSIONS 0
-#define NUM_THREADS 4
+#define CLASSIC_VERSION 1
+#define VALIDATE_VERSIONS 1
+#define NUM_THREADS 1
 #define ELEM_OFFS 0
 
 #define N 16
-#define DATATYPE 0 // 0 = int32, 1 = flt32, 2 = flt64
+#define DATATYPE 2 // 0 = int32, 1 = flt32, 2 = flt64
 
 #if DATATYPE == 0
 #   define VCLASS int32_v
@@ -84,8 +84,8 @@ int main(int argc, char *argv[])
 
 
     for (size_t i = 0; i < n; ++i) {
-        A[i] = i + 1;
-        B[i] = i;
+        A[i] = i + 1.3;
+        B[i] = i + 2.5;
     }
 
     // Run
@@ -106,10 +106,10 @@ int main(int argc, char *argv[])
 
 
 #if CLASSIC_VERSION == 1
+    tic(timer);
+
     if (posix_memalign((void **)&C2, alignment, n * sizeof(STYPE)))
         _Exit(EXIT_FAILURE);
-
-    tic(timer);
 
     #pragma omp parallel for default(shared) schedule(static) num_threads(NUM_THREADS) if(NUM_THREADS > 1)
     for (size_t i = elem_offs; i < n; ++i) {
@@ -127,23 +127,10 @@ int main(int argc, char *argv[])
 
     tic(timer);
 
-    C1 = VCLASS::add(&A[elem_offs], &B[elem_offs], n - elem_offs);
+    C1 = add(&A[elem_offs], &B[elem_offs], n - elem_offs);
 
     elapsed = toc(timer);
     cout << "Elapsed time (OO version): " << elapsed << " seconds" << endl;
-#endif
-
-
-#if OO_VERSION == 2
-    SYSCONF::set_omp(NUM_THREADS);
-    SYSCONF::omp_settings();
-
-    tic(timer);
-
-    C1 = VCLASS::add2(&A[elem_offs], &B[elem_offs], n - elem_offs);
-
-    elapsed = toc(timer);
-    cout << "Elapsed time (OO2 version): " << elapsed << " seconds" << endl;
 #endif
 
 
