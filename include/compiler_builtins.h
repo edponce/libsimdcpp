@@ -18,7 +18,7 @@
  *                 void _mm_free(void *p)
  *        Windows: void * _aligned_malloc(size_t size, size_t alignment)
  *
- *  simd_prefetch(a,x):
+ *  __prefetch(a,x):
  *      standalone function to specify the movement of data (pointed by 'a') into cache
  *      before it is accessed. Read accesses use 'x' = 0 and write accesses use 'x' = 1.
  *      A third argument corresponds to the degree of temporal locality [0-3], where
@@ -26,8 +26,8 @@
  *      Ex:
  *          for (int i = 0; i < n; ++i) {
  *              a[i] += b[i];
- *              simd_prefetch(&a[i+j],1);
- *              simd_prefetch(&b[i+j],0);
+ *              __prefetch(&a[i+16],1);
+ *              __prefetch(&b[i+16],0);
  *          }
  */
 #if defined(__clang__)
@@ -51,9 +51,9 @@
 #   define SIMD_FEATURE_KNCNI  0
 
     // Prefetching builtins
-#   define simd_prefetch(a,x) __builtin_prefetch(a,x)
-#   define simd_prefetch_r(a) simd_prefetch(a,0)
-#   define simd_prefetch_w(a) simd_prefetch(a,1)
+#   define __prefetch(a,x) __builtin_prefetch(a,x)
+#   define __prefetchr(a) __prefetch(a,0)
+#   define __prefetchw(a) __prefetch(a,1)
 
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
     // Used to verify SIMD features supported
@@ -77,9 +77,9 @@
 #   define SIMD_FEATURE_KNCNI  CPU_SUPPORTS(_FEATURE_KNCNI)
 
     // Prefetching builtins
-#   define simd_prefetch(a,x) _mm_prefetch(a,x)
-#   define simd_prefetch_r(a) simd_prefetch(a,_MM_HINT_T0)
-#   define simd_prefetch_w(a) simd_prefetch(a,_MM_HINT_T0)
+#   define __prefetch(a,x) _mm_prefetch(a,_MM_HINT_T2)
+#   define __prefetchr(a) __prefetch(a)
+#   define __prefetchw(a) __prefetch(a)
 
 #elif defined(__GNUC__)
     // Used to verify SIMD features supported
@@ -110,9 +110,9 @@
 #   define SIMD_FEATURE_KNCNI  0
 
     // Prefetching builtins
-#   define simd_prefetch(a,x) __builtin_prefetch(a,x)
-#   define simd_prefetch_r(a) simd_prefetch(a,0)
-#   define simd_prefetch_w(a) simd_prefetch(a,1)
+#   define __prefetch(a,x) __builtin_prefetch(a,x,3)
+#   define __prefetchr(a) __prefetch(a,0)
+#   define __prefetchw(a) __prefetch(a,1)
 
 #else
     // Used to verify SIMD features supported
@@ -135,9 +135,9 @@
 #   define SIMD_FEATURE_KNCNI   0
 
     // Prefetching builtins
-#   define simd_prefetch(a,x) ((void)0)
-#   define simd_prefetch_r(a) ((void)0)
-#   define simd_prefetch_w(a) ((void)0)
+#   define __prefetch(a,x) ((void)0)
+#   define __prefetchr(a) ((void)0)
+#   define __prefetchw(a) ((void)0)
 #endif
 
 

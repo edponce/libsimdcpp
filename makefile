@@ -35,7 +35,9 @@ export CXX := g++
 export SIMDFLAGS
 
 # GNU compiler and linker options
-export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
+#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O0 -fno-tree-vectorize -std=c++98
+export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -ftree-vectorize -std=c++98
+#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
 #export CXXFLAGS := $(SIMDFLAGS) -m32 -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
 
 # Intel compiler and linker options
@@ -46,6 +48,8 @@ export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wex
 
 # IBM/GNU PowerPC
 #export CXXFLAGS := $(SIMDFLAGS) -mpowerpc64 -maltivec -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
+
+#export CXXFLAGS += -fopt-info
 
 # Linker options
 export LFLAGS := -funroll-loops
@@ -60,10 +64,10 @@ export LFLAGS += -fopenmp # GNU compiler
 #             -DSIMD_AVX
 #             -DSIMD_AVX2
 #             -DSIMD_AVX512
-DEFINES := -DSIMD_MODE
+#DEFINES := -DSIMD_MODE
 #DEFINES := -DSIMD_MMX
 #DEFINES := -DSIMD_SSE2
-#DEFINES := -DSIMD_SSE4_2
+DEFINES := -DSIMD_SSE4_2
 #DEFINES := -DSIMD_AVX
 #DEFINES := -DSIMD_AVX2
 #DEFINES := -DSIMD_AVX512

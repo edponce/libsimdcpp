@@ -9,17 +9,17 @@
 using std::cout;
 using std::endl;
 
-#define FREE(p) while(0) { if(p) { free(p); p = NULL; } }
+#define FREE(p) do { if(p) { free(p); p = NULL; } } while(0)
 
 #define FUNC_VERSION 0
 #define OO_VERSION 1
-#define CLASSIC_VERSION 1
+#define CLASSIC_VERSION 0
 #define VALIDATE_VERSIONS 1
-#define NUM_THREADS 1
+#define NUM_THREADS 2
 #define ELEM_OFFS 0
 
 #define N 16
-#define DATATYPE 2 // 0 = int32, 1 = flt32, 2 = flt64
+#define DATATYPE 0 // 0 = int32, 1 = flt32, 2 = flt64
 
 #if DATATYPE == 0
 #   define VCLASS int32_v
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-#if VALIDATE_VERSIONS == 1
+#if VALIDATE_VERSIONS == 1 && (OO_VERSION + CLASSIC_VERSION) > 1
     // Validate
     for (size_t i = elem_offs; i < n; ++i) {
         if (C1[i-elem_offs] != C2[i])

@@ -985,13 +985,11 @@ typedef __m128d SIMD_DBL;
  *  Misc instructions  *
  ***********************/
 static SIMD_FUNC_INLINE
-void simd_prefetch(const void *sa, const int32_t hint)
+void simd_prefetch(const void *sa, const int32_t hint = 0)
 {
     switch (hint) {
-        case 0: _mm_prefetch((char *)sa, _MM_HINT_T0); break;
-        case 1: _mm_prefetch((char *)sa, _MM_HINT_T1); break;
-        case 2: _mm_prefetch((char *)sa, _MM_HINT_T2); break;
-        case 3: _mm_prefetch((char *)sa, _MM_HINT_NTA); break;
+        case 1: __prefetchw((char *)sa); break;
+        default: __prefetchr((char *)sa); break;
     }
 }
 
@@ -1950,6 +1948,7 @@ class SYSCONF
         /*!
          *  If \c nthreads < 1, the environment variable OMP_NUM_THREADS is used
          *  OpenMP only gets activated if set_omp() is invoked
+         *  \todo Fix logic of OpenMP setting
          */
         static void set_omp(const int32_t nthreads)
         {
@@ -2203,6 +2202,7 @@ class VCLASS: public base_v
         { simd_storeu((STYPE * const)sa, v, n); }
 };
 
+//! Kernel is memory-bound, use 2 threads to prevent bus contention
 static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n = SIMD_STREAMS_32, const bool run_par = true)
 {
     STYPE *sc = NULL;
@@ -2210,14 +2210,12 @@ static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const 
         const size_t rem = n & (SIMD_STREAMS_32 - 1);
         const size_t nn = n - rem;
         const size_t salign = (((size_t)sa & (SIMD_WIDTH_BYTES - 1)) | ((size_t)sb & (SIMD_WIDTH_BYTES - 1)));
-        #pragma omp parallel for default(shared) schedule(static) num_threads(SYSCONF::get_threads()) if ((SYSCONF::get_omp() & run_par) == true)
+        #pragma omp parallel for default(shared) schedule(static) num_threads(2) if ((SYSCONF::get_omp() & run_par) == true)
         for (size_t i = 0; i < nn; i+=SIMD_STREAMS_32) {
             VTYPE va, vb;
             if (salign == 0) {
-                //va = simd_load(sa + i, SIMD_STREAMS_32, true);
-                //vb = simd_load(sb + i, SIMD_STREAMS_32, true);
-                va = simd_load(sa + i);
-                vb = simd_load(sb + i);
+                va = simd_load(sa + i, SIMD_STREAMS_32, true);
+                vb = simd_load(sb + i, SIMD_STREAMS_32, true);
             } else {
                 va = simd_loadu(sa + i);
                 vb = simd_loadu(sb + i);
