@@ -34,27 +34,37 @@ export CXX := g++
 #SIMDFLAGS += -mfma
 export SIMDFLAGS
 
-# GNU compiler and linker options
-#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O0 -fno-tree-vectorize -std=c++98
+# Compiler and linker options
+ifeq ($(CXX),g++) # GNU
 export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -ftree-vectorize -std=c++98
-#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
-#export CXXFLAGS := $(SIMDFLAGS) -m32 -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
+export CXXFLAGS += -fopt-info
 
-# Intel compiler and linker options
-#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
+else ifeq ($(CXX),icpc) # Intel
+export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
 
-# Clang compiler and linker options
-#export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
+else ifneq (,$(findstring clang,$(CXX))) # Clang
+export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
+export CXXFLAGS += -fopt-info
 
-# IBM/GNU PowerPC
-#export CXXFLAGS := $(SIMDFLAGS) -mpowerpc64 -maltivec -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
-
-#export CXXFLAGS += -fopt-info
+else ifneq (,$(findstring powerpc,$(CXX))) # IBM/GNU PowerPC
+export CXXFLAGS := $(SIMDFLAGS) -mpowerpc64 -maltivec -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
+endif
 
 # Linker options
+ifeq ($(CXX),g++) # GNU
 export LFLAGS := -funroll-loops
-export LFLAGS += -fopenmp # GNU compiler
-#export LFLAGS += -openmp  # Intel compiler
+export LFLAGS += -fopenmp
+
+else ifneq (,$(findstring clang,$(CXX))) # Clang
+export LFLAGS := -funroll-loops
+export LFLAGS += -fopenmp=libomp
+
+else ifeq ($(CXX),icpc) # Intel
+export LFLAGS += -openmp
+
+else ifneq (,$(findstring powerpc,$(CXX))) # IBM/GNU PowerPC
+export LFLAGS += -fopenmp
+endif
 
 # Preprocessor definitions
 # SIMD modes: -DSIMD_MODE (auto)
