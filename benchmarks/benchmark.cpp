@@ -13,7 +13,7 @@ using std::endl;
 
 #define FUNC_VERSION 0
 #define OO_VERSION 1
-#define CLASSIC_VERSION 0
+#define CLASSIC_VERSION 1
 #define VALIDATE_VERSIONS 1
 #define NUM_THREADS 2
 #define ELEM_OFFS 0
@@ -134,7 +134,7 @@ int main(int argc, char *argv[])
 #endif
 
 
-#if VALIDATE_VERSIONS == 1 && (OO_VERSION + CLASSIC_VERSION) > 1
+#if VALIDATE_VERSIONS == 1 && (OO_VERSION | CLASSIC_VERSION) > 1
     // Validate
     for (size_t i = elem_offs; i < n; ++i) {
         if (C1[i-elem_offs] != C2[i])

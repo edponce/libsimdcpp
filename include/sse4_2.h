@@ -2193,13 +2193,13 @@ class VCLASS: public base_v
         { v = simd_load((const STYPE *)sa, n, strmHint); }
 
         SIMD_FUNC_INLINE void store(STYPE * const sa, const size_t n = nstreams, const bool strmHint = false) const
-        { simd_store((STYPE * const)sa, v, n, strmHint); }
+        { simd_store(sa, v, n, strmHint); }
 
         SIMD_FUNC_INLINE void loadu(const STYPE * const sa, const size_t n = nstreams)
         { v = simd_loadu((const STYPE *)sa, n); }
 
         SIMD_FUNC_INLINE void storeu(STYPE * const sa, const size_t n = nstreams) const
-        { simd_storeu((STYPE * const)sa, v, n); }
+        { simd_storeu(sa, v, n); }
 };
 
 //! Kernel is memory-bound, use 2 threads to prevent bus contention
@@ -2299,13 +2299,13 @@ class VCLASS: public base_v
         { v = simd_load((const STYPE *)sa, n, strmHint); }
 
         SIMD_FUNC_INLINE void store(STYPE * const sa, const size_t n = nstreams, const bool strmHint = false) const
-        { simd_store((STYPE * const)sa, v, n, strmHint); }
+        { simd_store(sa, v, n, strmHint); }
 
         SIMD_FUNC_INLINE void loadu(const STYPE * const sa, const size_t n = nstreams)
         { v = simd_loadu((const STYPE *)sa, n); }
 
         SIMD_FUNC_INLINE void storeu(STYPE * const sa, const size_t n = nstreams) const
-        { simd_storeu((STYPE * const)sa, v, n); }
+        { simd_storeu(sa, v, n); }
 };
 
 static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n = SIMD_STREAMS_32, const bool run_par = true)
@@ -2406,13 +2406,13 @@ class VCLASS: public base_v
         { v = simd_load((const STYPE *)sa, n, strmHint); }
 
         SIMD_FUNC_INLINE void store(STYPE * const sa, const size_t n = nstreams, const bool strmHint = false) const
-        { simd_store((STYPE * const)sa, v, n, strmHint); }
+        { simd_store(sa, v, n, strmHint); }
 
         SIMD_FUNC_INLINE void loadu(const STYPE * const sa, const size_t n = nstreams)
         { v = simd_loadu((const STYPE *)sa, n); }
 
         SIMD_FUNC_INLINE void storeu(STYPE * const sa, const size_t n = nstreams) const
-        { simd_storeu((STYPE * const)sa, v, n); }
+        { simd_storeu(sa, v, n); }
 };
 
 static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const sb, const size_t n = SIMD_STREAMS_64, const bool run_par = true)

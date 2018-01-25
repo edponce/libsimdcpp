@@ -2,6 +2,12 @@
 #include "environ.h"
 #include "compiler_builtins.h"
 
+/*!
+ * \todo The header immintrin.h is required for Intel compiler,
+ * since it defines _may_i_use_cpu_feature
+ */
+#include <immintrin.h>
+
 
 static void print_feature_support(const char *feature, const int supported) {
     fprintf(stdout, "%s: %s\n", feature, (supported) ? ("YES") : ("NO"));

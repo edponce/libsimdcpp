@@ -56,6 +56,7 @@
 #   define __prefetchw(a) __prefetch(a,1)
 
 #elif defined(__INTEL_COMPILER) || defined(__INTEL_CLANG_COMPILER)
+
     // Used to verify SIMD features supported
 #   define CPU_INIT_SUPPORT() ((void)0)
 #   define CPU_IS(a)          0
@@ -77,7 +78,7 @@
 #   define SIMD_FEATURE_KNCNI  CPU_SUPPORTS(_FEATURE_KNCNI)
 
     // Prefetching builtins
-#   define __prefetch(a,x) _mm_prefetch(a,_MM_HINT_T2)
+#   define __prefetch(a) _mm_prefetch(a,_MM_HINT_T2)
 #   define __prefetchr(a) __prefetch(a)
 #   define __prefetchw(a) __prefetch(a)
 

@@ -12,8 +12,8 @@ export TOPDIR := $(strip $(patsubst %/, %, $(dir $(MAKEFILE))))
 # g++: 5.4.0
 # icpc: ?
 # clang++: 4.0
-export CXX := g++
-#export CXX := icpc
+#export CXX := g++
+export CXX := icpc
 #export CXX := clang++-4.0
 #export CXX := powerpc64-linux-gnu-g++-5
 
@@ -28,23 +28,27 @@ export CXX := g++
 #SIMDFLAGS += -mmmx
 #SIMDFLAGS += -msse -msse2
 #SIMDFLAGS += -msse3 -mssse3 -msse4.1 -msse4.2
+SIMDFLAGS += -xsse3 -xssse3 -xsse4.1 -xsse4.2
 #SIMDFLAGS += -mavx
 #SIMDFLAGS += -mavx2
 #SIMDFLAGS += -mavx512f -mavx512bw -mavx512dq
 #SIMDFLAGS += -mfma
+#SIMDFLAGS += -xMIC-AVX512
+#SIMDFLAGS += -march=native -mtune=native
 export SIMDFLAGS
 
 # Compiler and linker options
 ifeq ($(CXX),g++) # GNU
-export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -ftree-vectorize -std=c++98
+export CXXFLAGS := $(SIMDFLAGS) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -ftree-vectorize -std=c++98
+#export CXXFLAGS += -fopt-info
+
+else ifneq (,$(findstring clang,$(CXX))) # Clang
+export CXXFLAGS := $(SIMDFLAGS) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
 export CXXFLAGS += -fopt-info
 
 else ifeq ($(CXX),icpc) # Intel
-export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
-
-else ifneq (,$(findstring clang,$(CXX))) # Clang
-export CXXFLAGS := $(SIMDFLAGS) -march=native -mtune=native -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
-export CXXFLAGS += -fopt-info
+export CXXFLAGS := $(SIMDFLAGS) -pedantic -Wall -Wextra -Wno-unknown-pragmas -O3 -std=c++98
+export CXXFLAGS += -qopt-report=4 -qopt-report-phase ipo
 
 else ifneq (,$(findstring powerpc,$(CXX))) # IBM/GNU PowerPC
 export CXXFLAGS := $(SIMDFLAGS) -mpowerpc64 -maltivec -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
@@ -52,15 +56,17 @@ endif
 
 # Linker options
 ifeq ($(CXX),g++) # GNU
-export LFLAGS := -funroll-loops
+export LFLAGS += -funroll-loops
 export LFLAGS += -fopenmp
 
 else ifneq (,$(findstring clang,$(CXX))) # Clang
-export LFLAGS := -funroll-loops
+export LFLAGS += -funroll-loops
 export LFLAGS += -fopenmp=libomp
 
 else ifeq ($(CXX),icpc) # Intel
-export LFLAGS += -openmp
+export LFLAGS += -funroll-loops
+export LFLAGS += -qopenmp
+#export LFLAGS += -fopenmp
 
 else ifneq (,$(findstring powerpc,$(CXX))) # IBM/GNU PowerPC
 export LFLAGS += -fopenmp
@@ -74,10 +80,10 @@ endif
 #             -DSIMD_AVX
 #             -DSIMD_AVX2
 #             -DSIMD_AVX512
-#DEFINES := -DSIMD_MODE
+DEFINES := -DSIMD_MODE
 #DEFINES := -DSIMD_MMX
 #DEFINES := -DSIMD_SSE2
-DEFINES := -DSIMD_SSE4_2
+#DEFINES := -DSIMD_SSE4_2
 #DEFINES := -DSIMD_AVX
 #DEFINES := -DSIMD_AVX2
 #DEFINES := -DSIMD_AVX512
@@ -154,21 +160,21 @@ clean:
 	rm -rf $(OBJDIR)
 
 # Testsuite
-test:
+test: simd
 	$(MAKE) -C $(TESTDIR)
 
 clean_test:
 	$(MAKE) -C $(TESTDIR) clean
 
 # Examples
-example:
+example: simd
 	$(MAKE) -C $(EXAMPLEDIR)
 
 clean_example:
 	$(MAKE) -C $(EXAMPLEDIR) clean
 
 # Benchmarks
-benchmark:
+benchmark: simd
 	$(MAKE) -C $(BENCHMARKDIR)
 
 clean_benchmark:

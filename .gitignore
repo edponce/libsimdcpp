@@ -1,5 +1,6 @@
 *.swp
 *.o
+*.optrpt
 testsuite/testsuite
 examples/example
 benchmarks/benchmark
