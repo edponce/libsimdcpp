@@ -1,55 +1,54 @@
 # Eduardo Ponce
 # 11/2017
-# Makefile for timers
-
-# C compilers
-CC := gcc
+# Makefile for libsimdcpp-benchsuite
 
 # Compiler and linker options
-CFLAGS +=
+CXXFLAGS +=
 
 # Linker options
 LFLAGS +=
 
 # Preprocessor definitions
-#DEFINES := -DUSE_MONOTONIC_CLOCK
 DEFINES +=
 
 # Define header paths in addition to standard paths
-INCDIR := -Iinclude
+INCDIR += -Iinclude -Itimers/include
 
 # Define library paths in addition to standard paths
-LIBDIR :=
+LIBDIR +=
 
 # Define libraries to link into executable
-LIBS :=
+LIBS +=
 
 # Header files
-HEADERS := include/timers.h
+HEADERS += include/*.h
 
-# Example
+# Testsuite
 OBJDIR := obj
-SRC := src/timers.cpp
-OBJ := $(patsubst %.cpp,$(OBJDIR)/%.o,$(notdir $(SRC)))
+SRC := src/test_simd.cpp src/test_utils.cpp
+OBJ += $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC))) timers/obj/timers.o
 
-DRIVER := timer_example.cpp
-EXE := timer_example
+DRIVER := src/test_suite.cpp
+EXE := benchsuite
 
 #######################################
 
 # Targets that are not real files
 .PHONY: all clean
 
-all: $(OBJ)
+all: $(EXE)
 
 $(EXE): $(DRIVER) $(OBJ) $(HEADERS) $(MAKEFILE_LIST)
-	$(CC) $(CFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $< -o $@ $(OBJ) $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $< -o $@ $(OBJ) $(LIBS)
 
 $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
-	$(CC) $(CFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
+	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
 	rm -f $(EXE)
 	rm -rf $(OBJDIR)
+
+timers/obj/%.o:
+	$(MAKE) -C timers
 

@@ -34,7 +34,7 @@ EXE := benchmark
 #######################################
 
 # Targets that are not real files
-.PHONY: all clean timer
+.PHONY: all clean
 
 all: $(EXE)
 

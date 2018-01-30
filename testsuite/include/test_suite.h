@@ -4,7 +4,7 @@
 
 /*!
  *  \addtogroup Testsuite Testsuite
- *  \brief Test suite control 
+ *  \brief Test suite control
  *  \{
  *
  *

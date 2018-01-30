@@ -10,13 +10,9 @@
 #include "test_utils.h"
 #include "test_simd.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 
 // Deallocate dynamic memory and nullify pointer
-#define FREE(p) free(p); p = NULL
+#define FREE(p) do { if(p) { free(p); p = NULL; } } while(0)
 
 
 int test_simd_add_sub()

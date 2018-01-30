@@ -2209,19 +2209,21 @@ static SIMD_FUNC_INLINE STYPE * add(const STYPE * const sa, const STYPE * const 
     if (!posix_memalign((void **)&sc, SIMD_WIDTH_BYTES, n * sizeof(STYPE))) {
         const size_t rem = n & (SIMD_STREAMS_32 - 1);
         const size_t nn = n - rem;
-        const size_t salign = (((size_t)sa & (SIMD_WIDTH_BYTES - 1)) | ((size_t)sb & (SIMD_WIDTH_BYTES - 1)));
-        #pragma omp parallel for default(shared) schedule(static) num_threads(2) if ((SYSCONF::get_omp() & run_par) == true)
+//        const size_t salign = (((size_t)sa & (SIMD_WIDTH_BYTES - 1)) | ((size_t)sb & (SIMD_WIDTH_BYTES - 1)));
+//      #pragma omp parallel for default(shared) schedule(static) num_threads(2) if ((SYSCONF::get_omp() & run_par) == true)
+        #pragma omp parallel for default(shared) schedule(static) if (run_par == true)
         for (size_t i = 0; i < nn; i+=SIMD_STREAMS_32) {
             VTYPE va, vb;
-            if (salign == 0) {
-                va = simd_load(sa + i, SIMD_STREAMS_32, true);
-                vb = simd_load(sb + i, SIMD_STREAMS_32, true);
-            } else {
+//            if (salign == 0) {
+//                va = simd_load(sa + i, SIMD_STREAMS_32, true);
+//                vb = simd_load(sb + i, SIMD_STREAMS_32, true);
+//            } else {
                 va = simd_loadu(sa + i);
                 vb = simd_loadu(sb + i);
-            }
+//            }
             vb = simd_add_32(va, vb);
-            simd_store(sc + i, vb, SIMD_STREAMS_32, true);
+//            simd_store(sc + i, vb, SIMD_STREAMS_32, true);
+            simd_storeu(sc + i, vb);
         }
         for (size_t i = nn; i < n; ++i) {
             sc[i] = sa[i] + sb[i];

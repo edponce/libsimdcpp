@@ -12,8 +12,8 @@ export TOPDIR := $(strip $(patsubst %/, %, $(dir $(MAKEFILE))))
 # g++: 5.4.0
 # icpc: ?
 # clang++: 4.0
-#export CXX := g++
-export CXX := icpc
+export CXX := g++
+#export CXX := icpc
 #export CXX := clang++-4.0
 #export CXX := powerpc64-linux-gnu-g++-5
 
@@ -27,8 +27,8 @@ export CXX := icpc
 # -mfma
 #SIMDFLAGS += -mmmx
 #SIMDFLAGS += -msse -msse2
-#SIMDFLAGS += -msse3 -mssse3 -msse4.1 -msse4.2
-SIMDFLAGS += -xsse3 -xssse3 -xsse4.1 -xsse4.2
+SIMDFLAGS += -msse3 -mssse3 -msse4.1 -msse4.2
+#SIMDFLAGS += -xsse3 -xssse3 -xsse4.1 -xsse4.2
 #SIMDFLAGS += -mavx
 #SIMDFLAGS += -mavx2
 #SIMDFLAGS += -mavx512f -mavx512bw -mavx512dq
@@ -44,11 +44,11 @@ export CXXFLAGS := $(SIMDFLAGS) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wn
 
 else ifneq (,$(findstring clang,$(CXX))) # Clang
 export CXXFLAGS := $(SIMDFLAGS) -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
-export CXXFLAGS += -fopt-info
+#export CXXFLAGS += -fopt-info
 
 else ifeq ($(CXX),icpc) # Intel
 export CXXFLAGS := $(SIMDFLAGS) -pedantic -Wall -Wextra -Wno-unknown-pragmas -O3 -std=c++98
-export CXXFLAGS += -qopt-report=4 -qopt-report-phase ipo
+#export CXXFLAGS += -qopt-report=4 -qopt-report-phase ipo
 
 else ifneq (,$(findstring powerpc,$(CXX))) # IBM/GNU PowerPC
 export CXXFLAGS := $(SIMDFLAGS) -mpowerpc64 -maltivec -pedantic -Wall -Wextra -Wno-unknown-pragmas -Wno-unused-result -O3 -std=c++98
@@ -134,7 +134,7 @@ SRC := src/environ.cpp
 export OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 
 # Testsuite
-TESTDIR := testsuite
+TESTSUITEDIR := testsuite
 
 # Examples
 EXAMPLEDIR := examples
@@ -142,12 +142,15 @@ EXAMPLEDIR := examples
 # Benchmarks
 BENCHMARKDIR := benchmarks
 
+# Benchsuite
+BENCHSUITEDIR := benchsuite
+
 #######################################
 
 # Targets that are not real files
-.PHONY: all clean simd clean_test clean_example clean_benchmark clean_all
+.PHONY: all clean simd clean_testsuite clean_example clean_benchmark clean_all doc
 
-all: simd test example benchmark
+all: simd testsuite example benchmark
 
 # SIMD library
 simd: $(OBJ)
@@ -160,11 +163,11 @@ clean:
 	rm -rf $(OBJDIR)
 
 # Testsuite
-test: simd
-	$(MAKE) -C $(TESTDIR)
+testsuite: simd
+	$(MAKE) -C $(TESTSUITEDIR)
 
-clean_test:
-	$(MAKE) -C $(TESTDIR) clean
+clean_testsuite:
+	$(MAKE) -C $(TESTSUITEDIR) clean
 
 # Examples
 example: simd
@@ -180,5 +183,15 @@ benchmark: simd
 clean_benchmark:
 	$(MAKE) -C $(BENCHMARKDIR) clean
 
-clean_all: clean clean_test clean_example clean_benchmark
+# Benchsuite
+benchsuite: simd
+	$(MAKE) -C $(BENCHSUITEDIR)
+
+clean_benchsuite:
+	$(MAKE) -C $(BENCHSUITEDIR) clean
+
+clean_all: clean clean_testsuite clean_example clean_benchmark
+
+doc:
+	doxygen Doxyfile
 
