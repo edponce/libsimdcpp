@@ -27,27 +27,27 @@ int test_simd_add_classic(int num_elems, int offset_elems)
 
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
-    const int streams = SIMD_STREAMS_32;
+    //const int streams = SIMD_STREAMS_32;
 
     {
         const TEST_TYPES test_type = TEST_I32;
         int32_t *A = NULL, *B = NULL, *C = NULL;
+        int32_t *pA = NULL, *pB = NULL, *pC = NULL;
 
-        if (num_elems <= 0)
-            num_elems = streams;
-        if (offset_elems < 0 || offset_elems >= num_elems)
-            offset_elems = 0;
-
-        create_test_array(test_type, (void **)&A, num_elems, alignment);
-        create_test_array(test_type, (void **)&B, num_elems, alignment);
+        create_test_array(test_type, (void **)&A, num_elems + offset_elems, alignment);
+        create_test_array(test_type, (void **)&B, num_elems + offset_elems, alignment);
         create_empty_array(test_type, (void **)&C, num_elems, alignment);
+
+        pA = A + offset_elems;
+        pB = B + offset_elems;
+        pC = C;
 
         elapsed = 0.0;
         tic(timer);
 
-        #pragma omp parallel for default(shared) schedule(static)
-        for (int i = offset_elems; i < num_elems; ++i)
-            C[i] = A[i] + B[i];
+        #pragma omp parallel for simd default(shared) schedule(static)
+        for (int i = 0; i < num_elems; ++i)
+            pC[i] = pA[i] + pB[i];
 
         elapsed = toc(timer);
         printf("(Classic) Elapsed time is %f seconds for %d elements, offset by %d elements\n", elapsed, num_elems, offset_elems);
@@ -73,67 +73,76 @@ int test_simd_add_func(int num_elems, int offset_elems)
     {
         const TEST_TYPES test_type = TEST_I32;
         int32_t *A = NULL, *B = NULL, *C1 = NULL, *C2 = NULL;
+        int32_t *pA = NULL, *pB = NULL, *pC1 = NULL, *pC2 = NULL;
 
-        if (num_elems <= 0)
-            num_elems = streams;
-        if (offset_elems < 0 || offset_elems >= num_elems)
-            offset_elems = 0;
-
-        create_test_array(test_type, (void **)&A, num_elems, alignment);
-        create_test_array(test_type, (void **)&B, num_elems, alignment);
+        create_test_array(test_type, (void **)&A, num_elems + offset_elems, alignment);
+        create_test_array(test_type, (void **)&B, num_elems + offset_elems, alignment);
         create_empty_array(test_type, (void **)&C2, num_elems, alignment);
-        create_empty_array(test_type, (void **)&C1, num_elems, alignment);
 
-        elapsed = 0.0;
+        pA = A + offset_elems;
+        pB = B + offset_elems;
+        pC2 = C2;
+
+
+//        printf("offset elems: %d\n", offset_elems);
 
         // Are arrays aligned?
-        int a_aligned = 1;
-        if ((size_t)(A + offset_elems) & (alignment - 1))
-            a_aligned = 0;
+        int a_alignment = ((size_t)pA & (alignment - 1)) / sizeof(*pA);
+        int b_alignment = ((size_t)pB & (alignment - 1)) / sizeof(*pB);
+//        printf("A left alignment: %d elements\n", a_alignment);
+//        printf("B left alignment: %d elements\n", b_alignment);
 
-        int b_aligned = 1;
-        if ((size_t)(B + offset_elems) & (alignment - 1))
-            b_aligned = 0;
-        //
+        int a_offs = (streams - a_alignment) % streams;
+        int b_offs = (streams - b_alignment) % streams;
+//        printf("A right alignment: %d elements\n", a_offs);
+//        printf("B right alignment: %d elements\n", b_offs);
 
-        if (!a_aligned)
-            printf("A is not aligned\n");
+        int a_aligned = (!a_offs) ? (1) : (0);
+        int b_aligned = (!b_offs) ? (1) : (0);
+//        printf("A aligned? %d\n", a_aligned);
+//        printf("B aligned? %d\n", b_aligned);
 
-        if (!b_aligned)
-            printf("B is not aligned\n");
-
-        // If A and B are aligned and there is a remainder
-        const int rem = (num_elems - offset_elems) & (streams - 1);
-        if (rem)
-            printf("Remainder elements: %d\n", rem);
-
+        // If there is a remainder after reaching an alignment point
+        const int rem = (num_elems - a_offs) & (streams - 1);
+//        printf("Remainder elements: %d\n", rem);
 
         int i;
+
         // A aligned
         if (a_aligned) {
             // A aligned, B aligned
             if (b_aligned) {
                 // No remainder
                 if (!rem) {
+                    printf("A aligned, B aligned, no remainder\n");
+                    create_empty_array(test_type, (void **)&C1, num_elems, alignment);
+                    pC1 = C1;
+
+                    elapsed = 0.0;
                     tic(timer);
                     for (i = 0; i < num_elems; i+=streams) {
-                        SIMD_INT va = simd_load(&A[i]);
-                        SIMD_INT vb = simd_load(&B[i]);
+                        SIMD_INT va = simd_load(&pA[i]);
+                        SIMD_INT vb = simd_load(&pB[i]);
                         SIMD_INT vc = simd_add_32(va, vb);
-                        simd_store(&C1[i], vc);
+                        simd_store(&pC1[i], vc);
                     }
                     elapsed = toc(timer);
                 // Yes remainder
                 } else {
+                    printf("A aligned, B aligned, yes remainder\n");
+                    create_empty_array(test_type, (void **)&C1, num_elems, alignment);
+                    pC1 = C1;
+
+                    elapsed = 0.0;
                     tic(timer);
                     for (i = 0; i < (num_elems - rem); i+=streams) {
-                        SIMD_INT va = simd_load(&A[i]);
-                        SIMD_INT vb = simd_load(&B[i]);
+                        SIMD_INT va = simd_load(&pA[i]);
+                        SIMD_INT vb = simd_load(&pB[i]);
                         SIMD_INT vc = simd_add_32(va, vb);
-                        simd_store(&C1[i], vc);
+                        simd_store(&pC1[i], vc);
                     }
                     for (; i < num_elems; ++i) {
-                        C1[i] = A[i] + B[i];
+                        pC1[i] = pA[i] + pB[i];
                     }
                     elapsed = toc(timer);
                 }
@@ -141,10 +150,14 @@ int test_simd_add_func(int num_elems, int offset_elems)
             } else {
                 // No remainder
                 if (!rem) {
-                    printf("incomplete\n");
+                    printf("A aligned, B not aligned, no remainder\n");
+                    create_empty_array(test_type, (void **)&C1, num_elems, alignment);
+                    pC1 = C1 + a_alignment;
                 // Yes remainder
                 } else {
-                    printf("incomplete\n");
+                    printf("A aligned, B not aligned, yes remainder\n");
+                    create_empty_array(test_type, (void **)&C1, num_elems, alignment);
+                    pC1 = C1 + a_alignment;
                 }
             }
         // A not aligned
@@ -153,44 +166,70 @@ int test_simd_add_func(int num_elems, int offset_elems)
             if (b_aligned) {
                 // No remainder
                 if (!rem) {
-                    printf("incomplete\n");
+                    printf("(incomplete) A not aligned, B aligned, no remainder\n");
+                    create_empty_array(test_type, (void **)&C1, num_elems, alignment);
+                    pC1 = C1 + a_alignment;
                 // Yes remainder
                 } else {
-                    printf("incomplete\n");
+                    printf("(incomplete) A not aligned, B aligned, yes remainder\n");
+                    create_empty_array(test_type, (void **)&C1, num_elems, alignment);
+                    pC1 = C1 + a_alignment;
                 }
             // A not aligned, B not aligned
             } else {
                 // No remainder
                 if (!rem) {
-                    printf("incomplete\n");
+                    printf("A not aligned, B not aligned, no remainder\n");
+                    create_empty_array(test_type, (void **)&C1, num_elems + a_alignment, alignment);
+                    pC1 = C1 + a_alignment;
+
+                    elapsed = 0.0;
+                    tic(timer);
+                    for (i = 0; i < a_offs; ++i) {
+                        pC1[i] = pA[i] + pB[i];
+                    }
+                    for (; i < (num_elems - rem); i+=streams) {
+                        SIMD_INT va = simd_load(&pA[i]);
+                        SIMD_INT vb = simd_load(&pB[i]);
+                        SIMD_INT vc = simd_add_32(va, vb);
+                        simd_store(&pC1[i], vc);
+                    }
+                    elapsed = toc(timer);
                 // Yes remainder
                 } else {
-                    printf("incomplete\n");
+                    printf("A not aligned, B not aligned, yes remainder\n");
+                    create_empty_array(test_type, (void **)&C1, num_elems + a_alignment, alignment);
+                    pC1 = C1 + a_alignment;
+
+                    elapsed = 0.0;
+                    tic(timer);
+                    for (i = 0; i < a_offs; ++i) {
+                        pC1[i] = pA[i] + pB[i];
+                    }
+                    for (; i < (num_elems - rem); i+=streams) {
+                        SIMD_INT va = simd_load(&pA[i]);
+                        SIMD_INT vb = simd_load(&pB[i]);
+                        SIMD_INT vc = simd_add_32(va, vb);
+                        simd_store(&pC1[i], vc);
+                    }
+                    for (; i < num_elems; ++i) {
+                        pC1[i] = pA[i] + pB[i];
+                    }
+                    elapsed = toc(timer);
                 }
             }
         }
 
-
-/*
-        tic(timer);
-        for (i = offset_elems; i < (offset_elems + rem); ++i) {
-            C1[i] = A[i] + B[i];
-        }
-        for (; i < num_elems; i+=streams) {
-            SIMD_INT va = simd_load(&A[i]);
-            SIMD_INT vb = simd_load(&B[i]);
-            SIMD_INT vc = simd_add_32(va, vb);
-            simd_store(&C1[i], vc);
-        }
-        elapsed = toc(timer);
-*/
-
         printf("(SIMD function) Elapsed time is %f seconds for %d elements, offset by %d elements\n", elapsed, num_elems, offset_elems);
 
-        for (int i = offset_elems; i < num_elems; ++i)
-            C2[i] = A[i] + B[i];
+//        printf("C2 ");
+        for (int i = 0; i < num_elems; ++i) {
+            pC2[i] = pA[i] + pB[i];
+//            printf("%d ", pC2[i]);
+        }
+//        printf("\n");
 
-        test_result += validate_test_arrays(test_type, (void *)&C1[offset_elems], (void *)&C2[offset_elems], num_elems - offset_elems);
+        test_result += validate_test_arrays(test_type, (void *)pC1, (void *)pC2, num_elems);
 
         FREE(A);
         FREE(B);
@@ -209,33 +248,32 @@ int test_simd_add_oo(int num_elems, int offset_elems)
 
     int test_result = 0;
     const int alignment = SIMD_WIDTH_BYTES;
-    const int streams = SIMD_STREAMS_32;
+    //const int streams = SIMD_STREAMS_32;
 
     {
         const TEST_TYPES test_type = TEST_I32;
         int32_t *A = NULL, *B = NULL, *C1 = NULL, *C2 = NULL;
+        int32_t *pA = NULL, *pB = NULL;
 
-        if (num_elems <= 0)
-            num_elems = streams;
-        if (offset_elems < 0 || offset_elems >= num_elems)
-            offset_elems = 0;
-
-        create_test_array(test_type, (void **)&A, num_elems, alignment);
-        create_test_array(test_type, (void **)&B, num_elems, alignment);
+        create_test_array(test_type, (void **)&A, num_elems + offset_elems, alignment);
+        create_test_array(test_type, (void **)&B, num_elems + offset_elems, alignment);
         create_empty_array(test_type, (void **)&C2, num_elems, alignment);
+
+        pA = A + offset_elems;
+        pB = B + offset_elems;
 
         elapsed = 0.0;
         tic(timer);
 
-        C1 = add(&A[offset_elems], &B[offset_elems], num_elems - offset_elems);
+        C1 = add(pA, pB, num_elems);
 
         elapsed = toc(timer);
         printf("(SIMD OO) Elapsed time is %f seconds for %d elements, offset by %d elements\n", elapsed, num_elems, offset_elems);
 
-        for (int i = offset_elems; i < num_elems; ++i)
-            C2[i] = A[i] + B[i];
+        for (int i = 0; i < num_elems; ++i)
+            C2[i] = pA[i] + pB[i];
 
-        test_result += validate_test_arrays(test_type, (void *)&C1[offset_elems], (void *)&C2[offset_elems], num_elems - offset_elems);
+        test_result += validate_test_arrays(test_type, (void *)C1, (void *)C2, num_elems);
 
         FREE(A);
         FREE(B);

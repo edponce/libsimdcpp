@@ -1,7 +1,7 @@
-*.swp
 *.o
 *.optrpt
 testsuite/testsuite
+benchsuite/benchsuite
 examples/example
 benchmarks/benchmark
 benchmarks/timers/timer

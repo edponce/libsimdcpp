@@ -1631,7 +1631,7 @@ SIMD_INT simd_loadu(const int16_t * const sa)
 { return _mm_lddqu_si128((SIMD_INT *)sa); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_load(const int32_t * const sa, const size_t n = SIMD_STREAMS_32, const bool strmHint = false)
+SIMD_INT simd_load(const int32_t * const sa, const int32_t n = SIMD_STREAMS_32, const bool strmHint = false)
 {
     SIMD_INT va;
     switch (n) {
@@ -1640,6 +1640,10 @@ SIMD_INT simd_load(const int32_t * const sa, const size_t n = SIMD_STREAMS_32, c
         case 2: va = _mm_loadl_epi64((SIMD_INT *)sa); break;
         case 3: va = _mm_set_epi32(0, sa[2], sa[1], sa[0]); break;
         case 4: va = (strmHint) ? (_mm_stream_load_si128((SIMD_INT *)sa)) : (_mm_load_si128((SIMD_INT *)sa)); break;
+        case -1: va = _mm_set_epi32(sa[0], 0, 0, 0); break;
+        case -2: va = _mm_set_epi32(sa[1], sa[0], 0, 0); break;
+        case -3: va = _mm_set_epi32(sa[2], sa[1], sa[0], 0); break;
+        case -4: va = (strmHint) ? (_mm_stream_load_si128((SIMD_INT *)sa)) : (_mm_load_si128((SIMD_INT *)sa)); break;
         default: va = _mm_setzero_si128(); break;
     }
     return va;
@@ -1779,7 +1783,7 @@ void simd_storeu(int16_t * const sa, const SIMD_INT va)
 { _mm_storeu_si128((SIMD_INT *)sa, va); }
 
 static SIMD_FUNC_INLINE
-void simd_store(int32_t * const sa, const SIMD_INT va, const size_t n = SIMD_STREAMS_32, const bool strmHint = false)
+void simd_store(int32_t * const sa, const SIMD_INT va, const int32_t n = SIMD_STREAMS_32, const bool strmHint = false)
 {
     switch (n) {
         case 1:
@@ -1788,11 +1792,22 @@ void simd_store(int32_t * const sa, const SIMD_INT va, const size_t n = SIMD_STR
             {
                 int32_t tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
                 _mm_store_si128((SIMD_INT *)tmp, va);
-                for (size_t i = 0; i < n; ++i)
+                for (int32_t i = 0; i < n; ++i)
                     sa[i] = tmp[i];
             }
             break;
         case 4: (strmHint) ? (_mm_stream_si128((SIMD_INT *)sa, va)) : (_mm_store_si128((SIMD_INT *)sa, va)); break;
+        case -1:
+        case -2:
+        case -3:
+            {
+                int32_t tmp[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+                _mm_store_si128((SIMD_INT *)tmp, va);
+                for (int32_t i = SIMD_STREAMS_32 + n, j = 0; i < (int32_t)SIMD_STREAMS_32; ++i, ++j)
+                    sa[j] = tmp[i];
+            }
+            break;
+        case -4: (strmHint) ? (_mm_stream_si128((SIMD_INT *)sa, va)) : (_mm_store_si128((SIMD_INT *)sa, va)); break;
         default: break;
     }
 }

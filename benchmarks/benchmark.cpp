@@ -16,10 +16,10 @@ using std::endl;
 #define FREE(p) do { if(p) { free(p); p = NULL; } } while(0)
 
 #define CLASSIC_VERSION 1
-#define FUNC_VERSION 1
-#define OO_VERSION 0
+#define FUNC_VERSION 0
+#define OO_VERSION 1
 #define VALIDATE_VERSIONS 1
-#define NUM_THREADS 1
+#define NUM_THREADS 2
 #define ELEM_OFFS 0
 
 #define N 16
@@ -102,7 +102,7 @@ int main(int argc, char *argv[])
     if (posix_memalign((void **)&C2, alignment, n * sizeof(STYPE)))
         _Exit(EXIT_FAILURE);
 
-    #pragma omp parallel for default(shared) schedule(static) num_threads(NUM_THREADS) if(NUM_THREADS > 1)
+    #pragma omp parallel for simd default(shared) schedule(static) num_threads(NUM_THREADS) if(NUM_THREADS > 1)
     for (size_t i = elem_offs; i < n; ++i) {
         C2[i] = A[i] + B[i];
     }
