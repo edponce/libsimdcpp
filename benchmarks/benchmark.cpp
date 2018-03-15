@@ -95,7 +95,6 @@ int main(int argc, char *argv[])
         B[i] = i + 2.5;
     }
 
-
 #if CLASSIC_VERSION == 1
     tic(timer);
 

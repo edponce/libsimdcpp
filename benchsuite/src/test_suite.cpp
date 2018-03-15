@@ -24,17 +24,17 @@ int main(int argc, char *argv[])
 {
     if (argc > 1) {
         num_elems = atoi(argv[1]);
-        if (num_elems <= 0) {
-            cout << "Invalid number of elements" << endl;
-            _Exit(EXIT_FAILURE);
-        }
+    }
+    if (num_elems <= 0) {
+        cout << "Invalid number of elements" << endl;
+        _Exit(EXIT_FAILURE);
     }
     if (argc > 2) {
         offset_elems = atoi(argv[2]);
-        if (offset_elems < 0 || offset_elems >= num_elems) {
-            cout << "Invalid offset elements" << endl;
-            _Exit(EXIT_FAILURE);
-        }
+    }
+    if (offset_elems < 0 || offset_elems >= num_elems) {
+        cout << "Invalid offset elements" << endl;
+        _Exit(EXIT_FAILURE);
     }
 
     const int NUM_TESTS = sizeof(TESTS) / sizeof(struct TEST_T);

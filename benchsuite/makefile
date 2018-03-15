@@ -43,7 +43,7 @@ $(EXE): $(DRIVER) $(OBJ) $(HEADERS) $(MAKEFILE_LIST)
 
 $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
-	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
 	rm -f $(EXE)

@@ -12,9 +12,9 @@ export TOPDIR := $(strip $(patsubst %/, %, $(dir $(MAKEFILE))))
 # g++: 5.4.0
 # icpc: ?
 # clang++: 4.0
-export CXX := g++
+#export CXX := g++
 #export CXX := icpc
-#export CXX := clang++-4.0
+export CXX := clang++-4.0
 #export CXX := powerpc64-linux-gnu-g++-5
 
 # GNU/Intel SIMD extensions
@@ -157,7 +157,7 @@ simd: $(OBJ)
 
 $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
-	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
+	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
 	rm -rf $(OBJDIR)

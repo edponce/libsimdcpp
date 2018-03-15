@@ -11,6 +11,7 @@
 #include "test_simd.h"
 #include "timers.h"
 
+
 #if defined(_OPENMP)
 #   include <omp.h>
 #endif
@@ -32,7 +33,7 @@ int test_simd_add_classic(int num_elems, int offset_elems)
     {
         const TEST_TYPES test_type = TEST_I32;
         int32_t *A = NULL, *B = NULL, *C = NULL;
-        int32_t *pA = NULL, *pB = NULL, *pC = NULL;
+        int32_t *pA = NULL, *pB = NULL;
 
         create_test_array(test_type, (void **)&A, num_elems + offset_elems, alignment);
         create_test_array(test_type, (void **)&B, num_elems + offset_elems, alignment);
@@ -40,20 +41,19 @@ int test_simd_add_classic(int num_elems, int offset_elems)
 
         pA = A + offset_elems;
         pB = B + offset_elems;
-        pC = C;
 
         elapsed = 0.0;
         tic(timer);
 
         #pragma omp parallel for simd default(shared) schedule(static)
         for (int i = 0; i < num_elems; ++i)
-            pC[i] = pA[i] + pB[i];
+            C[i] = pA[i] + pB[i];
 
         elapsed = toc(timer);
         printf("(Classic) Elapsed time is %f seconds for %d elements, offset by %d elements\n", elapsed, num_elems, offset_elems);
 
-        FREE(A);
-        FREE(B);
+        FREE(A); pA = NULL;
+        FREE(B); pB = NULL;
         FREE(C);
     }
 
@@ -231,10 +231,10 @@ int test_simd_add_func(int num_elems, int offset_elems)
 
         test_result += validate_test_arrays(test_type, (void *)pC1, (void *)pC2, num_elems);
 
-        FREE(A);
-        FREE(B);
-        FREE(C1);
-        FREE(C2);
+        FREE(A); pA = NULL;
+        FREE(B); pB = NULL;
+        FREE(C1); pC1 = NULL;
+        FREE(C2); pC2 = NULL;
     }
 
     return test_result;
@@ -275,10 +275,224 @@ int test_simd_add_oo(int num_elems, int offset_elems)
 
         test_result += validate_test_arrays(test_type, (void *)C1, (void *)C2, num_elems);
 
-        FREE(A);
-        FREE(B);
+        FREE(A); pA = NULL;
+        FREE(B); pB = NULL;
         FREE(C1);
-        FREE(C2);
+    }
+
+    return test_result;
+}
+
+
+int test_simd_loop_dependence_classic(int num_elems, int offset_elems)
+{
+    long int timer[2];
+    double elapsed = 0.0;
+
+    int test_result = 0;
+    const int alignment = SIMD_WIDTH_BYTES;
+    //const int streams = SIMD_STREAMS_32;
+
+    {
+        const TEST_TYPES test_type = TEST_I32;
+        int32_t *A = NULL, *B = NULL, *C = NULL, *D = NULL, *E = NULL;
+        int32_t *pA = NULL, *pB = NULL, *pC = NULL, *pD = NULL, *pE = NULL;
+
+        create_test_array(test_type, (void **)&A, num_elems + offset_elems, alignment);
+        create_test_array(test_type, (void **)&B, num_elems + offset_elems, alignment);
+        create_test_array(test_type, (void **)&C, num_elems + offset_elems, alignment);
+        create_empty_array(test_type, (void **)&D, num_elems, alignment);
+        create_test_array(test_type, (void **)&E, num_elems + offset_elems, alignment);
+
+        pA = A + offset_elems;
+        pB = B + offset_elems;
+        pC = C + offset_elems;
+        pD = D;
+        pE = E + offset_elems;
+
+        D[0] = 0;
+
+        elapsed = 0.0;
+        tic(timer);
+
+        #pragma omp parallel for simd default(shared) schedule(static)
+        for (int i = 1; i < num_elems; ++i) {
+            pD[i] = pE[i] - pA[i-1];
+            pA[i] = pB[i] + pC[i];
+        }
+
+        elapsed = toc(timer);
+        printf("(Classic) Elapsed time is %f seconds for %d elements, offset by %d elements\n", elapsed, num_elems, offset_elems);
+
+        FREE(A); pA = NULL;
+        FREE(B); pB = NULL;
+        FREE(C); pC = NULL;
+        FREE(D); pD = NULL;
+        FREE(E); pE = NULL;
+    }
+
+    return test_result;
+}
+
+
+int test_simd_loop_dependence(int num_elems, int offset_elems)
+{
+    long int timer[2];
+    double elapsed = 0.0;
+
+    int test_result = 0;
+    const int alignment = SIMD_WIDTH_BYTES;
+    const int streams = SIMD_STREAMS_32;
+
+    {
+        const TEST_TYPES test_type = TEST_I32;
+        int32_t *A1 = NULL, *A2 = NULL, *B = NULL, *C = NULL, *D1 = NULL, *D2 = NULL, *E = NULL;
+        int32_t *pA1 = NULL, *pA2 = NULL, *pB = NULL, *pC = NULL, *pE = NULL;
+
+        create_test_array(test_type, (void **)&A1, num_elems + offset_elems, alignment);
+        create_empty_array(test_type, (void **)&A2, num_elems + offset_elems, alignment);
+        create_test_array(test_type, (void **)&B, num_elems + offset_elems, alignment);
+        create_test_array(test_type, (void **)&C, num_elems + offset_elems, alignment);
+        create_empty_array(test_type, (void **)&D1, num_elems, alignment);
+        create_empty_array(test_type, (void **)&D2, num_elems, alignment);
+        create_test_array(test_type, (void **)&E, num_elems + offset_elems, alignment);
+
+        pA1 = A1 + offset_elems;
+        pA2 = A2 + offset_elems;
+        for (int i = 0; i < num_elems; ++i)
+            pA2[i] = pA1[i];
+        pB = B + offset_elems;
+        pC = C + offset_elems;
+        pE = E + offset_elems;
+
+        D1[0] = 0;
+        D2[0] = D1[0];
+
+        elapsed = 0.0;
+        tic(timer);
+
+        for (int i = 1; i < streams; ++i) {
+            pA1[i] = pB[i] + pC[i];
+        }
+        #pragma omp parallel for default(shared) schedule(static)
+        for (int i = streams; i < num_elems; i+=streams) {
+            SIMD_INT vb = simd_load(&pB[i]);
+            SIMD_INT vc = simd_load(&pC[i]);
+            SIMD_INT va = simd_add_32(vb, vc);
+            simd_store(&pA1[i], va);
+        }
+        for (int i = 1; i < streams; ++i) {
+            D1[i] = pE[i] - pA1[i-1];
+        }
+        #pragma omp parallel for default(shared) schedule(static)
+        for (int i = streams; i < num_elems; i+=streams) {
+            SIMD_INT ve = simd_load(&pE[i]);
+            SIMD_INT va = simd_loadu(&pA1[i-1]);
+            SIMD_INT vd = simd_sub_32(ve, va);
+            simd_store(&D1[i], vd);
+        }
+
+        elapsed = toc(timer);
+        printf("(SIMD) Elapsed time is %f seconds for %d elements, offset by %d elements\n", elapsed, num_elems, offset_elems);
+
+        for (int i = 1; i < num_elems; ++i) {
+            D2[i] = pE[i] - pA2[i-1];
+            pA2[i] = pB[i] + pC[i];
+        }
+
+        test_result += validate_test_arrays(test_type, (void *)D1, (void *)D2, num_elems);
+        test_result += validate_test_arrays(test_type, (void *)pA1, (void *)pA2, num_elems);
+
+        FREE(A1); pA1 = NULL;
+        FREE(A2); pA2 = NULL;
+        FREE(B); pB = NULL;
+        FREE(C); pC = NULL;
+        FREE(D1);
+        FREE(D2);
+        FREE(E); pE = NULL;
+    }
+
+    return test_result;
+}
+
+
+int test_simd_loop_dependence2(int num_elems, int offset_elems)
+{
+    long int timer[2];
+    double elapsed = 0.0;
+
+    int test_result = 0;
+    const int alignment = SIMD_WIDTH_BYTES;
+    const int streams = SIMD_STREAMS_32;
+
+    {
+        const TEST_TYPES test_type = TEST_I32;
+        int32_t *A1 = NULL, *A2 = NULL, *B = NULL, *C = NULL, *D1 = NULL, *D2 = NULL, *E = NULL;
+        int32_t *pA1 = NULL, *pA2 = NULL, *pB = NULL, *pC = NULL, *pE = NULL;
+
+        create_test_array(test_type, (void **)&A1, num_elems + offset_elems, alignment);
+        create_empty_array(test_type, (void **)&A2, num_elems + offset_elems, alignment);
+        create_test_array(test_type, (void **)&B, num_elems + offset_elems, alignment);
+        create_test_array(test_type, (void **)&C, num_elems + offset_elems, alignment);
+        create_empty_array(test_type, (void **)&D1, num_elems, alignment);
+        create_empty_array(test_type, (void **)&D2, num_elems, alignment);
+        create_test_array(test_type, (void **)&E, num_elems + offset_elems, alignment);
+
+        pA1 = A1 + offset_elems;
+        pA2 = A2 + offset_elems;
+        for (int i = 0; i < num_elems; ++i)
+            pA2[i] = pA1[i];
+        pB = B + offset_elems;
+        pC = C + offset_elems;
+        pE = E + offset_elems;
+
+        D1[0] = 0;
+        D2[0] = D1[0];
+
+        bool strm_mem = (num_elems < 1000000) ? (false) : (true);
+
+        elapsed = 0.0;
+        tic(timer);
+
+        for (int i = 1; i < streams; ++i) {
+            pA1[i] = pB[i] + pC[i];
+        }
+        #pragma omp parallel for default(shared) schedule(static)
+        for (int i = streams; i < num_elems; i+=streams) {
+            SIMD_INT vb = simd_load(&pB[i], streams, strm_mem);
+            SIMD_INT vc = simd_load(&pC[i], streams, strm_mem);
+            SIMD_INT va = simd_add_32(vb, vc);
+            simd_store(&pA1[i], va, streams, strm_mem);
+        }
+        for (int i = 1; i < streams; ++i) {
+            D1[i] = pE[i] - pA1[i-1];
+        }
+        #pragma omp parallel for default(shared) schedule(static)
+        for (int i = streams; i < num_elems; i+=streams) {
+            SIMD_INT ve = simd_load(&pE[i], streams, strm_mem);
+            SIMD_INT va = simd_loadu(&pA1[i-1]);
+            SIMD_INT vd = simd_sub_32(ve, va);
+            simd_store(&D1[i], vd, streams, strm_mem);
+        }
+
+        elapsed = toc(timer);
+        printf("(SIMD) Elapsed time is %f seconds for %d elements, offset by %d elements\n", elapsed, num_elems, offset_elems);
+
+        for (int i = 1; i < num_elems; ++i) {
+            D2[i] = pE[i] - pA2[i-1];
+            pA2[i] = pB[i] + pC[i];
+        }
+
+        test_result += validate_test_arrays(test_type, (void *)D1, (void *)D2, num_elems);
+        test_result += validate_test_arrays(test_type, (void *)pA1, (void *)pA2, num_elems);
+
+        FREE(A1); pA1 = NULL;
+        FREE(A2); pA2 = NULL;
+        FREE(B); pB = NULL;
+        FREE(C); pC = NULL;
+        FREE(D1);
+        FREE(D2);
+        FREE(E); pE = NULL;
     }
 
     return test_result;
