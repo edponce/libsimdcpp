@@ -248,9 +248,9 @@ int manager_main(int * const manager_to_worker, int * const worker_to_manager, c
  */
 pid_t create_workers(int * const manager_to_worker, const int num_workers)
 {
-    const pid_t manager_pid = getpid();;
+    const pid_t manager_pid = getpid();
     pid_t worker_pid = (pid_t)-1;
-    pid_t *workers = (pid_t *)malloc(num_workers * sizeof(pid_t));
+    //pid_t *workers = (pid_t *)malloc(num_workers * sizeof(pid_t));
 
     // Spawn pool of worker processes
     for (int current_worker = 0; current_worker < num_workers; ++current_worker) {
@@ -267,11 +267,11 @@ pid_t create_workers(int * const manager_to_worker, const int num_workers)
         // Break out of loop to prevent recursive forks
         else if (!worker_pid)
             break;
-        else
-            workers[current_worker] = worker_pid;
+        //else
+        //    workers[current_worker] = worker_pid;
     }
 
-    free(workers); workers = NULL;
+    //free(workers); workers = NULL;
 
     return worker_pid;
 }
@@ -279,7 +279,7 @@ pid_t create_workers(int * const manager_to_worker, const int num_workers)
 
 int cancel_workers(int * const manager_to_worker, const int num_workers)
 {
-    const pid_t manager_pid = getpid();;
+    const pid_t manager_pid = getpid();
 
     // Cancel active workers
     //for (int previous_worker = current_worker - 1; previous_worker >= 0; --previous_worker) {

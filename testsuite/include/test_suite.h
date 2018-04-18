@@ -12,6 +12,7 @@
  */
 
 
+#include <sys/types.h> // pid_t
 #include "test_simd.h"
 
 
