@@ -23,7 +23,7 @@ using std::endl;
 #define ELEM_OFFS 0
 
 #define N 16
-#define DATATYPE 0 // 0 = int32, 1 = flt32, 2 = flt64
+#define DATATYPE 2 // 0 = int32, 1 = flt32, 2 = flt64
 
 #if DATATYPE == 0
 #   define VCLASS int32_v
@@ -101,7 +101,7 @@ int main(int argc, char *argv[])
     if (posix_memalign((void **)&C2, alignment, n * sizeof(STYPE)))
         _Exit(EXIT_FAILURE);
 
-    #pragma omp parallel for simd default(shared) schedule(static) num_threads(NUM_THREADS) if(NUM_THREADS > 1)
+    #pragma omp parallel for simd default(shared) schedule(static) num_threads(NUM_THREADS)
     for (size_t i = elem_offs; i < n; ++i) {
         C2[i] = A[i] + B[i];
     }
@@ -141,6 +141,7 @@ int main(int argc, char *argv[])
     tic(timer);
 
     C1 = add(&A[elem_offs], &B[elem_offs], n - elem_offs);
+    //C1 = add(A, B, n);
 
     elapsed = toc(timer);
     cout << "Elapsed time (OO version): " << elapsed << " seconds" << endl;

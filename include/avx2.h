@@ -903,8 +903,8 @@ SIMD_INT simd_sll_64(const SIMD_INT va, const int8_t shft)
 { return _mm256_slli_epi64(va, shft); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_sll_128(const SIMD_INT va, const int8_t shft)
-{ return _mm256_slli_si128(va, shft); }
+SIMD_INT simd_sll_256(const SIMD_INT va, const int8_t shft)
+{ return _mm256_slli_si256(va, shft); }
 
 static SIMD_FUNC_INLINE
 SIMD_INT simd_srl_16(const SIMD_INT va, const int8_t shft)
@@ -919,8 +919,8 @@ SIMD_INT simd_srl_64(const SIMD_INT va, const int8_t shft)
 { return _mm256_srli_epi64(va, shft); }
 
 static SIMD_FUNC_INLINE
-SIMD_INT simd_srl_128(const SIMD_INT va, const int8_t shft)
-{ return _mm256_srli_si128(va, shft); }
+SIMD_INT simd_srl_256(const SIMD_INT va, const int8_t shft)
+{ return _mm256_srli_si256(va, shft); }
 
 #if !defined(__clang__)
 /*
