@@ -20,7 +20,7 @@ GVL library consists of several layers:
 - C++ object oriented (and templates) APIs
 - Multi-core dispatcher using OpenMP
 
-<img src="doc/figures/gvl_arch.png" alt="GVL Architecture" width="200"/>
+<img src="doc/figures/gvl_arch.png" alt="GVL Architecture" width="600"/>
 
 GVL vector instruction sets supported are:
 - Intel SIMD intrinsics
