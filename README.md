@@ -1,10 +1,10 @@
 # GVL - Generic Vector Library
 
-High-performance processors are pervasive in current computing systems
+High-performance processors are ubiquitous in current computing systems
 and have wide vector units.
 The common approach for programming these is via high-level languages,
 such as C and C++, and letting compilers automatically vectorize.
-While compilers have been very successfull at analyzing vectorization
+While compilers have been very successful at analyzing vectorization
 opportunities, in certain circumstances the programmer wants to tune the code
 explicitly.
 Moreover, vector instructions vary between processor vendors and compilers.
@@ -20,7 +20,7 @@ GVL library consists of several layers:
 - C++ object oriented (and templates) APIs
 - Multi-core dispatcher using OpenMP
 
-![alt text](doc/figures/gvl_arch.png "GVL Architecture")
+<img src="doc/figures/gvl_arch.png" alt="GVL Architecture" width="200"/>
 
 GVL vector instruction sets supported are:
 - Intel SIMD intrinsics
@@ -59,7 +59,7 @@ It seems this is due to compiler (GCC) not providing automatic
 support for large vector datatypes.
 
 
-## General issues with automatic parallelization
+## General issues with automatic parallelism
 
 1. Data dependencies
 1. Data races
