@@ -1,7 +1,6 @@
 #ifndef _SIMD_H
 #define _SIMD_H
 
-
 /*
  *  If SIMD_MODE is enabled, use compiler flags to auto-select best SIMD mode supported
  *  Auto-select SIMD support has priority over specific SIMD support

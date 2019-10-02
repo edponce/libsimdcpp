@@ -36,11 +36,11 @@
  *  AVX512 512-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
-const int SIMD_WIDTH_BITS = 512;
-const int SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
-const int SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
-const int SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
-const int SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
+const int32_t SIMD_WIDTH_BITS = 512;
+const int32_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
+const int32_t SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
+const int32_t SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
+const int32_t SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
 typedef __m512i SIMD_INT;
 typedef __m512  SIMD_FLT;
 typedef __m512d SIMD_DBL;

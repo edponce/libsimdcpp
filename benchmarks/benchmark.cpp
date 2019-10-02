@@ -16,10 +16,10 @@ using std::endl;
 #define FREE(p) do { if(p) { free(p); p = NULL; } } while(0)
 
 #define CLASSIC_VERSION 1
-#define FUNC_VERSION 0
-#define OO_VERSION 1
+#define FUNC_VERSION 1
+#define OO_VERSION 0
 #define VALIDATE_VERSIONS 1
-#define NUM_THREADS 2
+#define NUM_THREADS 1
 #define ELEM_OFFS 0
 
 #define N 16

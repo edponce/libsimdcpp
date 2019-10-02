@@ -1,3 +1,4 @@
+
 /*!
  *  \defgroup SSE4_2 SSE4.2
  *  \brief SIMD interface for SSE4.2 (128-bit wide vector registers)
@@ -970,12 +971,12 @@ namespace SSE4_2 {
 #include <stdint.h>
 
 
-const size_t SIMD_WIDTH_BITS = 128;
-const size_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
-const size_t SIMD_STREAMS_8 = SIMD_WIDTH_BYTES;
-const size_t SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / sizeof(int16_t);
-const size_t SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / sizeof(int32_t);
-const size_t SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / sizeof(int64_t);
+const int32_t SIMD_WIDTH_BITS = 128;
+const int32_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
+const int32_t SIMD_STREAMS_8 = SIMD_WIDTH_BYTES;
+const int32_t SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / sizeof(int16_t);
+const int32_t SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / sizeof(int32_t);
+const int32_t SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / sizeof(int64_t);
 typedef __m128i SIMD_INT;
 typedef __m128  SIMD_FLT;
 typedef __m128d SIMD_DBL;
@@ -1022,6 +1023,22 @@ SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_add_pd(va, vb); }
 
 static SIMD_FUNC_INLINE
+SIMD_INT simd_hadd_16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_hadd_epi16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_hadd_32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_hadd_epi32(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_hadd(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm_hadd_ps(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_hadd(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm_hadd_pd(va, vb); }
+
+static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_8(const SIMD_INT va, const SIMD_INT vb)
 { return _mm_sub_epi8(va, vb); }
 
@@ -1044,6 +1061,22 @@ SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm_sub_pd(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_hsub_16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_hsub_epi16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_hsub_32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm_hsub_epi32(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_hsub(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm_hsub_ps(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_hsub(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm_hsub_pd(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_fmadd(const SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)

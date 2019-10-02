@@ -63,4 +63,3 @@ double toc(long int * const timers)
 }
 
 #endif
-

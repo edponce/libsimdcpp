@@ -707,6 +707,22 @@ SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm256_add_pd(va, vb); }
 
 static SIMD_FUNC_INLINE
+SIMD_INT simd_hadd_16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm256_hadd_epi16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_hadd_32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm256_hadd_epi32(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_hadd(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm256_hadd_ps(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_hadd(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm256_hadd_pd(va, vb); }
+
+static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_sub_epi16(va, vb); }
 
@@ -725,6 +741,22 @@ SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm256_sub_pd(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_hsub_16(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm256_hsub_epi16(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_hsub_32(const SIMD_INT va, const SIMD_INT vb)
+{ return _mm256_hsub_epi32(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_hsub(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm256_hsub_ps(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_hsub(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm256_hsub_pd(va, vb); }
 
 static SIMD_FUNC_INLINE
 SIMD_FLT simd_fmadd(SIMD_FLT va, const SIMD_FLT vb, const SIMD_FLT vc)

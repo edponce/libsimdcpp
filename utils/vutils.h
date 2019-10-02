@@ -33,4 +33,3 @@ void simd_print(const char * const, const SIMD_DBL);
 
 
 #endif  // _VUTILS_H
-

@@ -13,9 +13,9 @@ export TOPDIR := $(strip $(patsubst %/, %, $(dir $(MAKEFILE))))
 # icpc: ?
 # clang++: 4.0
 export CXX := g++
-#export CXX := icpc
-#export CXX := clang++-4.0
-#export CXX := powerpc64-linux-gnu-g++-5
+# export CXX := icpc
+# export CXX := clang++-4.0
+# export CXX := powerpc64-linux-gnu-g++-5
 
 # GNU/Intel SIMD extensions
 # -mmmx
@@ -126,11 +126,11 @@ export LIBDIR :=
 export LIBS :=
 
 # Header files
-export HEADERS := $(TOPDIR)/include/*.h
+export HEADERS := $(TOPDIR)/include/*.h $(TOPDIR)/utils/*.h
 
 # SIMD library
 OBJDIR := $(TOPDIR)/obj
-SRC := src/environ.cpp
+SRC := src/environ.cpp utils/utils.cpp utils/vutils.cpp
 export OBJ := $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 
 # Testsuite
@@ -138,6 +138,7 @@ TESTSUITEDIR := testsuite
 
 # Examples
 EXAMPLEDIR := examples
+EXAMPLES := hello_world small_gemv
 
 # Benchmarks
 BENCHMARKDIR := benchmarks
@@ -147,15 +148,19 @@ BENCHSUITEDIR := benchsuite
 
 #######################################
 
-# Targets that are not real files
+# Targets that get executed even if files of those names exist
 .PHONY: all clean simd clean_testsuite clean_example clean_benchmark clean_all doc
 
-all: simd testsuite example benchmark
+all: simd testsuite #example #benchmark
 
 # SIMD library
 simd: $(OBJ)
 
 $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE)
+	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
+	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
+
+$(OBJDIR)/%.o: utils/%.cpp $(HEADERS) $(MAKEFILE)
 	@test ! -d $(OBJDIR) && mkdir $(OBJDIR) || true
 	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
@@ -171,10 +176,14 @@ clean_testsuite:
 
 # Examples
 example: simd
-	$(MAKE) -C $(EXAMPLEDIR)
+	@for dir in $(addprefix $(EXAMPLEDIR)/,$(EXAMPLES)); do \
+		$(MAKE) -C $$dir; \
+	done
 
 clean_example:
-	$(MAKE) -C $(EXAMPLEDIR) clean
+	@for dir in $(addprefix $(EXAMPLEDIR)/,$(EXAMPLES)); do \
+		$(MAKE) -C $$dir clean; \
+	done
 
 # Benchmarks
 benchmark: simd
@@ -194,4 +203,3 @@ clean_all: clean clean_testsuite clean_example clean_benchmark
 
 doc:
 	doxygen Doxyfile
-

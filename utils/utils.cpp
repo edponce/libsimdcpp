@@ -18,8 +18,9 @@ int setOmpEnv(const int num_threads)
     int nt;
 
 #if defined(_OPENMP)
-    if (getenv("OMP_NUM_THREADS"))
-        nt = (num_threads > 0) ? (num_threads) : OMP_NUM_THREADS;
+    char *envval = NULL;
+    if ((envval = getenv("OMP_NUM_THREADS")))
+        nt = (num_threads > 0) ? (num_threads) : atoi(envval);
     else
         nt = (num_threads > 0) ? (num_threads) : 1;
     omp_set_num_threads(nt);
@@ -189,4 +190,3 @@ long int getL3LineSz()
 
 long int getL3Assoc()
 { return sysconf(_SC_LEVEL3_CACHE_ASSOC); }
-

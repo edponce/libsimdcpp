@@ -1,6 +1,12 @@
 # Eduardo Ponce
-# 11/2017
-# Makefile for libsimdcpp-examples
+# 08/2019
+
+# Defaults
+TOPDIR ?= ../../
+CXX ?= icpc
+SIMDFLAGS ?= -march=native -mtune=native
+CXXFLAGS ?= $(SIMDFLAGS) -pedantic -Wall -Wextra -Wno-unknown-pragmas -O3 -std=c++98
+LFLAGS ?= -funroll-loops
 
 # Compiler and linker options
 CXXFLAGS +=
@@ -9,10 +15,10 @@ CXXFLAGS +=
 LFLAGS +=
 
 # Preprocessor definitions
-DEFINES +=
+DEFINES ?= -DSIMD_MODE
 
 # Define header paths in addition to standard paths
-INCDIR +=
+INCDIR ?= -I$(TOPDIR)/include
 
 # Define library paths in addition to standard paths
 LIBDIR +=
@@ -23,22 +29,25 @@ LIBS +=
 # Header files
 HEADERS +=
 
+# SIMD library
+OBJ ?= $(TOPDIR)/obj/environ.o
+
 # Example
 OBJDIR := obj
 SRC :=
 OBJ += $(patsubst %.cpp, $(OBJDIR)/%.o, $(notdir $(SRC)))
 
 DRIVER := example.cpp
-EXE := example
+BIN := example
 
 #######################################
 
 # Targets that are not real files
 .PHONY: all clean
 
-all: $(EXE)
+all: $(BIN)
 
-$(EXE): $(DRIVER) $(OBJ) $(HEADERS) $(MAKEFILE_LIST)
+$(BIN): $(DRIVER) $(OBJ) $(HEADERS) $(MAKEFILE_LIST)
 	$(CXX) $(CXXFLAGS) $(LFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) $< -o $@ $(OBJ) $(LIBS)
 
 $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
@@ -46,6 +55,5 @@ $(OBJDIR)/%.o: src/%.cpp $(HEADERS) $(MAKEFILE_LIST)
 	$(CXX) $(CXXFLAGS) $(DEFINES) $(INCDIR) $(LIBDIR) -c $< -o $@ $(LIBS)
 
 clean:
-	rm -f $(EXE)
+	rm -f $(BIN)
 	rm -rf $(OBJDIR)
-

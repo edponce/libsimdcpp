@@ -36,11 +36,11 @@
  *  AVX 256-bit wide vector units
  *  Define constants required for SIMD module to function properly.
  */
-const int SIMD_WIDTH_BITS = 256;
-const int SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
-const int SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
-const int SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
-const int SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
+const int32_t SIMD_WIDTH_BITS = 256;
+const int32_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
+const int32_t SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / 2;
+const int32_t SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / 4;
+const int32_t SIMD_STREAMS_64 = SIMD_WIDTH_BYTES / 8;
 typedef __m256i SIMD_INT;
 typedef __m256  SIMD_FLT;
 typedef __m256d SIMD_DBL;
@@ -136,6 +136,64 @@ SIMD_DBL simd_add(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm256_add_pd(va, vb); }
 
 static SIMD_FUNC_INLINE
+SIMD_INT simd_hadd_16(const SIMD_INT va, const SIMD_INT vb)
+{
+    int16_t sa[SIMD_STREAMS_16] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    int16_t sb[SIMD_STREAMS_16] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm256_store_si256((SIMD_INT *)sa, va);
+    _mm256_store_si256((SIMD_INT *)sb, vb);
+
+    sa[0] += sa[1];
+    sa[1] = sa[2] + sa[3];
+    sa[2] = sa[4] + sa[5];
+    sa[3] = sa[6] + sa[7];
+    sa[4] = sb[0] + sb[1];
+    sa[5] = sb[2] + sb[3];
+    sa[6] = sb[4] + sb[5];
+    sa[7] = sb[6] + sb[7];
+    sa[8] += sa[9];
+    sa[9] = sa[10] + sa[11];
+    sa[10] = sa[12] + sa[13];
+    sa[11] = sa[14] + sa[15];
+    sa[12] = sb[8] + sb[9];
+    sa[13] = sb[10] + sb[11];
+    sa[14] = sb[12] + sb[13];
+    sa[15] = sb[14] + sb[15];
+
+    return _mm256_load_si256((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_hadd_32(const SIMD_INT va, const SIMD_INT vb)
+{
+    int32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    int32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm256_store_si256((SIMD_INT *)sa, va);
+    _mm256_store_si256((SIMD_INT *)sb, vb);
+
+    sa[0] += sa[1];
+    sa[1] = sa[2] + sa[3];
+    sa[2] = sb[0] + sb[1];
+    sa[3] = sb[2] + sb[3];
+    sa[4] += sa[5];
+    sa[5] = sa[6] + sa[7];
+    sa[6] = sb[4] + sb[5];
+    sa[7] = sb[6] + sb[7];
+
+    return _mm256_load_si256((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_hadd(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm256_hadd_ps(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_hadd(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm256_hadd_pd(va, vb); }
+
+static SIMD_FUNC_INLINE
 SIMD_INT simd_sub_i16(const SIMD_INT va, const SIMD_INT vb)
 { return _mm256_sub_epi16(va, vb); }
 
@@ -188,6 +246,64 @@ SIMD_FLT simd_sub(const SIMD_FLT va, const SIMD_FLT vb)
 static SIMD_FUNC_INLINE
 SIMD_DBL simd_sub(const SIMD_DBL va, const SIMD_DBL vb)
 { return _mm256_sub_pd(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_hsub_16(const SIMD_INT va, const SIMD_INT vb)
+{
+    int16_t sa[SIMD_STREAMS_16] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    int16_t sb[SIMD_STREAMS_16] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm256_store_si256((SIMD_INT *)sa, va);
+    _mm256_store_si256((SIMD_INT *)sb, vb);
+
+    sa[0] -= sa[1];
+    sa[1] = sa[2] - sa[3];
+    sa[2] = sa[4] - sa[5];
+    sa[3] = sa[6] - sa[7];
+    sa[4] = sb[0] - sb[1];
+    sa[5] = sb[2] - sb[3];
+    sa[6] = sb[4] - sb[5];
+    sa[7] = sb[6] - sb[7];
+    sa[8] -= sa[9];
+    sa[9] = sa[10] - sa[11];
+    sa[10] = sa[12] - sa[13];
+    sa[11] = sa[14] - sa[15];
+    sa[12] = sb[8] - sb[9];
+    sa[13] = sb[10] - sb[11];
+    sa[14] = sb[12] - sb[13];
+    sa[15] = sb[14] - sb[15];
+
+    return _mm256_load_si256((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_INT simd_hsub_32(const SIMD_INT va, const SIMD_INT vb)
+{
+    int32_t sa[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+    int32_t sb[SIMD_STREAMS_32] SIMD_ALIGNED(SIMD_WIDTH_BYTES);
+
+    _mm256_store_si256((SIMD_INT *)sa, va);
+    _mm256_store_si256((SIMD_INT *)sb, vb);
+
+    sa[0] -= sa[1];
+    sa[1] = sa[2] - sa[3];
+    sa[2] = sb[0] - sb[1];
+    sa[3] = sb[2] - sb[3];
+    sa[4] -= sa[5];
+    sa[5] = sa[6] - sa[7];
+    sa[6] = sb[4] - sb[5];
+    sa[7] = sb[6] - sb[7];
+
+    return _mm256_load_si256((SIMD_INT *)sa);
+}
+
+static SIMD_FUNC_INLINE
+SIMD_FLT simd_hsub(const SIMD_FLT va, const SIMD_FLT vb)
+{ return _mm256_hsub_ps(va, vb); }
+
+static SIMD_FUNC_INLINE
+SIMD_DBL simd_hsub(const SIMD_DBL va, const SIMD_DBL vb)
+{ return _mm256_hsub_pd(va, vb); }
 
 /*!
  *  Fused multiply-add/sub for 32/64-bit floating-point elements
