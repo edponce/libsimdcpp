@@ -1,0 +1,2 @@
+Need to run CPUID and create a header file defining features available.
+This will allow to set up code at compile time and control headers/functions not always available.
