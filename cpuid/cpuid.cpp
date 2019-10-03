@@ -2,9 +2,21 @@
  * CPUID
  *
  * Details obtained from Wikipedia and Intel Developer's Guide
+ *
  * Examples:
  *   https://trac.wildfiregames.com/browser/ps/trunk/source/lib/sysdep/arch/x86_x64?order=name
  *   https://docs.microsoft.com/en-us/cpp/intrinsics/cpuid-cpuidex?view=vs-2019
+ *   http://www.flounder.com/cpuid_explorer2.htm#CPUID(2)
+ *
+ *   Intel and AMD have CPUID
+ *   ARM has CPUID register which requires EL1 or above to access
+ *   IBM System Z have STIDP (Store CPU ID)
+ *   PowerPC has PVR (Processor Version Register) which requires supervisor access
+ *
+ * Linux alternatives:
+ *   /proc/cpuinfo  
+ *   dmidecode
+ *   sysconf
  */
 
 #include <iostream>
@@ -17,10 +29,18 @@
 //   void __cpuid(int regs[4], int function)  // (subfunction) ECX = 0
 //   void __cpuidex(int regs[4], int function, int subfunction)
 #  include <intrin.h>
-#  define __cpuid__ __cpuid 
+#  define __cpuid__(r, f)       __cpuid((r), (f))
+#  define __cpuidex__(r, f, sf) __cpuidex((r), (f), (sf))
 #elif defined(__GNUC__)
 #  include <cpuid.h>
-#  define __cpuid__(regs, func) ((void)__get_cpuid((func), &(regs)[0], &(regs)[1], &(regs)[2], &(regs)[3]))
+#  define __cpuid__(r, f) ((void)__get_cpuid((f), &(r)[0], &(r)[1], &(r)[2], &(r)[3]))
+#  define __cpuidex__(r, f, sf) \
+     asm volatile ("cpuid"      \
+         : "=a" ((r)[0]),       \
+           "=b" ((r)[1]),       \
+           "=c" ((r)[2]),       \
+           "=d" ((r)[3])        \
+         : "a" ((f)), "c" ((sf)))
 #else
 #  error "Old MSC compiler are not supported."
 #endif
@@ -84,6 +104,8 @@ enum {
 
 // Main features for x86 systems.
 struct features {
+    std::string manufacturer_id;
+    std::string processor_id;
     int clsize = 0;  // cache line size
     bool clflush = 0;
     bool clflushopt = 0;
@@ -121,6 +143,14 @@ struct features {
 ///////////////////////////////////////////////////////////////////////////////
 // CPUID instruction
 ///////////////////////////////////////////////////////////////////////////////
+union cpuid_info cpuidex(uint32_t function, uint32_t subfunction)
+{
+    union cpuid_info info;
+    __cpuidex__(info.regs, function, subfunction);
+    return info;
+}
+
+
 union cpuid_info cpuid(uint32_t function)
 {
     // EAX=0: Highest function parameter and manufacturer ID
@@ -136,8 +166,8 @@ union cpuid_info cpuid(uint32_t function)
     // EAX=80000006: Extended L2 cache features
     // EAX=80000007: Advanced power management info
     // EAX=80000008: Virtual and physical address sizes
-    const uint32_t subfunction = 0;  // ECX
-    union cpuid_info info;
+//    const uint32_t subfunction = 0;  // ECX
+//    union cpuid_info info;
 //    asm volatile (
 //        "cpuid" : "=a" (info.eax),
 //                  "=b" (info.ebx),
@@ -145,8 +175,9 @@ union cpuid_info cpuid(uint32_t function)
 //                  "=d" (info.edx)
 //                : "a" (function), "c" (subfunction)
 //    );
-    __cpuid__(info.regs, function);
-    return info;
+//    __cpuid__(info.regs, function);
+//    return info;
+    return cpuidex(function, 0);
 }
 
 
@@ -196,10 +227,13 @@ std::string processor_id()
 }
 
 
-struct features features_supported()
+struct features get_features()
 {
     struct features vf;
     union cpuid_info info;
+
+    vf.manufacturer_id = manufacturer_id();
+    vf.processor_id = processor_id(); 
 
     uint32_t hf = highest_function();
     if (hf >= 1) {
@@ -233,7 +267,7 @@ struct features features_supported()
         vf.avx512fmaps = CHECK_BIT(info.edx, AVX512FMAPS);
     }
 
-    uint32_t hxf = highest_function();
+    uint32_t hxf = highest_extended_function();
     if (hxf >= 1) {
         info = cpuid(0x80000001);
         vf._fma4 = CHECK_BIT(info.ecx, _FMA4);
@@ -263,10 +297,10 @@ int main()
 {
     std::cout << "CPUID level: " << highest_function() << std::endl;
     std::cout << "CPUID extended level: " << highest_extended_function() << std::endl;
-    std::cout << "Manufacturer ID: " << manufacturer_id() << std::endl;
-    std::cout << "Processor ID: " << processor_id() << std::endl;
 
-    struct features vf = features_supported();
+    struct features vf = get_features();
+    std::cout << "Manufacturer ID: " << vf.manufacturer_id << std::endl;
+    std::cout << "Processor ID: " << vf.processor_id << std::endl;
     std::cout << "Cache line size (B): " << vf.clsize << std::endl;
     std::cout << "CLFLUSH: " << vf.clflush << std::endl;
     std::cout << "CLFLUSHOPT: " << vf.clflushopt << std::endl;
