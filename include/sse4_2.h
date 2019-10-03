@@ -971,8 +971,12 @@ namespace SSE4_2 {
 #include <stdint.h>
 
 
-const int32_t SIMD_WIDTH_BITS = 128;
-const int32_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
+// NOTE: GCC 4.8 does not considers 'const' variables as 'const literals' for macros.
+// This was fixed for GCC 5.3+.
+#define SIMD_WIDTH_BITS 128
+#define SIMD_WIDTH_BYTES ((SIMD_WIDTH_BITS) / 8)
+//const int32_t SIMD_WIDTH_BITS = 128;
+//const int32_t SIMD_WIDTH_BYTES = SIMD_WIDTH_BITS / 8;
 const int32_t SIMD_STREAMS_8 = SIMD_WIDTH_BYTES;
 const int32_t SIMD_STREAMS_16 = SIMD_WIDTH_BYTES / sizeof(int16_t);
 const int32_t SIMD_STREAMS_32 = SIMD_WIDTH_BYTES / sizeof(int32_t);

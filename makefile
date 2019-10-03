@@ -31,6 +31,7 @@ SIMDFLAGS += -msse3 -mssse3 -msse4.1 -msse4.2
 #SIMDFLAGS += -xsse3 -xssse3 -xsse4.1 -xsse4.2
 #SIMDFLAGS += -mavx
 #SIMDFLAGS += -mavx2
+#SIMDFLAGS += -march=skylake-avx512
 #SIMDFLAGS += -mavx512f -mavx512bw -mavx512dq
 #SIMDFLAGS += -mfma
 #SIMDFLAGS += -xMIC-AVX512

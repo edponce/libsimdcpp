@@ -50,6 +50,7 @@
 // NOTE: This compiler check is last because the meaning of the __GNUC__ macro
 //       has changed subtly over the years, from identifying the GNU C/C++
 //       compiler to identifying any compiler that implements the GNU compiler extensions.
+//       Need to check the use of GCC_VERSION.
 #elif defined(__GNUC__)
 #   if defined(__GNUC_PATCHLEVEL__)
 #       define GNUC_VERSION (__GNUC__ * 10000 + __GNUC_MINOR__ * 100 + __GNUC_PATCHLEVEL__)  // VVRPP

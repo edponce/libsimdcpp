@@ -89,10 +89,10 @@ int detectProcSIMD()
     if (!CPU_SUPPORTS("avx2"))
         support = 0;
 #endif
-#if defined(__AVX512BW__)
-    if (!CPU_SUPPORTS("avx512BW"))
-        support = 0;
-#endif
+//#if defined(__AVX512BW__)
+//    if (!CPU_SUPPORTS("avx512BW"))
+//        support = 0;
+//#endif
 
     return support;
 

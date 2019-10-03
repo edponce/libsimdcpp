@@ -28,9 +28,9 @@ struct TEST_T {
 struct TEST_T TESTS[] =
 {
     //{ test_simd_add_classic, "(Dummy warm-up) Add signed 32-bit integers" },
-    { test_simd_add_oo, "(SIMD OO) Add signed 32-bit integers" },
-    { test_simd_add_func, "(SIMD function) Add signed 32-bit integers" },
     { test_simd_add_classic, "(Classic) Add signed 32-bit integers" },
+    { test_simd_add_func, "(SIMD function) Add signed 32-bit integers" },
+    { test_simd_add_oo, "(SIMD OO) Add signed 32-bit integers" },
     //{ test_simd_loop_dependence_classic, "(Classic) Loop dependence" },
     //{ test_simd_loop_dependence, "(SIMD) Loop dependence" },
     //{ test_simd_loop_dependence2, "(SIMD) Loop dependence 2" },
