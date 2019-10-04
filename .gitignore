@@ -6,5 +6,6 @@ examples/example
 benchmarks/benchmark
 benchmarks/timers/timer
 cpuid/cpuid
+cpuid/cacheflush
 html/
 NOTES
